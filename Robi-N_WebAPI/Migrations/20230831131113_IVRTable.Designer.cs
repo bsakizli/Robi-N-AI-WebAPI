@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230831131113_IVRTable")]
+    partial class IVRTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,6 +60,43 @@ namespace Robi_N_WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RBN_AI_SERVICE_USERS");
+                });
+
+            modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.IVR_HOLIDAY_DAYS", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("active")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("addDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("displayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("endDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("holidayDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("holidayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("startDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("updateDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IVR_HOLIDAY_DAYS");
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_AI_SERVICE_ROLE", b =>
@@ -110,46 +150,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RBN_AI_SERVICE_ROLES_MAP");
-                });
-
-            modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_HOLIDAY_DAYS", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("addDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("displayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("endDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("holidayDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("holidayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("startDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("updateDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RBN_IVR_HOLIDAY_DAYS");
                 });
 #pragma warning restore 612, 618
         }

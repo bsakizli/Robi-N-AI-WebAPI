@@ -11,5 +11,6 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<ApiUsers> RBN_AI_SERVICE_USERS { get; set; }  
         public DbSet<RBN_AI_SERVICE_ROLES_MAP> RBN_AI_SERVICE_ROLES_MAP { get; set; }  
         public DbSet<RBN_AI_SERVICE_ROLE> RBN_AI_SERVICE_ROLE { get; set; }  
+        public DbSet<RBN_IVR_HOLIDAY_DAYS> RBN_IVR_HOLIDAY_DAYS { get; set; }  
     }
 }
