@@ -13,10 +13,13 @@ using static Robi_N_WebAPI.Model.Request.requestVoiceIVRApplication;
 using static Robi_N_WebAPI.Model.Response.responseVoiceIVRApplication;
 using static Robi_N_WebAPI.Model.Response.responseVoiceIVRApplication.GoogleCalender;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class VoiceIVRApplicationController : ControllerBase
     {
