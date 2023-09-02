@@ -7,16 +7,16 @@ using System.Text.Encodings.Web;
 using System.Text;
 using Robi_N_WebAPI.Services;
 
-namespace Robi_N_WebAPI.Authentication.Basic
+namespace Robi_N_WebAPI.Authentication.basic
 {
-    public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public class basicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         #region Property
         readonly IUserService _userService;
         #endregion
 
         #region Constructor
-        public BasicAuthenticationHandler(IUserService userService,
+        public basicAuthenticationHandler(IUserService userService,
             IOptionsMonitor<AuthenticationSchemeOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
