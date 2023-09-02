@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
@@ -5,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Robi_N_WebAPI.Authentication.Basic;
 using Robi_N_WebAPI.Model;
+using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
 using System.Text;
 
@@ -13,7 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -60,7 +64,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement {
-   {
+    {
      new OpenApiSecurityScheme
      {
        Reference = new OpenApiReference
@@ -74,6 +78,39 @@ builder.Services.AddSwaggerGen(options =>
   });
 });
 
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BasicAuth", Version = "v1" });
+    c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "basic",
+        In = ParameterLocation.Header,
+        Description = "Basic Authorization header using the Bearer scheme."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "basic"
+                                }
+                            },
+                            new string[] {}
+                    }
+                });
+});
+
+
+builder.Services.AddAuthentication("BasicAuthentication")
+   .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 {
@@ -105,7 +142,7 @@ app.UseStatusCodePages(async context =>
 {
     if (context.HttpContext.Response.StatusCode == 401)
     {
-       
+
         context.HttpContext.Response.ContentType = "application/json";
         await context.HttpContext.Response.WriteAsync(JsonConvert.SerializeObject(new
         {
@@ -120,7 +157,7 @@ app.UseStatusCodePages(async context =>
 
     if (context.HttpContext.Response.StatusCode == 403)
     {
-      
+
         context.HttpContext.Response.ContentType = "application/json";
         await context.HttpContext.Response.WriteAsync(JsonConvert.SerializeObject(new
         {
@@ -138,7 +175,7 @@ app.UseSwagger();
 //app.UseSwaggerUI();
 //app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v2/swagger.json", "PlaceInfo Services"));
 
-app.UseSwaggerUI( c =>
+app.UseSwaggerUI(c =>
 {
     string swaggerJsonPath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
     c.SwaggerEndpoint($"{swaggerJsonPath}/swagger/v2/swagger.json", "Robin Web API");

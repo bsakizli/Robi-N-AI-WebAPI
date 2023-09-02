@@ -75,36 +75,51 @@ namespace Robi_N_WebAPI.Controllers
             var _date = dateTime.Date;
             var _time = dateTime.TimeOfDay.Ticks;
 
-            if(_time != 0)
+            if(_holidays != null)
             {
-                if (dateTime > _holidays.holidayDate)
+                if (_time != 0)
                 {
-                     globalResponse = new GlobalResponse
+                    if (dateTime > _holidays.holidayDate)
+                    {
+                        globalResponse = new GlobalResponse
+                        {
+                            statusCode = 201,
+                            status = true,
+                            message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
+                        };
+                        return BadRequest(globalResponse);
+                    }
+                    else
+                    {
+                        globalResponse = new GlobalResponse
+                        {
+                            statusCode = 200,
+                            status = false,
+                            message = "You are in working hours."
+                        };
+                        return Ok(globalResponse);
+                    }
+                }
+                else
+                {
+                    globalResponse = new GlobalResponse
                     {
                         statusCode = 201,
                         status = true,
                         message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
                     };
-                }
-                else
-                {
-                     globalResponse = new GlobalResponse
-                    {
-                        statusCode = 200,
-                        status = false,
-                        message = "You are in working hours."
-                    };
+                    return BadRequest(globalResponse);
                 }
             } else
             {
-                 globalResponse = new GlobalResponse
+                globalResponse = new GlobalResponse
                 {
-                    statusCode = 201,
-                    status = true,
-                    message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
+                    statusCode = 200,
+                    status = false,
+                    message = "You are in working hours."
                 };
+                return BadRequest(globalResponse);
             }
-            return Ok(globalResponse);
         }
 
 
