@@ -10,6 +10,8 @@ using Robi_N_WebAPI.Authentication.Basic;
 using Robi_N_WebAPI.Model;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -106,6 +108,21 @@ builder.Services.AddSwaggerGen(c =>
                 });
 });
 
+//Log.Logger = new LoggerConfiguration()
+//    .ReadFrom.Configuration(builder.Configuration)
+//    .CreateLogger();
+
+
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo
+    .MSSqlServer(
+        connectionString: builder.Configuration["ConnectionStrings:DefaultConnection"] /*"Server=localhost;Database=LogDb;Integrated Security=SSPI;"*/,
+        sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs" })
+    .CreateLogger();
+
+
+builder.Host.UseSerilog();
 
 builder.Services.AddAuthentication("BasicAuthentication")
    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
@@ -136,7 +153,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-
+app.UseSerilogRequestLogging();
 
 app.UseStatusCodePages(async context =>
 {

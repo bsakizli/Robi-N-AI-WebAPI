@@ -22,11 +22,13 @@ namespace Robi_N_WebAPI.Controllers
     {
         private readonly JwtSettings _JwtSettings;
         private readonly AIServiceDbContext _db;
+        private readonly ILogger<IdentityCheckController> _logger;
 
         PBKDF2 crypto = new PBKDF2();
 
-        public IdentityCheckController(AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
+        public IdentityCheckController(ILogger<IdentityCheckController> logger,AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
+            _logger = logger;
             _db = db;
             _JwtSettings = JwtSettings.Value;
         }
