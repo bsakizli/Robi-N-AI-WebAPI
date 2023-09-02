@@ -46,32 +46,41 @@ builder.Services.AddAuthentication(opt =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        ValidAlgorithms = new List<string>() { "RS256" },
-        AuthenticationType = "JWT",
-        IssuerSigningKey = new RsaSecurityKey(rsa)
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? String.Empty))
+
+        //ValidateIssuer = true,
+        //ValidateAudience = true,
+        //ValidateLifetime = true,
+        //ValidateIssuerSigningKey = true,
+        //ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        //ValidAudience = builder.Configuration["Jwt:Audience"],
+        //ValidAlgorithms = new List<string>() { "RS256" },
+        //AuthenticationType = "JWT",
+        ////IssuerSigningKey = new RsaSecurityKey(rsa)
+        //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? String.Empty))
     };
 
-    options.Events = new JwtBearerEvents()
-    {
-        OnMessageReceived = context =>
-        {
-            var Token = context.Request.Headers["Authorization"].ToString();
-            context.Token = Token;
-            return Task.CompletedTask;
-        },
-        OnAuthenticationFailed = context =>
-        {
-            return Task.CompletedTask;
-        },
-        OnChallenge = context =>
-        {
-            return Task.CompletedTask;
-        },
-        OnTokenValidated = context =>
-        {
-            return Task.CompletedTask;
-        }
-    };
+    //options.Events = new JwtBearerEvents()
+    //{
+    //    OnMessageReceived = context =>
+    //    {
+    //        var Token = context.Request.Headers["Authorization"].ToString();
+    //        context.Token = Token;
+    //        return Task.CompletedTask;
+    //    },
+    //    OnAuthenticationFailed = context =>
+    //    {
+    //        return Task.CompletedTask;
+    //    },
+    //    OnChallenge = context =>
+    //    {
+    //        return Task.CompletedTask;
+    //    },
+    //    OnTokenValidated = context =>
+    //    {
+    //        return Task.CompletedTask;
+    //    }
+    //};
 
     options.Validate();
 
@@ -100,8 +109,8 @@ builder.Services.AddAuthentication(opt =>
     {
         OnMessageReceived = context =>
         {
-            var Token = context.Request.Headers["Authorization"].ToString();
-            context.Token = Token;
+            //var Token = context.Request.Headers["Authorization"].ToString();
+            //context.Token = Token;
             return Task.CompletedTask;
         },
         OnAuthenticationFailed = context =>
@@ -125,20 +134,30 @@ builder.Services.AddAuthentication(opt =>
 {
     options.ForwardDefaultSelector = context =>
     {
+      
         string authorization = context.Request.Headers[HeaderNames.Authorization];
-
         {
 
-            var jwtHandler = new JwtSecurityTokenHandler();
-            if (jwtHandler.CanReadToken(authorization))
+            if(authorization != null)
             {
-                var issuer = jwtHandler.ReadJwtToken(authorization).Issuer;
-                if (issuer == builder.Configuration["Jwt:Issuer"])
+                var tt = authorization.Contains("Bearer");
+
+                if (authorization.Contains("Bearer"))
                 {
                     return "Bearer";
                 }
+            } 
+            
+            //var jwtHandler = new JwtSecurityTokenHandler();
+            //if (jwtHandler.CanReadToken(authorization))
+            //{
+            //    var issuer = jwtHandler.ReadJwtToken(authorization).Issuer;
+            //    if (issuer == builder.Configuration["Jwt:Issuer"])
+            //    {
+            //        return "Bearer";
+            //    }
 
-            }
+            //}
         }
 
         return "basic";
@@ -174,25 +193,53 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "Please insert JWT with pas Bearer into field",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Scheme = "Bearer",
-        Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+
+
+
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "Bearer"}
-            },
-            new string[] { }
+            In = ParameterLocation.Header,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            Description = "Please insert JWT with Bearer into field",
+            Name = "Authorization",
+            Type = SecuritySchemeType.ApiKey
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+        {
+         new OpenApiSecurityScheme
+         {
+           Reference = new OpenApiReference
+           {
+             Type = ReferenceType.SecurityScheme,
+             Id = "Bearer"
+           }
+          },
+          new string[] { }
         }
     });
+
+
+    //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    //{
+    //    Description = "Please insert JWT with pas Bearer into field",
+    //    Name = "Authorization",
+    //    In = ParameterLocation.Header,
+    //    Scheme = "Bearer",
+    //    Type = SecuritySchemeType.ApiKey,
+    //    BearerFormat = "JWT"
+    //});
+    //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    //{
+    //    {
+    //        new OpenApiSecurityScheme
+    //        {
+    //            Reference = new OpenApiReference{Type = ReferenceType.SecurityScheme, Id = "Bearer"}
+    //        },
+    //        new string[] { }
+    //    }
+    //});
 });
 
 
