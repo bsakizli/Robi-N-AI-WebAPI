@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
@@ -13,6 +13,7 @@ using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
+using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,7 +21,6 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -167,12 +167,18 @@ builder.Services.AddAuthentication(opt =>
 
 builder.Services.AddSwaggerGen(c =>
 {
+  
     c.SwaggerDoc("v2", new OpenApiInfo()
     {
+        Contact = new OpenApiContact { 
+        Name = "Barış Sakızlı",
+        Email = "baris.sakizli@bdh.com.tr"
+        },
+      TermsOfService = new Uri("https://www.bdh.com.tr/"),
       Title = "Robi-N AI API",
       Version = "v2",
       Description = "AI-powered custom solution services"
-    });
+    });;;
 
         c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
     {

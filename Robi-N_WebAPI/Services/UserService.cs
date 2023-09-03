@@ -18,6 +18,7 @@ namespace Robi_N_WebAPI.Services
 
         public bool ValidateCredentials(string _username, string password)
         {
+
             try
             {
                 var _serviceUser = _db.RBN_AI_SERVICE_USERS.Where(x => x.active == true && x.username == _username).FirstOrDefault();
