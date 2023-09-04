@@ -16,6 +16,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using Nancy.Json;
+using ExtendedXmlSerializer.Configuration;
+using ExtendedXmlSerializer;
+using Robi_N_WebAPI.Model.Xml.Response;
+using Nancy.Diagnostics;
+using Newtonsoft.Json;
+using Robi_N_WebAPI.Model.Service.Response;
+using System.Net;
+using System.Text;
+using System.Xml.Serialization;
+using System.Xml;
+using Robi_N_WebAPI.Services;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -26,11 +37,13 @@ namespace Robi_N_WebAPI.Controllers
     {
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IdentityCheckController> _logger;
+        private readonly IConfiguration _configuration;
 
         PBKDF2 crypto = new PBKDF2();
 
-        public VoiceIVRApplicationController(ILogger<IdentityCheckController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
+        public VoiceIVRApplicationController(IConfiguration configuration,ILogger<IdentityCheckController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
+            _configuration = configuration;
             _logger = logger;
             _db = db;
         }
@@ -68,8 +81,8 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-        [HttpGet("getholidayDayCheckDate")]
-        public IActionResult getholidayDayCheckDate(DateTime dateTime)
+        [HttpGet("getHolidayDayCheckDate")]
+        public IActionResult getHolidayDayCheckDate(DateTime dateTime)
         {
             GlobalResponse globalResponse;
 
@@ -151,8 +164,8 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-        [HttpGet("getholidayDayCheckNow")]
-        public IActionResult getholidayDayCheckNow()
+        [HttpGet("getHolidayDayCheckNow")]
+        public IActionResult getHolidayDayCheckNow()
         {
             GlobalResponse globalResponse;
             try
@@ -462,6 +475,92 @@ namespace Robi_N_WebAPI.Controllers
                     status = false,
                     statusCode = 404,
                     message = String.Format("A system error occurred while deleting the holiday description. - Exception: {0}", ex.Message)
+                };
+                var _responseText = new JavaScriptSerializer().Serialize(response);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                return BadRequest(response);
+            }
+        }
+
+
+
+        //private static readonly HttpClient client = new HttpClient();
+        //static async Task Test1()
+        //{
+        //    client.DefaultRequestHeaders.Accept.Clear();
+        //    string baseUrl = "https://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&stationString=KMSP&hoursBeforeNow=2";
+        //    client.BaseAddress = new Uri(baseUrl);
+           
+        //    HttpResponseMessage result = client.GetAsync(baseUrl).Result;
+        //    XmlSerializer serialObject = new XmlSerializer(typeof(responseCSQList.Csqs));
+
+        //    List<responseCSQList.Csq> MetarCollection = new List<responseCSQList.Csq>();
+        //    if (result.IsSuccessStatusCode)
+        //    {
+        //        using (Stream reader = result.Content.ReadAsStreamAsync().Result)
+        //        {
+        //            responseCSQList.Csq metar = new responseCSQList.Csq();
+        //            metar = (responseCSQList.Csq)serialObject.Deserialize(reader);
+        //            MetarCollection.Add(metar);
+        //        }
+        //    }
+            
+        //}
+
+
+        [HttpGet("getCSQList")]
+        public  IActionResult listCSQ()
+        {
+            responseListCSQ response = new responseListCSQ();
+
+            try
+            {
+                UCCXWebService webService = new UCCXWebService(_configuration);
+                var _csqs = webService.getCSQList();
+                if (_csqs.Csq.Count > 0)
+                {
+                    List<responseListCSQ.csq> _csqList = new List<responseListCSQ.csq>();
+                    foreach (var item in _csqs.Csq)
+                    {
+                        responseListCSQ.csq csq = new responseListCSQ.csq
+                        {
+                            name = item.Name
+                        };
+                        _csqList.Add(csq);
+                    }
+
+                    response = new responseListCSQ
+                    {
+                        status = true,
+                        statusCode = 200,
+                        message = "CSQ List achievement.",
+                        csqs = _csqList
+                    };
+
+
+                    var _responseText = new JavaScriptSerializer().Serialize(response);
+                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                    return Ok(response);
+                } else
+                {
+                    response = new responseListCSQ
+                    {
+                        status = false,
+                        statusCode = 201,
+                        message = "CSQ Defined"
+                    };
+                    var _responseText = new JavaScriptSerializer().Serialize(response);
+                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                    return BadRequest(response);
+                }
+
+            } catch
+            {
+                response = new responseListCSQ
+                {
+                    status = false,
+                    statusCode = 500,
+                    message = "CSQ Listing system error."
                 };
                 var _responseText = new JavaScriptSerializer().Serialize(response);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
