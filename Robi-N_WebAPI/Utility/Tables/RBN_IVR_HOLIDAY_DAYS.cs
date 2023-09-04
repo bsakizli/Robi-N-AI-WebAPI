@@ -19,6 +19,7 @@ namespace Robi_N_WebAPI.Utility.Tables
         public DateTime endDate { get; set; }
         [DataType(DataType.Date)]
 
+        public int years { get; set; }
         public DateTime addDate { get; set; }
         public DateTime updateDate { get; set; }
         public bool active { get; set; }

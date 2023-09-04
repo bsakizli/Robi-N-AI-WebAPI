@@ -22,6 +22,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Robi_N_WebAPI.Helper;
+using System.Data;
+using Microsoft.AspNetCore.Rewrite;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -107,6 +109,7 @@ namespace Robi_N_WebAPI.Controllers
                     search.PropertiesToLoad.Add("cn");
                     search.PropertiesToLoad.Add("givenName");
                     search.PropertiesToLoad.Add("sn");
+                    search.PropertiesToLoad.Add("sAMAccountName");
 
                     SearchResult result = search.FindOne();
 
@@ -125,6 +128,7 @@ namespace Robi_N_WebAPI.Controllers
                     else
                     {
                         if (result.Properties["sn"].Count != 0)
+                            properties.Add("userName", result.Properties["sAMAccountName"][0]);
                            properties.Add("LastName", result.Properties["sn"][0]);
                         if (result.Properties["givenName"].Count != 0)
                             properties.Add("FirstName", result.Properties["givenName"][0]);
@@ -136,7 +140,30 @@ namespace Robi_N_WebAPI.Controllers
 
                     //string _fullName = properties.FirstOrDefault(item => "FirstName")?.Value;
                     var _fullName = properties.FirstOrDefault(pair => pair.Key == "FirstName").Value +" " + properties.FirstOrDefault(pair => pair.Key == "LastName").Value;
-             
+                    var _username = properties.FirstOrDefault(pair => pair.Key == "userName").Value.ToString();
+
+                    if (_JwtSettings.Key == null) throw new Exception("JWT key değeri null olamaz");
+
+                    var secKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_JwtSettings.Key));
+                    var credentials = new SigningCredentials(secKey, SecurityAlgorithms.HmacSha256);
+
+                    var claimArray = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, _username!),
+                        new Claim(ClaimTypes.GivenName, _filterAttribute!),
+                        new Claim(ClaimTypes.Name, _fullName!),
+                        //new Claim(ClaimTypes.Role, apiUsers.role!),
+                    };
+
+                    claimArray.Add(new Claim(ClaimTypes.Role, "User"!));
+
+                    var token = new JwtSecurityToken(
+                        _JwtSettings.Issuer,
+                        _JwtSettings.Audience,
+                        claimArray,
+                        expires: DateTime.Now.AddMinutes(Convert.ToDouble(120)),
+                        signingCredentials: credentials
+                        );
 
                     response = new ldapAccessControl
                     {
@@ -144,12 +171,14 @@ namespace Robi_N_WebAPI.Controllers
                         statusCode = 200,
                         message = "LDAP verification is done and login is done.",
                         displayName = _filterAttribute,
-                        fullName = _fullName
+                        userName = properties.FirstOrDefault(pair => pair.Key == "userName").Value.ToString(),
+                        fullName = _fullName,
+                        token = new JwtSecurityTokenHandler().WriteToken(token),
+                        expiredDate = token.ValidTo
                     };
                     var globalResponseResult = new JavaScriptSerializer().Serialize(response);
                     _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), globalResponseResult));
                     return Ok(response);
-
 
                 }
                 else
@@ -211,7 +240,7 @@ namespace Robi_N_WebAPI.Controllers
                 signingCredentials: credentials
                 );
 
-            var tt = DateTime.Now;
+           
 
             responseCreateToken = new responseCreateToken
             {
