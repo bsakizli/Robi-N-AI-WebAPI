@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using ExtendedXmlSerializer.ExtensionModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -148,8 +150,8 @@ builder.Services.AddAuthentication(opt =>
                 {
                     return "Bearer";
                 }
-            } 
-            
+            }
+
             //var jwtHandler = new JwtSecurityTokenHandler();
             //if (jwtHandler.CanReadToken(authorization))
             //{
@@ -281,7 +283,9 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 
 
 builder.Services.AddControllers();
-
+builder.Services.AddMvc().AddXmlDataContractSerializerFormatters();
+builder.Services.AddControllers().AddXmlSerializerFormatters();
+builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddDbContext<AIServiceDbContext>(options =>

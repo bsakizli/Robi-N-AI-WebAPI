@@ -27,6 +27,7 @@ using System.Text;
 using System.Xml.Serialization;
 using System.Xml;
 using Robi_N_WebAPI.Services;
+using Microsoft.Win32;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -63,6 +64,7 @@ namespace Robi_N_WebAPI.Controllers
                     DateTime _startDate = Convert.ToDateTime(item.start.date);
 
                     var Record = _db.Set<RBN_IVR_HOLIDAY_DAYS>();
+                    //_db.RBN_VOICE_SOUNDS.AddObject(Record);
                     Record.Add(new RBN_IVR_HOLIDAY_DAYS
                     {
                         active = true,
@@ -74,7 +76,6 @@ namespace Robi_N_WebAPI.Controllers
                         holidayName = item.summary,
                         years = Convert.ToInt32(_startDate.Year),
                         startDate = Convert.ToDateTime(item.start.date)
-
                     });
                     _db.SaveChanges();
                 }

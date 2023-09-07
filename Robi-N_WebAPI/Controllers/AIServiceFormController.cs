@@ -11,11 +11,20 @@ using SixLabors.ImageSharp;
 using System.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Robi_N_WebAPI.Utility;
+using Robi_N_WebAPI.Model.Request;
+using System.Diagnostics.Eventing.Reader;
+using Newtonsoft.Json;
+using Robi_N_WebAPI.Model.Service.Response;
+using MimeKit;
+using MimeKit.Text;
+using MailKit.Net.Smtp;
+using MailEntity;
 
 namespace Robi_N_WebAPI.Controllers
 {
-    [Route("api/[controller]/[action]")]
-    [Authorize(Roles = "MIS User")]
+    //[Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
+    //[Authorize(Roles = "MIS User")]
     [ApiController]
     public class AIServiceFormController : ControllerBase
     {
@@ -26,16 +35,21 @@ namespace Robi_N_WebAPI.Controllers
         {
             _db = db;
             _configuration = configuration;
-        }   
+        }
 
 
-        [HttpPost]
-        public async Task<ActionResult> FormQRCodeReading(IFormFile ServiceFormPicture)
+        [HttpPost("FormQRCodeReading")]
+        public async Task<ActionResult> FormQRCodeReading(IFormFile ServiceFormPicture, [FromForm]long ticketId, [FromForm]long solutionDate)
         {
             ResponseFormQRCodeReading response;
             try
             {
-                IronBarCode.License.LicenseKey = _configuration.GetValue<string>("IronBarCode.LicenseKey");
+                License.LicenseKey = _configuration.GetValue<string>("IronBarCode.LicenseKey");
+
+                DateTimeOffset _reqestSolutionDateTime = DateTimeOffset.FromUnixTimeSeconds(solutionDate);
+
+                MailService test = new MailService();
+                test.SendMail();
 
                 IList<string> fileExtensionsToAllowed = new List<string> { ".jpg", ".png", ".jpeg" };
                 var uploadedFileExtension = Path.GetExtension(ServiceFormPicture.FileName).ToLower();
@@ -87,24 +101,91 @@ namespace Robi_N_WebAPI.Controllers
                     var resultFromStream = BarcodeReader.Read(bytes, myOptions);
 
                     var results  = resultFromStream.ToList();
+
                     if (results.Count > 0)
                     {
                         var _readResult = results.ToList()[0];
 
-                        response = new ResponseFormQRCodeReading
+                        var _qrResponse = JsonConvert.DeserializeObject<responseFormQRCodeReadingQRResponse>(_readResult.ToString());
+
+                        DateTimeOffset qractivityStartDate = DateTimeOffset.FromUnixTimeSeconds(_qrResponse.Start);
+                        DateTimeOffset qractivityEndDate = DateTimeOffset.FromUnixTimeSeconds(_qrResponse.End);
+                        DateTimeOffset qractivityCreationDate = DateTimeOffset.FromUnixTimeSeconds(_qrResponse.Create);
+                        DateTimeOffset qrSolutionDate = DateTimeOffset.FromUnixTimeSeconds(_qrResponse.Solution);
+
+                        TimeSpan _timeout = qractivityCreationDate - qractivityEndDate;
+                        
+                        if (ticketId == _qrResponse.Ticket)
                         {
-                            status = true,
-                            message = "QR Reading Completed",
-                            statusCode = 200,
-                            result = _readResult.ToString()
-                        };
+
+                            if (qractivityEndDate == _reqestSolutionDateTime)
+                            {
+                                if (_timeout.Minutes < 20)
+                                {
+
+                                    response = new ResponseFormQRCodeReading
+                                    {
+                                        status = true,
+                                        message = "QR Reading Completed",
+                                        displayMessage = "Servis formu başarıyla eklenmiştir.",
+                                        statusCode = 200,
+                                        resultText = _readResult.ToString(),
+                                        QrResult = _qrResponse
+                                    };
+                                    return Ok(response);
+                                }
+                                else
+                                {
+                                    //Mail Gönder
+                                    //Aktivite Bitiş Tarihi ile yaratma tarihi arasında 20 dk fazla süre var.
+                                    response = new ResponseFormQRCodeReading
+                                    {
+                                        status = false,
+                                        message = "QR Reading Info",
+                                        displayMessage = "Geçmiş tarihe aktivite girişi yapamazsınız. Ekip Liderine bilgi verildi.",
+                                        statusCode = 202,
+                                        resultText = _readResult.ToString(),
+                                        QrResult = _qrResponse
+                                    };
+                                    return BadRequest(response);
+                                }
+                            } else
+                            {
+                                //Aktivite Bitiş Tarihi ile Çözüm Tarihi Aynı Değil
+                                response = new ResponseFormQRCodeReading
+                                {
+                                    status = false,
+                                    message = "QR Reading Info",
+                                    displayMessage = "Aktivitenizin bitiş tarihi ile çözüm tarihininiz uyuşmuyor, lütfen kontrol ediniz.",
+                                    statusCode = 203,
+                                    resultText = _readResult.ToString(),
+                                    QrResult = _qrResponse
+                                };
+                                return BadRequest(response);
+                            }
+                        } else
+                        {
+                            //Kayıt ID Aynı Değil
+                            response = new ResponseFormQRCodeReading
+                            {
+                                status = false,
+                                message = "QR Reading Info",
+                                displayMessage = "Eklemek istediğiniz servis formu bu kayıt numarasına ait değil, lütfen kontrol ediniz.",
+                                statusCode = 204,
+                                resultText = _readResult.ToString(),
+                                QrResult = _qrResponse
+                            };
+                            return BadRequest(response);
+                        }
+                        
                     } else
                     {
                         response = new ResponseFormQRCodeReading
                         {
                             status = true,
                             message = "The QR Code on the service form could not be read, the quality of the service form is not good enough or the QR Code was not found. Provide the checks and try again.",
-                            statusCode = 202
+                            statusCode = 201,
+                            displayMessage = "Servis formunun kalitesi yeterli değil, servis formu okunmuyor."
                         };
                         return BadRequest(response);
                     }
@@ -118,8 +199,9 @@ namespace Robi_N_WebAPI.Controllers
                     statusCode= 500,
                     message = ex.Message
                 };
+                return BadRequest(response);
             }
-            return Ok(response);
+            //return Ok(response);
         }
        
 

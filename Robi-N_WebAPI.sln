@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetGSMService", "NetGSMServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBService", "DBService\DBService.csproj", "{943F1580-358F-4C21-8ED7-6F6CEFE4B6D4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailEntity", "MailEntity\MailEntity.csproj", "{E0A0497C-780E-4744-A342-858E48B6388D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleCloudUtility", "GoogleCloudUtility\GoogleCloudUtility.csproj", "{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{943F1580-358F-4C21-8ED7-6F6CEFE4B6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{943F1580-358F-4C21-8ED7-6F6CEFE4B6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{943F1580-358F-4C21-8ED7-6F6CEFE4B6D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0A0497C-780E-4744-A342-858E48B6388D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0A0497C-780E-4744-A342-858E48B6388D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0A0497C-780E-4744-A342-858E48B6388D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0A0497C-780E-4744-A342-858E48B6388D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

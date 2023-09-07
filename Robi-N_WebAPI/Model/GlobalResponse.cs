@@ -5,5 +5,6 @@
         public bool status { get; set; }
         public int statusCode { get; set; }
         public string? message { get; set; }
+        public string? displayMessage { get; set; }
     }
 }
