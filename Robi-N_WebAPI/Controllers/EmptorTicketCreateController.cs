@@ -55,8 +55,9 @@ namespace Robi_N_WebAPI.Controllers
 
                     var _smsResult = smsApi.SendSMS(req.gsmPhone,customerMessage);
 
-                    bool _smsStatus = _smsResult.Contains("errno=0");
-                    if(_smsStatus)
+                    //bool _smsStatus = _smsResult.Contains("errno=0");
+
+                    if(_smsResult)
                     {
                         RequestRegistrationInformationCallSingleNumber reqCall = new RequestRegistrationInformationCallSingleNumber
                         {

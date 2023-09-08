@@ -133,13 +133,13 @@ namespace Robi_N_WebAPI.Controllers
                 }
 
             }
-            catch
+            catch (Exception ex)
             {
                 response = new responseListCSQ
                 {
                     status = false,
                     statusCode = 500,
-                    message = "CSQ Listing system error."
+                    message = String.Format(@"CSQ Listing system error. - Exception: {0}", ex.Message.ToString())
                 };
                 var _responseText = new JavaScriptSerializer().Serialize(response);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
