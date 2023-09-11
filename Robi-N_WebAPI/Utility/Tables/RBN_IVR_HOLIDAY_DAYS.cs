@@ -8,6 +8,8 @@ namespace Robi_N_WebAPI.Utility.Tables
         [Key]
         public int Id { get; set; }
         public string? displayName { get; set; }
+        [Required,]
+        public string? csq { get; set; }
         public string? description { get; set; }
         public string? holidayName { get; set; }
 

@@ -15,6 +15,8 @@ using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
+using Swashbuckle.Examples;
+using Swashbuckle.Swagger;
 using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
@@ -171,20 +173,27 @@ builder.Services.AddAuthentication(opt =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-  
+
+
+
     c.SwaggerDoc("v2", new OpenApiInfo()
     {
-        Contact = new OpenApiContact { 
-        Name = "Barış Sakızlı",
-        Email = "baris.sakizli@bdh.com.tr"
+        Contact = new OpenApiContact
+        {
+            Name = "Barış Sakızlı",
+            Email = "baris.sakizli@bdh.com.tr"
         },
-      TermsOfService = new Uri("https://www.bdh.com.tr/"),
-      Title = "Robi-N AI API",
-      Version = "v2",
-      Description = "AI-powered custom solution services"
-    });;;
+        TermsOfService = new Uri("https://www.bdh.com.tr/"),
+        Title = "Robi-N AI API",
+        Version = "v2",
+        Description = "AI-powered custom solution services"
+    });
 
-        c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+    c.EnableAnnotations();
+
+
+
+    c.AddSecurityDefinition("basic", new OpenApiSecurityScheme
     {
         Description = "Basic auth added to authorization header",
         Name = "Authorization",
