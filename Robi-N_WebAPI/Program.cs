@@ -291,10 +291,10 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 
 
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 builder.Services.AddMvc().AddXmlDataContractSerializerFormatters();
 builder.Services.AddControllers().AddXmlSerializerFormatters();
-builder.Services.AddControllersWithViews();
+//builder.Services.AddControllersWithViews();
 
 
 builder.Services.AddDbContext<AIServiceDbContext>(options =>
@@ -519,6 +519,7 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 
 //builder.Services.AddCors();
 
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
@@ -586,6 +587,16 @@ app.UseCors("corspolicy");
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();
