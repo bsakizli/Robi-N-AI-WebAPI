@@ -1,14 +1,106 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using HtmlAgilityPack;
 using RobinCore.Models;
 using System.Data;
-
-
+using System.Net;
+using System.Text;
+using MailEntity;
+using System.Net.Http;
+using Microsoft.AspNetCore.Http;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace RobinCore
 {
     public class RobinHelper
     {
+        MailService mailService = new MailService();
+
+
+       
+
+        public static bool GetHtmlText()
+        {
+
+            WebRequest req = WebRequest.Create("http://localhost:5027/HrApp/NewlyHiredEmployees");
+            WebResponse res = req.GetResponse();
+            StreamReader reader = new StreamReader(res.GetResponseStream());
+            string result = reader.ReadToEnd();
+            reader.Close();
+            res.Close();
+
+            return true;
+        }
+        public string? BaseUrl(HttpRequest req)
+        {
+            if (req == null) return null;
+            var uriBuilder = new UriBuilder(req.Scheme, req.Host.Host, req.Host.Port ?? -1);
+            if (uriBuilder.Uri.IsDefaultPort)
+            {
+                uriBuilder.Port = -1;
+            }
+
+            return uriBuilder.Uri.AbsoluteUri;
+        }
+
+
+
+        public Boolean getMailTemplate(string _url)
+        {
+            try
+            {
+              
+
+                Uri url = new Uri(String.Format(@"{0}/HrApp/NewlyHiredEmployees",_url)); //Uri tipinde değişeken linkimizi veriyoruz.
+
+                WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
+                client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+
+                string html = client.DownloadString(url);
+
+
+                HtmlDocument document = new HtmlDocument();
+                document.LoadHtml(html);
+
+                var divs = document.DocumentNode.SelectNodes(@"//div");
+                if (divs != null)
+                {
+                    foreach (var tag in divs)
+                    {
+                        if (tag.Attributes["class"] != null && string.Compare(tag.Attributes["class"].Value, "robin-action-button", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        {
+                            tag.Remove();
+                        }
+                        else if (tag.Attributes["id"] != null && string.Compare(tag.Attributes["id"].Value, "robin-action-button", StringComparison.InvariantCultureIgnoreCase) == 0)
+                        {
+                            tag.Remove();
+                        }
+                    }
+                }
+                string tt = document.DocumentNode.OuterHtml;
+
+                System.Globalization.CultureInfo usEnglish = new System.Globalization.CultureInfo("tr-TR");
+                System.Globalization.DateTimeFormatInfo englishInfo = usEnglish.DateTimeFormat;
+                string monthName = englishInfo.MonthNames[DateTime.Now.Month - 1];
+
+                string MonthName = DateTime.Now.ToString("MMMM", System.Globalization.CultureInfo.CreateSpecificCulture("tr-TR"));
+
+                string _subject = String.Format("Aramıza Yeni Katılan Çalışma Arkadaşlarımız.. - {0}", MonthName + " " + DateTime.Now.Year);
+
+                bool status = mailService.SendMailHtml(tt, _subject);
+
+                return true;
+            } catch
+            {
+                return false;
+
+            }
+
+            
+
+        }
+
+
         public static string GetCellValue(SpreadsheetDocument document, Cell cell)
         {
             SharedStringTablePart stringTablePart = document.WorkbookPart.SharedStringTablePart;
@@ -29,7 +121,7 @@ namespace RobinCore
             byte[] imageArray = null;
             try
             {
-                imageArray = System.IO.File.ReadAllBytes(String.Format(@"\\192.168.110.100\HR_Content\Persone_Resimler\{0}.jpg", fileName));
+                imageArray = System.IO.File.ReadAllBytes(String.Format(@"\\192.168.110.100\HR_Content\Personel_Resimler\{0}.jpg", fileName));
                 return imageArray;
             }
             catch
@@ -41,7 +133,7 @@ namespace RobinCore
         public List<startedList> GetExcelFile()
         {
             var table = new DataTable();
-            using (SpreadsheetDocument spreadSheetDocument = SpreadsheetDocument.Open(@"C:\Users\baris.sakizli\Desktop\2023.xlsx", false))
+            using (SpreadsheetDocument spreadSheetDocument = SpreadsheetDocument.Open(@"\\192.168.110.100\HR_Content\ExcelDosyalari\Aramiza_Katilanlar.xlsx", false))
             {
                 WorkbookPart workbookPart = spreadSheetDocument.WorkbookPart;
                 IEnumerable<Sheet> sheets = spreadSheetDocument.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
@@ -93,7 +185,7 @@ namespace RobinCore
 
                 if (byteImage != null)
                 {
-                    _image = Convert.ToBase64String(byteImage);
+                    _image = "data:image/jpeg;base64," +Convert.ToBase64String(byteImage);
                 }
                 else
                 {
@@ -107,7 +199,7 @@ namespace RobinCore
                     departmentName = _departmentName,
                     previousJob = _previousJob,
                     section = _section,
-                    image = "data:image/jpeg;base64," + _image
+                    image =  _image
                 };
                 _personelListesi.Add(personel);
 

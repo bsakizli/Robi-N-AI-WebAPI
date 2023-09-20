@@ -584,15 +584,17 @@ app.UseSwaggerUI(c =>
 
 app.UseCors("corspolicy");
 
-app.UseAuthorization();
-
-app.MapControllers();
-
-
-
 app.UseStaticFiles();
-
 app.UseRouting();
+//app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
+
 
 app.MapControllerRoute(
     name: "default",

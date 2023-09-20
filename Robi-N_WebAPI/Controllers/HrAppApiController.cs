@@ -1,5 +1,5 @@
 ﻿
-using Microsoft.AspNetCore.Mvc;
+
 
 using Robi_N_WebAPI.Utility;
 using Microsoft.Extensions.Options;
@@ -7,10 +7,14 @@ using Robi_N_WebAPI.Model;
 using DocumentFormat.OpenXml.Packaging;
 using System.Data;
 using DocumentFormat.OpenXml.Spreadsheet;
+using RobinCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class HrAppApiController : ControllerBase
     {
@@ -19,7 +23,7 @@ namespace Robi_N_WebAPI.Controllers
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
-
+     
 
         public HrAppApiController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration configuration, ILogger<IdentityCheckController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
@@ -27,72 +31,56 @@ namespace Robi_N_WebAPI.Controllers
             _configuration = configuration;
             _logger = logger;
             _db = db;
+         
         }
 
-        public static string GetCellValue(SpreadsheetDocument document, Cell cell)
-        {
-            SharedStringTablePart stringTablePart = document.WorkbookPart.SharedStringTablePart;
-            string? value = cell.CellValue.InnerXml;
-            if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
-            {
-                return stringTablePart.SharedStringTable.ChildElements[Int32.Parse(value)].InnerText;
-            }
-            else
-            {
-                return value;
-            }
-        }
+        RobinHelper _robin = new RobinHelper();
+      
+
 
         [HttpGet("hrHiredEmployeesSendMail")]
         public IActionResult hrHiredEmployeesSendMail()
         {
-            var table = new DataTable();
-            using (SpreadsheetDocument spreadSheetDocument = SpreadsheetDocument.Open(@"C:\Users\baris.sakizli\Desktop\2023.xlsx", false))
+            var baseUri = $"{Request.Scheme}://{Request.Host}";
+            try
             {
-                WorkbookPart workbookPart = spreadSheetDocument.WorkbookPart;
-                IEnumerable<Sheet> sheets = spreadSheetDocument.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
-                string relationshipId = sheets.First().Id.Value;
-                WorksheetPart worksheetPart = (WorksheetPart)spreadSheetDocument.WorkbookPart.GetPartById(relationshipId);
-                Worksheet workSheet = worksheetPart.Worksheet;
-                SheetData sheetData = workSheet.GetFirstChild<SheetData>();
-                IEnumerable<Row> rows = sheetData.Descendants<Row>();
-                foreach (Cell cell in rows.ElementAt(0))
+                GlobalResponse _response = new GlobalResponse();
+                if (_robin.getMailTemplate(baseUri))
                 {
-                    table.Columns.Add(GetCellValue(spreadSheetDocument, cell));
-                }
-
-                foreach (Row row in rows)
-                {
-                    DataRow tempRow = table.NewRow();
-                    for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
+                    _response = new GlobalResponse
                     {
-                        tempRow[i] = GetCellValue(spreadSheetDocument, row.Descendants<Cell>().ElementAt(i));
-                    }
-                    table.Rows.Add(tempRow);
-                }
-            }
-            table.Rows.RemoveAt(0);
+                        status = true,
+                        statusCode = 200,
+                        message = "Mail has been sent."
+                    };
 
-            foreach (DataRow row in table.Rows)
+                    return Ok(_response);
+                }
+                else
+                {
+                    _response = new GlobalResponse
+                    {
+                        status = false,
+                        statusCode = 201,
+                        message = "Failed to send mail."
+                    };
+
+                    return BadRequest(_response);
+                }
+
+
+            } catch(Exception ex)
             {
-                string _fullname = String.Empty;
-
-                if (!String.IsNullOrEmpty(row[2].ToString()))
+                GlobalResponse _response = new GlobalResponse();
+                _response = new GlobalResponse
                 {
-                    _fullname = row[1] +" " + row[2] +" " + row[3];
-                } else
-                {
-                    _fullname = row[1] + " " + row[2];
-                }
+                    status = false,
+                    statusCode = 500,
+                    message = String.Format(@"Server error please inform the administrator. - Message: {0}", ex.Message.ToString())
+                };
 
-                string? _registryNumber = row[0].ToString();
-                string? _departmentName = row[6].ToString();
-                string? _previousJob = row[9].ToString();
-                string? _education = row[10].ToString();
+                return BadRequest(_response);
             }
-
-
-            return Ok("asdasd");
         }
 
     }
