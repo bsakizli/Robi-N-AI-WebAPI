@@ -23,8 +23,8 @@ using MailEntity;
 namespace Robi_N_WebAPI.Controllers
 {
     //[Route("api/[controller]/[action]")]
-    [Route("api/[controller]/[action]")]
-    //[Authorize(Roles = "MIS User")]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "MIS User")]
     [ApiController]
     public class AIServiceFormController : ControllerBase
     {

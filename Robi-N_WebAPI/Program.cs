@@ -1,4 +1,5 @@
-﻿using ExtendedXmlSerializer.ExtensionModel;
+﻿using EmptorUtility;
+using ExtendedXmlSerializer.ExtensionModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -289,7 +291,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 
-
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 //builder.Services.AddControllers();
 builder.Services.AddMvc().AddXmlDataContractSerializerFormatters();
@@ -298,9 +300,13 @@ builder.Services.AddControllers().AddXmlSerializerFormatters();
 
 
 builder.Services.AddDbContext<AIServiceDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
+//builder.Services.AddDbContext<EmptorDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("EmptorConnection"))
+//);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

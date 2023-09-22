@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MailEntity", "MailEntity\Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleCloudUtility", "GoogleCloudUtility\GoogleCloudUtility.csproj", "{ABE0D827-46C1-4CD4-913A-CA7DF8A5C4A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobinCore", "RobinCore\RobinCore.csproj", "{2105F341-D419-43A8-BF73-F08E20AC4A4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinCore", "RobinCore\RobinCore.csproj", "{2105F341-D419-43A8-BF73-F08E20AC4A4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptorUtility", "EmptorUtility\EmptorUtility.csproj", "{F3A3E695-1352-45E1-BFA5-6EC736914343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{2105F341-D419-43A8-BF73-F08E20AC4A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2105F341-D419-43A8-BF73-F08E20AC4A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2105F341-D419-43A8-BF73-F08E20AC4A4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3A3E695-1352-45E1-BFA5-6EC736914343}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3A3E695-1352-45E1-BFA5-6EC736914343}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3A3E695-1352-45E1-BFA5-6EC736914343}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3A3E695-1352-45E1-BFA5-6EC736914343}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

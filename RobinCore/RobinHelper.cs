@@ -17,8 +17,6 @@ namespace RobinCore
         MailService mailService = new MailService();
 
 
-       
-
         public static bool GetHtmlText()
         {
 
@@ -49,7 +47,6 @@ namespace RobinCore
         {
             try
             {
-              
 
                 Uri url = new Uri(String.Format(@"{0}/HrApp/NewlyHiredEmployees",_url)); //Uri tipinde değişeken linkimizi veriyoruz.
 
@@ -77,7 +74,7 @@ namespace RobinCore
                         }
                     }
                 }
-                string tt = document.DocumentNode.OuterHtml;
+                string _result = document.DocumentNode.OuterHtml;
 
                 System.Globalization.CultureInfo usEnglish = new System.Globalization.CultureInfo("tr-TR");
                 System.Globalization.DateTimeFormatInfo englishInfo = usEnglish.DateTimeFormat;
@@ -87,9 +84,15 @@ namespace RobinCore
 
                 string _subject = String.Format("Aramıza Yeni Katılan Çalışma Arkadaşlarımız.. - {0}", MonthName + " " + DateTime.Now.Year);
 
-                bool status = mailService.SendMailHtml(tt, _subject);
+                bool status = mailService.SendMailHtml(_result, _subject);
 
-                return true;
+                if(status)
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
             } catch
             {
                 return false;

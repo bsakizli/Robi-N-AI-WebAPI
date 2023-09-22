@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Google.Api.Gax.Grpc.Rest;
+using Google.Cloud.Vision.V1;
+using Microsoft.AspNetCore.Mvc;
 using Robi_N_WebAPI.Model;
 using System.Diagnostics;
+using Image = Google.Cloud.Vision.V1.Image;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -15,6 +18,14 @@ namespace Robi_N_WebAPI.Controllers
 
         public IActionResult Index()
         {
+
+            //var client = new ImageAnnotatorClientBuilder
+            //{
+            //    GrpcAdapter = RestGrpcAdapter.Default
+            //}.Build();
+
+           
+
             return View();
         }
 

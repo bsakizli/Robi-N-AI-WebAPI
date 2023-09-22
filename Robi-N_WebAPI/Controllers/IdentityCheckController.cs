@@ -24,6 +24,8 @@ using System.Text;
 using Robi_N_WebAPI.Helper;
 using System.Data;
 using Microsoft.AspNetCore.Rewrite;
+using Robi_N_WebAPI.Services;
+using System.Web.Http.Filters;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -35,9 +37,10 @@ namespace Robi_N_WebAPI.Controllers
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly Program _program;
+        public EmptorService _emptorService = new EmptorService();
 
         PBKDF2 crypto = new PBKDF2();
-
+      
         public IdentityCheckController(ILogger<IdentityCheckController> logger,AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
             _logger = logger;
@@ -80,7 +83,128 @@ namespace Robi_N_WebAPI.Controllers
             return Ok(_CreateToken);
         }
 
-      
+
+        [AllowAnonymous]
+        [HttpPost("emptorLoginUser")]
+        public IActionResult emptorLoginUser(string username, string password)
+        {
+            responseEmptorLoginUser response;
+            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), username +" - " +password));
+           
+            try
+            {
+                
+                if(!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+                {
+                    //Emptor Login Service
+                    var _response = _emptorService.emptorLoginUserCheck(username, password);
+
+                    if (_response != null)
+                    {
+                        if (Convert.ToInt32(_response.ResultCode) == 0)
+                        {
+                            if (_JwtSettings.Key == null) throw new Exception("JWT key değeri null olamaz");
+
+                            var secKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_JwtSettings.Key));
+                            var credentials = new SigningCredentials(secKey, SecurityAlgorithms.HmacSha256);
+
+                            var claimArray = new List<Claim>
+                         {
+                            new Claim(ClaimTypes.IsPersistent, _response.UserId),
+                            new Claim(ClaimTypes.Email, _response.Email),
+                            new Claim(ClaimTypes.Name, _response.FirstName),
+                            new Claim(ClaimTypes.GivenName, _response.UserFullName),
+                            new Claim(ClaimTypes.NameIdentifier, username!),
+                            new Claim(ClaimTypes.GroupSid, _response.PositionName!),
+                            //new Claim(ClaimTypes.Role, apiUsers.role!),
+                         };
+
+                            claimArray.Add(new Claim(ClaimTypes.Role, "User"!));
+
+                            var token = new JwtSecurityToken(
+                                _JwtSettings.Issuer,
+                                _JwtSettings.Audience,
+                                claimArray,
+                                expires: DateTime.Now.AddMinutes(Convert.ToDouble(120)),
+                                signingCredentials: credentials
+                                );
+
+
+
+                            response = new responseEmptorLoginUser
+                            {
+                                status = true,
+                                statusCode = 200,
+                                message = "Emptor Login Verified.",
+                                User = _response,
+                                token = new JwtSecurityTokenHandler().WriteToken(token),
+                                expiredDate = token.ValidTo,
+                                displayMessage = _response.ResultMessage
+                            };
+                            var globalResponseResult = new JavaScriptSerializer().Serialize(response);
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                            return Ok(response);
+                            //Token Vereceksin.
+                        }
+                        else
+                        {
+                            response = new responseEmptorLoginUser
+                            {
+                                status = false,
+                                statusCode = 401,
+                                displayMessage = _response.ResultMessage,
+                                message = "Emptor Login Failed."
+                            };
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                            return BadRequest(response);
+                            //Hata Mesajı
+                        }
+                    }
+                    else
+                    {
+                        response = new responseEmptorLoginUser
+                        {
+                            status = false,
+                            statusCode = 500,
+                            displayMessage = "Inform the manager. There is a systemic problem.",
+                            message = "Emptor Service Error"
+                        };
+                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                        return BadRequest(response);
+                        //Servis Hatası
+                    }
+
+                } else
+                {
+                    response = new responseEmptorLoginUser
+                    {
+                        status = false,
+                        statusCode = 199,
+                        displayMessage = "Kullanıcı adı ve şifre alanı boş olamaz.",
+                        message = "Username and Password Error"
+                    };
+                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                    return BadRequest(response);
+                    //Kullanıcı Adı ve Şifre Boş Olamaz
+                }
+
+                
+
+            } catch
+            {
+                response = new responseEmptorLoginUser
+                {
+                    status = false,
+                    statusCode = 500,
+                    displayMessage = "Inform the manager. There is a systemic problem.",
+                    message = "Emptor Service Error"
+                };
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                return BadRequest(response);
+            }
+
+        }
+
 
 
         [AllowAnonymous]

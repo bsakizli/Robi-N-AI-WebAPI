@@ -36,8 +36,6 @@ namespace Robi_N_WebAPI.Controllers
 
         RobinHelper _robin = new RobinHelper();
       
-
-
         [HttpGet("hrHiredEmployeesSendMail")]
         public IActionResult hrHiredEmployeesSendMail()
         {

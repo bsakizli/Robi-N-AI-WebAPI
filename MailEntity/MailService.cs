@@ -6,6 +6,15 @@ namespace MailEntity
 {
     public class MailService
     {
+        //private readonly IConfiguration _configuration;
+
+        //public MailService(AIServiceDbContext db, IConfiguration configuration)
+        //{
+        //    _db = db;
+        //    _configuration = configuration;
+        //}
+
+        //_configuration.GetValue<string>("IronBarCode.LicenseKey");
 
         public bool SendMail()
         {
@@ -39,9 +48,6 @@ namespace MailEntity
                     emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
 
                     emailClient.Authenticate("robin@bdh.com.tr", "ea3zCPD998");
-
-
-                    
 
                     var tt = emailClient.Send(message);
 

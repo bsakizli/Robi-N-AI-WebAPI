@@ -206,7 +206,7 @@ namespace Robi_N_WebAPI.Controllers
                 return BadRequest(globalResponse);
             }
         }
-
+        
         [HttpGet("getCSQList")]
         public IActionResult listCSQ()
         {
