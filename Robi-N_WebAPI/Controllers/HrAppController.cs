@@ -18,7 +18,7 @@ namespace Robi_N_WebAPI.Controllers
         private readonly ILogger _logger;
 
 
-        RobinHelper _robin = new RobinHelper();
+        RobinHelper _robin =  new RobinHelper();
 
 
         public IActionResult Index()
@@ -47,13 +47,13 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-        public IActionResult hrSendMail()
+        public async Task<IActionResult> hrSendMail()
         {
 
             var baseUri = $"{Request.Scheme}://{Request.Host}";
 
 
-            Boolean status =  _robin.getMailTemplate(baseUri);
+            Boolean status = await _robin.getMailTemplate(baseUri);
 
             return RedirectToAction("newlyHiredEmployees", "HrApp");
 

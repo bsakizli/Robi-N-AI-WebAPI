@@ -263,12 +263,6 @@ builder.Services.AddSwaggerGen(c =>
     //});
 });
 
-
-
-
-
-
-
 //builder.Services.AddAuthentication("basicAuthentication")
 //.AddScheme<AuthenticationSchemeOptions, basicAuthenticationHandler>("basicAuthentication", null);
 

@@ -37,13 +37,13 @@ namespace Robi_N_WebAPI.Controllers
         RobinHelper _robin = new RobinHelper();
       
         [HttpGet("hrHiredEmployeesSendMail")]
-        public IActionResult hrHiredEmployeesSendMail()
+        public async Task<IActionResult> hrHiredEmployeesSendMail()
         {
             var baseUri = $"{Request.Scheme}://{Request.Host}";
             try
             {
                 GlobalResponse _response = new GlobalResponse();
-                if (_robin.getMailTemplate(baseUri))
+                if (await _robin.getMailTemplate(baseUri))
                 {
                     _response = new GlobalResponse
                     {

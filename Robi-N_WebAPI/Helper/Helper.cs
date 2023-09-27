@@ -16,9 +16,11 @@ namespace Robi_N_WebAPI.Helper
         }
 
 
-        public static responseVoiceIVRApplication.GoogleCalender.Root? getGoogleTurkeyHolidays()
+        public static async Task<responseVoiceIVRApplication.GoogleCalender.Root>? getGoogleTurkeyHolidays()
         {
-            var myUri = new Uri("https://www.googleapis.com/calendar/v3/calendars/turkish__tr%40holiday.calendar.google.com/events?key=AIzaSyBsYRMzm0k_h7l1frdKi7kXpr-af11_nPQ");
+
+
+            Uri myUri = new Uri("https://www.googleapis.com/calendar/v3/calendars/turkish__tr%40holiday.calendar.google.com/events?key=AIzaSyBsYRMzm0k_h7l1frdKi7kXpr-af11_nPQ");
             var myWebRequest = WebRequest.Create(myUri);
             var request = (HttpWebRequest)myWebRequest;
 
@@ -30,7 +32,7 @@ namespace Robi_N_WebAPI.Helper
 
             request.Method = "GET";
 
-            WebResponse response = request.GetResponse();
+            WebResponse response = await request.GetResponseAsync();
             Stream result = response.GetResponseStream();
             StreamReader reader = new StreamReader(result);
             string cikti = reader.ReadToEnd();

@@ -43,17 +43,16 @@ namespace RobinCore
 
 
 
-        public Boolean getMailTemplate(string _url)
+        public async Task<Boolean> getMailTemplate(string _url)
         {
             try
             {
-
                 Uri url = new Uri(String.Format(@"{0}/HrApp/NewlyHiredEmployees",_url)); //Uri tipinde değişeken linkimizi veriyoruz.
 
                 WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
                 client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
 
-                string html = client.DownloadString(url);
+                string html = await client.DownloadStringTaskAsync(url);
 
 
                 HtmlDocument document = new HtmlDocument();

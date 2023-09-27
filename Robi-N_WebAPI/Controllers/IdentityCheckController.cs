@@ -85,8 +85,8 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("emptorLoginUser")]
-        public IActionResult emptorLoginUser(string username, string password)
+        [HttpPost("emptorLogin")]
+        public IActionResult emptorLogin(string username, string password)
         {
             responseEmptorLoginUser response;
             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), username +" - " +password));
@@ -97,7 +97,7 @@ namespace Robi_N_WebAPI.Controllers
                 if(!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
                 {
                     //Emptor Login Service
-                    var _response = _emptorService.emptorLoginUserCheck(username, password);
+                    var _response = _emptorService.emptorLoginUserCheck(username, Helper.Helper.Base64Decode(password));
 
                     if (_response != null)
                     {
@@ -208,8 +208,8 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [AllowAnonymous]
-        [HttpPost("ldapAccessControl")]
-        public IActionResult ldapAccessControl(string username, string password)
+        [HttpPost("ldaplogin")]
+        public IActionResult ldaplogin(string username, string password)
         {
             ldapAccessControl response = new ldapAccessControl();
 

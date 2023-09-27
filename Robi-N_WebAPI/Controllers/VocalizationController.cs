@@ -135,10 +135,10 @@ namespace Robi_N_WebAPI.Controllers
 
         [HttpPost("WarrantyTransactionFeeVocalization")]
         //[Consumes("application/xml")]
-        [Produces("application/xml")]
-        public ContentResult WarrantyTransactionFeeVocalization(string price = null)
+        public async Task<IActionResult> WarrantyTransactionFeeVocalization(string price = null)
         {
             var xmlDoc = new XmlDocument();
+            var response = new responseWarrantyTransactionFeeVocalization();
             try
             {
                 var globalResponseResult = new JavaScriptSerializer().Serialize(price);
@@ -168,18 +168,29 @@ namespace Robi_N_WebAPI.Controllers
                             soundContent = _googleServiceResponse.AudioContent.ToByteArray()
                         };
                         _db.RBN_VOICE_SOUNDS.Add(item);
-                        if (_db.SaveChanges() == 1)
+                        if (await _db.SaveChangesAsync() == 1)
                         {
                             //var _url = String.Format(@"http://callcdn.bdh.com.tr/Kayit_Altina_Alinacaktir.wav");
                             var _url = String.Format(@"{0}/soundfiles/{1}.wav", _configuration.GetValue<string>("SoundServerHost"), item.fileName);
                             xmlDoc.LoadXml(String.Format(@"<vxml xmlns='http://www.w3.org/2001/vxml' version='2.0'><form><block><prompt bargein='true'><audio src='{0}'/></prompt></block></form></vxml>", _url));
 
-                            return new ContentResult
+
+                            response = new responseWarrantyTransactionFeeVocalization
                             {
-                                Content = xmlDoc.DocumentElement.OuterXml.ToString(),
-                                ContentType = "application/xml",
-                                StatusCode = 200
+                                status = true,
+                                message = "Successful voice-over",
+                                displayMessage = "Seslendirme başarılı",
+                                statusCode = 200,
+                                url = _url
                             };
+                            //return new ContentResult
+                            //{
+                            //    Content = xmlDoc.DocumentElement.OuterXml.ToString(),
+                            //    ContentType = "application/xml",
+                            //    StatusCode = 200
+                            //};
+
+                            return Ok(response);
 
 
                             //return Ok(xmlDoc.DocumentElement.OuterXml.ToString());
@@ -190,12 +201,22 @@ namespace Robi_N_WebAPI.Controllers
                             var _url = String.Format(@"{0}/soundfiles/{1}.wav", _configuration.GetValue<string>("SoundServerHost"), "503ebb18-ce0e-4439-bb41-9f7d61c530f2");
                             xmlDoc.LoadXml(String.Format(@"<vxml xmlns='http://www.w3.org/2001/vxml' version='2.0'><form><block><prompt bargein='true'><audio src='{0}'/></prompt></block></form></vxml>", _url));
 
-                            return new ContentResult
+                            response = new responseWarrantyTransactionFeeVocalization
                             {
-                                Content = xmlDoc.DocumentElement.OuterXml.ToString(),
-                                ContentType = "application/xml",
-                                StatusCode = 404
+                                status = true,
+                                message = "Unavailable for Voice Over",
+                                displayMessage = "Seslendirme servisi hatası",
+                                statusCode = 404,
+                                url = _url
                             };
+                            return BadRequest(response);
+
+                            //return new ContentResult
+                            //{
+                            //    Content = xmlDoc.DocumentElement.OuterXml.ToString(),
+                            //    ContentType = "application/xml",
+                            //    StatusCode = 404
+                            //};
                         }
 
                     }
@@ -204,12 +225,15 @@ namespace Robi_N_WebAPI.Controllers
                         var _url = String.Format(@"{0}/soundfiles/{1}.wav", _configuration.GetValue<string>("SoundServerHost"), "503ebb18-ce0e-4439-bb41-9f7d61c530f2");
                         xmlDoc.LoadXml(String.Format(@"<vxml xmlns='http://www.w3.org/2001/vxml' version='2.0'><form><block><prompt bargein='true'><audio src='{0}'/></prompt></block></form></vxml>", _url));
 
-                        return new ContentResult
+                        response = new responseWarrantyTransactionFeeVocalization
                         {
-                            Content = xmlDoc.DocumentElement.OuterXml.ToString(),
-                            ContentType = "application/xml",
-                            StatusCode = 404
+                            status = true,
+                            message = "Unavailable for Voice Over",
+                            displayMessage = "Seslendirme servisi hatası",
+                            statusCode = 404,
+                            url = _url
                         };
+                        return BadRequest(response);
                     }
 
                 } else
@@ -217,28 +241,46 @@ namespace Robi_N_WebAPI.Controllers
                     var _url = String.Format(@"{0}/soundfiles/{1}.wav", _configuration.GetValue<string>("SoundServerHost"), "503ebb18-ce0e-4439-bb41-9f7d61c530f2");
                     xmlDoc.LoadXml(String.Format(@"<vxml xmlns='http://www.w3.org/2001/vxml' version='2.0'><form><block><prompt bargein='true'><audio src='{0}'/></prompt></block></form></vxml>", _url));
 
-                    return new ContentResult
+                    //return new ContentResult
+                    //{
+                    //    Content = xmlDoc.DocumentElement.OuterXml.ToString(),
+                    //    ContentType = "application/xml",
+                    //    StatusCode = 404
+                    //};
+
+                    response = new responseWarrantyTransactionFeeVocalization
                     {
-                        Content = xmlDoc.DocumentElement.OuterXml.ToString(),
-                        ContentType = "application/xml",
-                        StatusCode = 404
+                        status = true,
+                        message = "Unavailable for Voice Over",
+                        displayMessage = "Seslendirme servisi hatası",
+                        statusCode = 404,
+                        url = _url
                     };
+                    return BadRequest(response);
                 }
 
-
-                
             }
             catch (Exception ?ex)
             {
                 var _url = String.Format(@"{0}/soundfiles/{1}.wav", _configuration.GetValue<string>("SoundServerHost"), "503ebb18-ce0e-4439-bb41-9f7d61c530f2");
                 xmlDoc.LoadXml(String.Format(@"<vxml xmlns='http://www.w3.org/2001/vxml' version='2.0'><form><block><prompt bargein='true'><audio src='{0}'/></prompt></block></form></vxml>", _url));
 
-                return new ContentResult
+                //return new ContentResult
+                //{
+                //    Content = xmlDoc.DocumentElement.OuterXml.ToString(),
+                //    ContentType = "application/xml",
+                //    StatusCode = 404
+                //};
+
+                response = new responseWarrantyTransactionFeeVocalization
                 {
-                    Content = xmlDoc.DocumentElement.OuterXml.ToString(),
-                    ContentType = "application/xml",
-                    StatusCode = 404
+                    status = true,
+                    message = "Unavailable for Voice Over",
+                    displayMessage = "Seslendirme servisi hatası",
+                    statusCode = 404,
+                    url = _url
                 };
+                return BadRequest(response);
             }
             
         }

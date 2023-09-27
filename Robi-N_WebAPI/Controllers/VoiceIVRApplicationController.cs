@@ -28,6 +28,8 @@ using System.Xml.Serialization;
 using System.Xml;
 using Robi_N_WebAPI.Services;
 using Microsoft.Win32;
+using Sprache;
+using Org.BouncyCastle.Math.EC;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -50,13 +52,13 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpGet("getHolidayDayCheckNowCsq")]
-        public IActionResult getHolidayDayCheckNowCsq(string csq)
+        public async Task<IActionResult> getHolidayDayCheckNowCsq(string csq)
         {
             GlobalResponse globalResponse;
             try
             {
 
-                var _holidays = _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefault(x => x.startDate.Date == DateTime.Now.Date && x.csq == csq);
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == DateTime.Now.Date && x.csq == csq);
 
                 //Holiday Start Time Control
                 var _date = DateTime.Now.Date;
@@ -125,13 +127,13 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpGet("getHolidayDayCheckDateCsq")]
-        public IActionResult getHolidayDayCheckDateCsq(DateTime dateTime, string csq)
+        public async Task<IActionResult> getHolidayDayCheckDateCsq(DateTime dateTime, string csq)
         {
             GlobalResponse globalResponse;
 
             try
             {
-                var _holidays = _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefault(x => x.startDate.Date == dateTime.Date && x.csq == csq);
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == dateTime.Date && x.csq == csq);
 
                 //Holiday Start Time Control
                 var _date = dateTime.Date;
@@ -208,14 +210,17 @@ namespace Robi_N_WebAPI.Controllers
         }
         
         [HttpGet("getCSQList")]
-        public IActionResult listCSQ()
+        public async Task<IActionResult> listCSQ()
         {
             responseListCSQ response = new responseListCSQ();
 
             try
             {
                 UCCXWebService webService = new UCCXWebService(_configuration);
-                var _csqs = webService.getCSQList();
+                
+                //var _csqs = await Task.Run(() => webService.getCSQList().Result);
+
+                var _csqs = await webService.getCSQList();
                 if (_csqs.Csq.Count > 0)
                 {
                     List<responseListCSQ.csq> _csqList = new List<responseListCSQ.csq>();
@@ -271,13 +276,13 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpGet("getHolidayDayCheckDate")]
-        public IActionResult getHolidayDayCheckDate(DateTime dateTime)
+        public async Task<IActionResult> getHolidayDayCheckDate(DateTime dateTime)
         {
             GlobalResponse globalResponse;
 
             try
             {
-                var _holidays = _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefault(x => x.startDate.Date == dateTime.Date);
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == dateTime.Date);
 
                 //Holiday Start Time Control
                 var _date = dateTime.Date;
@@ -354,13 +359,13 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpGet("getHolidayDayCheckNow")]
-        public IActionResult getHolidayDayCheckNow()
+        public async Task<IActionResult> getHolidayDayCheckNow()
         {
             GlobalResponse globalResponse;
             try
             {
 
-                var _holidays = _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefault(x => x.startDate.Date == DateTime.Now.Date);
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == DateTime.Now.Date);
 
                 //Holiday Start Time Control
                 var _date = DateTime.Now.Date;
@@ -429,12 +434,12 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpGet("getholidayDayList")]
-        public IActionResult getholidayDayList()
+        public async Task<IActionResult> getholidayDayList()
         {
-            responseVoiceIVRApplication.getholidayDayList response;
+            getholidayDayList response;
             try
             {
-                var _holidays = _db.RBN_IVR_HOLIDAY_DAYS.ToList();
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.ToListAsync();
                 response = new responseVoiceIVRApplication.getholidayDayList
                 {
                     statusCode = 200,
@@ -466,13 +471,13 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("getGoogleHolidayDaysUpdate")]
-        public IActionResult getGoogleHolidayDaysUpdate(string csq)
+        public async Task<IActionResult> getGoogleHolidayDaysUpdate(string csq)
         {
-            var _getGoogleHolidays = Helper.Helper.getGoogleTurkeyHolidays();
+            Root _getGoogleHolidays = await Helper.Helper.getGoogleTurkeyHolidays();
 
             foreach (var item in _getGoogleHolidays.items)
             {
-                var _getHoliday = _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.startDate == Convert.ToDateTime(item.start.date) && x.csq == csq).FirstOrDefault();
+                var _getHoliday = await _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.startDate == Convert.ToDateTime(item.start.date) && x.csq == csq).FirstOrDefaultAsync();
 
                 if (_getHoliday == null)
                 {
@@ -494,7 +499,7 @@ namespace Robi_N_WebAPI.Controllers
                         years = Convert.ToInt32(_startDate.Year),
                         startDate = Convert.ToDateTime(item.start.date)
                     });
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
                 }
 
             }
@@ -503,7 +508,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("addHolidayDay")]
-        public IActionResult addHolidayDay(newHolidayDay item)
+        public async Task<IActionResult> addHolidayDay(newHolidayDay item)
         {
             getholidayDay response;
 
@@ -512,7 +517,7 @@ namespace Robi_N_WebAPI.Controllers
                 var payLoadResult = new JavaScriptSerializer().Serialize(item);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - PayloadData: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), payLoadResult));
 
-                var _holiday = _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.holidayDate == item.startDate).FirstOrDefault();
+                var _holiday = await _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.holidayDate == item.startDate).FirstOrDefaultAsync();
                 if (_holiday == null)
                 {
 
@@ -520,6 +525,7 @@ namespace Robi_N_WebAPI.Controllers
                     var _record = new RBN_IVR_HOLIDAY_DAYS()
                     {
                         active = true,
+                        csq = item.csq,
                         addDate = DateTime.Now,
                         description = item.description,
                         holidayDate = Convert.ToDateTime(item.startDate),
@@ -529,7 +535,7 @@ namespace Robi_N_WebAPI.Controllers
                         startDate = Convert.ToDateTime(item.startDate)
                     };
                     var lastRecord = _db.RBN_IVR_HOLIDAY_DAYS.Add(_record);
-                    _db.SaveChanges();
+                    await _db.SaveChangesAsync();
 
                     if (lastRecord != null)
                     {
@@ -585,7 +591,9 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpPut("updateHolidayDay/{id}")]
-        public IActionResult updateHolidayDay(int id, [FromBody] newHolidayDay item)
+        //[FromBody]
+        //newHolidayDay item
+        public async Task<IActionResult> updateHolidayDay(int id, [FromBody] newHolidayDay item)
         {
             getholidayDay response;
             try
@@ -593,33 +601,71 @@ namespace Robi_N_WebAPI.Controllers
                 var payLoadResult = new JavaScriptSerializer().Serialize(item);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - PayloadData: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), payLoadResult));
 
-                var _item = _db.RBN_IVR_HOLIDAY_DAYS.First(x => x.Id == id);
-                _item.description = item.description;
-                _item.displayName = item.displayName;
-                _item.endDate = item.endDate;
-                _item.startDate = item.startDate;
-                _item.updateDate = DateTime.Now;
-                _item.holidayDate = item.startDate;
-                if(_db.SaveChanges() == 1)
-                {
-                    response = new getholidayDay
-                    {
-                        status = true,
-                        statusCode = 200,
-                        message = "The update has been successfully implemented.",
-                        data = _item
-                    };
-                    var _responseText = new JavaScriptSerializer().Serialize(response);
-                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                //var _item = await _db.RBN_IVR_HOLIDAY_DAYS.Where(x=>x.Id == id && x.Id == null).FirstOrDefaultAsync();
 
-                    return Ok(response);
+                //RBN_IVR_HOLIDAY_DAYS data = new RBN_IVR_HOLIDAY_DAYS
+                //{
+                //    Id = id,
+                //    description = item.description,
+                //    displayName = item.displayName,
+                //    active = item.active,
+                //    endDate = item.endDate,
+                //    startDate = item.startDate,
+                //    updateDate = DateTime.Now,
+                //    holidayDate = item.startDate,
+                //    years = item.years,
+                //};
+                //_db.Update(data);
+
+                var _item = await _db.Set<RBN_IVR_HOLIDAY_DAYS>().FirstOrDefaultAsync(x => x.Id == id);
+
+
+                if (_item != null) {
+
+                    _item.description = item.description;
+                    _item.holidayName = item.holidayName;
+                    _item.displayName = item.displayName;
+                    _item.active = item.active;
+                    _item.endDate = item.endDate;
+                    _item.startDate = item.startDate;
+                    _item.holidayDate = item.startDate;
+                    _item.updateDate = DateTime.Now;
+                    _item.years = item.years;
+
+                    if (await _db.SaveChangesAsync() == 1)
+                    {
+                        response = new getholidayDay
+                        {
+                            status = true,
+                            statusCode = 200,
+                            message = "The update has been successfully implemented.",
+                            data = _item
+                        };
+                        var _responseText = new JavaScriptSerializer().Serialize(response);
+                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response = new getholidayDay
+                        {
+                            status = true,
+                            statusCode = 201,
+                            message = "No changes were detected.",
+                            data = _item
+                        };
+                        var _responseText = new JavaScriptSerializer().Serialize(response);
+                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                        return BadRequest(response);
+                    }
                 } else
                 {
                     response = new getholidayDay
                     {
                         status = true,
-                        statusCode = 201,
-                        message = "No changes were detected.",
+                        statusCode = 199,
+                        message = "No record",
                         data = _item
                     };
                     var _responseText = new JavaScriptSerializer().Serialize(response);
@@ -644,7 +690,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpDelete("deleteHolidayDay/{id}")]
-        public IActionResult deleteHolidayDay(int id)
+        public async Task<IActionResult> deleteHolidayDay(int id)
         {
             getholidayDay response;
 
@@ -653,11 +699,11 @@ namespace Robi_N_WebAPI.Controllers
                 var payLoadResult = new JavaScriptSerializer().Serialize(id);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - PayloadData: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), payLoadResult));
 
-                var record = _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.Id == id).FirstOrDefault();
-             
-                if(record != null)
+                var record = await _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+                if (record != null)
                 {
-                    if (_db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.Id == id).ExecuteDelete() == 1)
+                    if (await _db.RBN_IVR_HOLIDAY_DAYS.Where(x => x.Id == id).ExecuteDeleteAsync() == 1)
                     {
                         response = new getholidayDay
                         {
@@ -667,7 +713,8 @@ namespace Robi_N_WebAPI.Controllers
                             data = record
                         };
                         var _responseText = new JavaScriptSerializer().Serialize(response);
-                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText)); 
+                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                       
                         return Ok(response);
                     } else
                     {
