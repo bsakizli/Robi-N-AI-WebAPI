@@ -141,8 +141,12 @@ namespace Robi_N_WebAPI.Controllers
                                 expiredDate = token.ValidTo,
                                 displayMessage = _response.ResultMessage
                             };
+
+
                             var globalResponseResult = new JavaScriptSerializer().Serialize(response);
                             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
+                            
+                            
                             return Ok(response);
                             //Token Vereceksin.
                         }
@@ -332,6 +336,12 @@ namespace Robi_N_WebAPI.Controllers
             }
 
         }
+
+
+
+
+
+
 
         private responseCreateToken CreateToken(ApiUsers apiUsers, List<RBN_AI_SERVICE_ROLE> roles)
         {

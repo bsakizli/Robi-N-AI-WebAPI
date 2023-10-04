@@ -11,4 +11,8 @@
     <PackageReference Include="Microsoft.Graph.Core" Version="3.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\EmptorUtility\EmptorUtility.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -13,5 +13,6 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_IVR_HOLIDAY_DAYS> RBN_IVR_HOLIDAY_DAYS { get; set; }  
         public DbSet<RBN_VOICE_SOUNDS> RBN_VOICE_SOUNDS { get; set; }  
         public DbSet<RBN_SMS_TEMPLATES> RBN_SMS_TEMPLATES { get; set; }  
+        public DbSet<RBN_WAITING_TIMES> RBN_WAITING_TIMES { get; set; }  
     }
 }

@@ -41,8 +41,6 @@ namespace RobinCore
             return uriBuilder.Uri.AbsoluteUri;
         }
 
-
-
         public async Task<Boolean> getMailTemplate(string _url)
         {
             try
@@ -165,22 +163,24 @@ namespace RobinCore
 
             foreach (DataRow row in table.Rows)
             {
-                string _fullname = String.Empty;
+                //string _fullname = String.Empty;
 
-                if (!String.IsNullOrEmpty(row[2].ToString()))
-                {
-                    _fullname = row[1] + " " + row[2] + " " + row[3];
-                }
-                else
-                {
-                    _fullname = row[1] + " " + row[3];
-                }
+                //if (!String.IsNullOrEmpty(row[2].ToString()))
+                //{
+                //    _fullname = row[1] + " " + row[2] + " " + row[3];
+                //}
+                //else
+                //{
+                //    _fullname = row[1] + " " + row[3];
+                //}
+                
                 string? _image = String.Empty;
                 string? _registryNumber = row[0].ToString();
-                string? _departmentName = row[6].ToString();
-                string? _section = row[5].ToString();
-                string? _previousJob = row[9].ToString();
-                string? _education = row[10].ToString();
+                string? _fullname = row[1].ToString();
+                string? _departmentName = row[3].ToString();
+                string? _section = row[2].ToString();
+                string? _previousJob = row[4].ToString();
+                string? _education = row[5].ToString();
 
 
                 var byteImage = getImagePath(_registryNumber);

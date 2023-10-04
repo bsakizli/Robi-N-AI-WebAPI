@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
@@ -58,17 +59,74 @@ namespace EmptorUtility
 
         }
 
-        public async Task<List<r_GetWaitReasonsListFromTicketId>> GetWaitReasonsListFromTicketId(int TicketId)
+        public async Task<r_getCompanyFullName> getCompanyFullName(string TicketId)
+        {
+            var tt = _appConfig.GetConnectionString("EmptorConnection");
+            r_getCompanyFullName _item = null;
+            DataTable dt = new DataTable();
+            SqlConnection con = new SqlConnection(tt);
+            SqlCommand cmd = new SqlCommand(String.Format(@"SELECT CC.ID, CC.FULLNAME
+            FROM CRMTBL_TICKET AS CT
+                 INNER JOIN CRMTBL_CUSTOMER AS CC WITH(NOLOCK) ON CC.ID = CT.C_CONCERNEDACCOUNTID
+            WHERE 1 = 1
+                  AND CT.IDDESC = @TICKET_ID
+                  AND CT.ACTIVE = 1;"), con);
+            cmd.Parameters.Add("@TICKET_ID", SqlDbType.VarChar).Value = TicketId;
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            adapter.Fill(dt);
+
+            con.Open();
+
+            //using (var connection = new SqlConnection(tt))
+            //{
+            //    connection.Open();
+            //    var record = connection.Query<ctyp>("SELECT MyID AS ID, Name FROM TABLE1 WHERE REC_ID = 1").FirstOrDefault();
+            //}
+
+
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+
+                if (rdr.HasRows)
+                {
+                    while (rdr.Read())
+                    {
+
+                        int Id = Convert.ToInt32(rdr["ID"]);
+                        string name = rdr["FULLNAME"].ToString();
+                        _item = new r_getCompanyFullName
+                        {
+                            Id = Id,
+                            Name = name
+                        };
+                       
+                    }
+                }
+            }
+            con.Close();
+
+            return _item;
+        }
+
+        public async Task<List<r_GetWaitReasonsListFromTicketId>> GetWaitReasonsListFromTicketId(string TicketId)
         {
             var list = new List<r_GetWaitReasonsListFromTicketId>();
-
             var tt = _appConfig.GetConnectionString("EmptorConnection");
 
             DataTable dt = new DataTable();
             SqlConnection con = new SqlConnection(tt);
-            SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @KAYIT_NUMARASI INT;
-SET @KAYIT_NUMARASI = @TICKET_ID; --KAYIT NUMARASI  9113444
-
+            SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @KAYIT_NUMARASI_ID_DESC VARCHAR(12);
+DECLARE @KAYIT_NUMARASI INT;
+SET @KAYIT_NUMARASI_ID_DESC = @TICKET_ID;
+DECLARE @ID_DESC INT;
+SET @KAYIT_NUMARASI =
+(
+    SELECT ID
+    FROM CRMTBL_TICKET
+    WHERE 1 = 1
+          AND IDDESC = @KAYIT_NUMARASI_ID_DESC
+          AND ACTIVE = 1
+);
 DECLARE @SERVIS_TIPI_ID INT;
 SET @SERVIS_TIPI_ID =
 (
@@ -101,11 +159,10 @@ PRINT(@SERVIS_TIPI_ID);
 PRINT(@ILGILI_FIRMA_ID);
 PRINT(@PARENT_ID);
 
-
 --------- ZENİA BEKLEME NEDENLERİ ---------
 IF(@PARENT_ID IN(2677399))
     BEGIN
-       SELECT CTWR.ID, 
+        SELECT CTWR.ID, 
                CTWR.DESCRIPTION_TR
         FROM CRMTBL_TICKETWAITINGREASON CTWR
         WHERE 1 = 1
@@ -117,27 +174,36 @@ IF(@PARENT_ID IN(2677399))
                    AND CTWR.MAINCUSTOMERID = @PARENT_ID);
     END;
 
---------- MİLLİ PİYANGO BEKLEME NEDENLERİ ---------
-	IF(@PARENT_ID IN(6136368))
+--------- TT_YHÇO BEKLEME NEDENLERİ ---------
+IF(@PARENT_ID IN(363460))
     BEGIN
-       SELECT CTWR.ID, 
+        SELECT CTWR.ID, 
+               CTWR.DESCRIPTION_TR
+        FROM CRMTBL_TICKETWAITINGREASON CTWR
+        WHERE 1 = 1
+              AND CTWR.ACTIVE = 1
+              AND CTWR.ID IN(249, 250, 3, 1, 7);
+    END;
+
+--------- MİLLİ PİYANGO BEKLEME NEDENLERİ ---------
+IF(@PARENT_ID IN(6136368))
+    BEGIN
+        SELECT CTWR.ID, 
                CTWR.DESCRIPTION_TR
         FROM CRMTBL_TICKETWAITINGREASON CTWR
         WHERE 1 = 1
               AND CTWR.ACTIVE = 1
               AND (
-                   --AND CTWR.TICKETTYPEID IS NULL
-                   @PARENT_ID = 6136368
-                   AND CTWR.TICKETTYPEID = @SERVIS_TIPI_ID
-                   AND CTWR.MAINCUSTOMERID = @PARENT_ID);
+              --AND CTWR.TICKETTYPEID IS NULL
+              @PARENT_ID = 6136368
+              AND CTWR.TICKETTYPEID = @SERVIS_TIPI_ID
+              AND CTWR.MAINCUSTOMERID = @PARENT_ID);
     END;
 
-
 --------- FİNANSBANK BELİRLİ BEKLEME NEDENLERİ ---------
-IF (@PARENT_ID IN(270855)) BEGIN
-
-
-      SELECT CTWR.ID, 
+IF(@PARENT_ID IN(270855))
+    BEGIN
+        SELECT CTWR.ID, 
                CTWR.DESCRIPTION_TR
         FROM CRMTBL_TICKETWAITINGREASON CTWR
         WHERE 1 = 1
@@ -148,10 +214,9 @@ IF (@PARENT_ID IN(270855)) BEGIN
                    --AND CTWR.TICKETTYPEID = @SERVIS_TIPI_ID
                    AND CTWR.ID IN(330, 331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342))
         AND CTWR.MAINCUSTOMERID = @PARENT_ID;
-
     END;
-
-   IF (@PARENT_ID NOT IN(270855,2677399,6136368)) BEGIN
+IF(@PARENT_ID NOT IN(270855, 2677399, 6136368,363460))
+    BEGIN
 
 ---- BUNLARIN DIŞINDA NE GELİRSE GELSİN STANDART BEKLEME NEDENLERİ
         SELECT CTWR.ID, 
@@ -164,7 +229,7 @@ IF (@PARENT_ID IN(270855)) BEGIN
         --AND (CTWR.MAINCUSTOMERID IS NULL OR CTWR.MAINCUSTOMERID NOT IN(2677399, 6136368, 270855))
         --AND CTWR.TICKETTYPEID = @SERVIS_TIPI_ID;
     END;"), con);
-            cmd.Parameters.Add("@TICKET_ID", SqlDbType.Int).Value = TicketId;
+            cmd.Parameters.Add("@TICKET_ID", SqlDbType.VarChar).Value = TicketId;
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             adapter.Fill(dt);
 
@@ -175,7 +240,6 @@ IF (@PARENT_ID IN(270855)) BEGIN
             //    connection.Open();
             //    var record = connection.Query<ctyp>("SELECT MyID AS ID, Name FROM TABLE1 WHERE REC_ID = 1").FirstOrDefault();
             //}
-
 
             using (SqlDataReader rdr = cmd.ExecuteReader())
             {
@@ -196,8 +260,297 @@ IF (@PARENT_ID IN(270855)) BEGIN
                     }
                 }
             }
+
             con.Close();
             return list;
+        }
+
+        public async Task<r_TicketWaitingPreCheck> TicketWaitingPreCheck(string TicketId)
+        {
+            var tt = _appConfig.GetConnectionString("EmptorConnection");
+            r_TicketWaitingPreCheck _response = null;
+            DataTable dt = new DataTable();
+            SqlConnection con = new SqlConnection(tt);
+            SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @STATUS INT, @KAYIT_NUMARASI_ID_DESC VARCHAR(12), @ID_DESC INT, @R_USERID INT, @ILGILI_FIRMA_ID INT, @PARENT_ID INT, @KAYIT_STATU INT, @KAYIT_NUMARASI INT, @BEKLEME_AKTIVITE_SAYISI INT, @BEKLEYE_ALINMA_SAYISI INT;
+SET @R_USERID = 123; --TEKNİSYEN VEYA ANA SORUMLU EMPTOR_ID
+SET @KAYIT_NUMARASI_ID_DESC = @TICKET_ID;
+
+SET @KAYIT_NUMARASI =
+(
+    SELECT ID FROM CRMTBL_TICKET WHERE 1 = 1 AND IDDESC=@KAYIT_NUMARASI_ID_DESC AND ACTIVE=1
+);
+
+SET @STATUS = (
+SELECT 
+COUNT(ID) AS STATUS
+FROM CRMTBL_TICKET WHERE 1 = 1 AND ID=@KAYIT_NUMARASI AND ACTIVE=1
+)
+
+
+SET @KAYIT_STATU =
+(
+    SELECT C_TICKETSTATUSSUBID
+    FROM CRMTBL_TICKET
+    WHERE 1 = 1
+          AND ID = @KAYIT_NUMARASI
+          AND ACTIVE = 1
+);
+SET @ILGILI_FIRMA_ID =
+(
+    SELECT C_CONCERNEDACCOUNTID
+    FROM CRMTBL_TICKET
+    WHERE 1 = 1
+          AND ID = @KAYIT_NUMARASI
+          AND ACTIVE = 1
+);
+SET @PARENT_ID =
+(
+    SELECT MainCustomerId
+    FROM CRMTBL_CUSTOMER
+    WHERE 1 = 1
+          AND ID = @ILGILI_FIRMA_ID
+          AND ACTIVE = 1
+);
+SET @BEKLEME_AKTIVITE_SAYISI =
+(
+    SELECT COUNT(CA.ACTIVITYTYPEID) AS BeklemeAktiviteSayisi
+    FROM CRMTBL_ACTIVITY AS CA
+    WHERE 1 = 1
+          AND CA.TICKETID = @KAYIT_NUMARASI
+          AND CA.ACTIVITYTYPEID = 122
+          AND CA.ACTIVE = 1
+);
+SET @BEKLEYE_ALINMA_SAYISI =
+(
+    SELECT COUNT(SERVICEID) AS BeklemeyeAlinmaSayisi
+    FROM PROTBL_SERVICESTATUSLOG AS PSL
+    WHERE 1 = 1
+          AND PSL.SERVICEID = @KAYIT_NUMARASI
+          AND PSL.STATUSID = 7
+);
+
+--IF(@PARENT_ID IN (2677399))
+--  BEGIN
+--	IF(@KAYIT_STATU = 8)
+--	  BEGIN
+--		 SELECT 199 AS StatusCode, 'Zenia Kaydı Yeni İstek Statüsnden beklemeye geçilmez. Kaydı işlemdeye alın.' AS StatusMessage;
+--	  END
+--	ELSE
+--	  BEGIN
+--		SELECT 'Kurallara devam';
+--	  END
+--  END
+
+
+--IF(@PARENT_ID IN (2677399))
+--  BEGIN
+--	IF(@KAYIT_STATU = 8)
+--	  BEGIN
+--		 SELECT 199 AS StatusCode, 'Zenia Kaydı Yeni İstek Statüsnden beklemeye geçilmez. Kaydı işlemdeye alın.' AS StatusMessage;
+--	  END
+--	ELSE
+--	  BEGIN
+--		SELECT 'Kurallara devam';
+--	  END
+--  END
+
+
+
+IF(@STATUS = 1)
+  BEGIN
+    IF(@KAYIT_STATU IN(1, 8, 7))
+    BEGIN
+       
+	   --KAYIT BEKLEMEYE ALINMASI İÇİN DİĞER KURALLAR BURADA OLACAK
+        --SELECT 201 AS StatusCode, 'Kayıt Beklemeye almak için Devam et' As StatusMessage;
+
+		IF((SELECT TOP 1
+			CASE
+			WHEN CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) < '08:00:00' THEN 1
+		    WHEN CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) >= '17:30:00' THEN 1
+			ELSE 0
+		END AS 'result'
+
+			FROM CRMTBL_ACTIVITY AS CA
+			WHERE 1 = 1
+				  AND CA.ACTIVE = 1
+				  AND CA.TICKETID = @KAYIT_NUMARASI
+				  AND CA.ACTIVITYTYPEID=122
+				  ORDER BY CA.ID DESC)=1)
+		  BEGIN
+		    IF(@BEKLEME_AKTIVITE_SAYISI <= 0)
+            BEGIN
+                SELECT 199 AS StatusCode, 
+                       'Kayıt içinde bekleme aktivitesi yok. Lütfen Bekleme Aktivitesi giriniz.' AS StatusMessage;
+            END;
+            ELSE
+            BEGIN
+                IF(@BEKLEME_AKTIVITE_SAYISI <= @BEKLEYE_ALINMA_SAYISI)
+                    BEGIN
+                        SELECT 199 AS StatusCode, 
+                               'Kayıt içinde bekleme aktivitesi yok. Lütfen ' + CONVERT(NVARCHAR(MAX), @BEKLEME_AKTIVITE_SAYISI + 1) + '. Lütfen Bekleme Aktivitesi giriniz.' AS StatusMessage;
+                    END;
+                    ELSE
+                    BEGIN
+                        SELECT 200 AS StatusCode, 
+                               'Kayıt Beklemeye Alınabilir!' AS StatusMessage;
+                    END;
+            END;
+		  END
+		ELSE
+		  BEGIN
+			SELECT 199 AS StatusCode, 'Mesai dışında girilen bir bekleme aktivitesi yok.' AS StatusMessage;
+		  END
+    END;
+    ELSE
+    BEGIN
+        SELECT 404 AS StatusCode, 
+               'Kayıt statüsü uygun olmadığından dolayı kayıt beklemeye alınamaz.' AS StatusMessage;
+    END;
+  END
+ELSE
+  BEGIN
+    SELECT 199 AS StatusCode, 
+                       'Böyle bir kayıt numarası bulunamadı.' AS StatusMessage;
+  END;"), con);
+            cmd.Parameters.Add("@TICKET_ID", SqlDbType.VarChar).Value = TicketId;
+            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            adapter.Fill(dt);
+
+            await con.OpenAsync();
+
+            using (SqlDataReader rdr =  await cmd.ExecuteReaderAsync())
+            {
+                if (rdr.HasRows)
+                {
+                    while (rdr.Read())
+                    {
+
+                        int StatusCode = Convert.ToInt32(rdr["StatusCode"]);
+                        string StatusMessage = rdr["StatusMessage"].ToString();
+                        _response = new r_TicketWaitingPreCheck
+                        {
+                            StatusCode = StatusCode,
+                            StatusMessage = StatusMessage
+                        };
+                       
+                    }
+                }
+            }
+            con.Close();
+            return _response;
+           
+        }
+
+
+        public async Task<Boolean> TicketWaiting(string TicketId, int ReasonId, DateTime ReasonDate)
+        {
+           try
+            {
+                var tt = _appConfig.GetConnectionString("EmptorConnection");
+               
+                DataTable dt = new DataTable();
+                SqlConnection con = new SqlConnection(tt);
+
+                SqlCommand cmd = new SqlCommand(String.Format(@"
+                DECLARE @DateNow AS DATETIME;
+                SET @DateNow = GETDATE();
+                EXEC sp_executesql 
+                     N'UPDATE CRMTBL_TICKET SET C_TICKETSTATUSSUBID = @C_TICKETSTATUSSUBID, UPDATE_USER_ID=@UPDATE_USER_ID, UPDATE_USER_POSITION_ID=@UPDATE_USER_POSITION_ID, UPDATE_USER_TIME = @UPDATE_USER_TIME, C_WAITINGREASONID = @C_WAITINGREASONID, C_BACKCALLDATE = @C_BACKCALLDATE WHERE IDDESC = @IDDESC', 
+                     N'@C_TICKETSTATUSSUBID int,@UPDATE_USER_TIME datetime,@C_WAITINGREASONID int, @UPDATE_USER_ID int, @UPDATE_USER_POSITION_ID int,@C_BACKCALLDATE datetime,@IDDESC nvarchar(12)', 
+                     @C_TICKETSTATUSSUBID = 7, 
+                     @UPDATE_USER_TIME = @DateNow, 
+                     @C_WAITINGREASONID = @ReasonId, 
+                     @C_BACKCALLDATE = @ReasonDate,
+	                 @UPDATE_USER_POSITION_ID=6277,
+	                 @UPDATE_USER_ID=8535,
+                     @IDDESC = @TicketId;"), con);
+                cmd.Parameters.Add("@TicketId", SqlDbType.VarChar).Value = TicketId;
+                cmd.Parameters.Add("@ReasonId", SqlDbType.Int).Value = ReasonId;
+                cmd.Parameters.Add("@ReasonDate", SqlDbType.DateTime).Value = ReasonDate;
+
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(dt);
+
+                var aa = dt.Rows.Count;
+
+                await con.CloseAsync();
+
+                return true;
+            } catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<r_getMainResponsibleInfo> getMainResponsibleInfo(int UserId, string TicketId)
+        {
+            r_getMainResponsibleInfo _response = null;
+            try
+            {
+                var tt = _appConfig.GetConnectionString("EmptorConnection");
+                
+                DataTable dt = new DataTable();
+                SqlConnection con = new SqlConnection(tt);
+                SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @TICKET_ID VARCHAR(12), @ANASORUMLU_ID INT, @ALTSORUMLU_ID INT;
+            SET @TICKET_ID = @TicketId;
+
+            SET @ANASORUMLU_ID= (SELECT RESPONSIBLEUSERID FROM CRMTBL_TICKET WHERE 1 = 1 AND ACTIVE=1 AND IDDESC=@TICKET_ID);
+            SET @ALTSORUMLU_ID = @UserId; --Robin Giriş Yapan
+
+            SELECT 
+            (SELECT FULLNAME FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleFullName,
+            (SELECT EMAIL FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleEmail,
+            (SELECT FULLNAME FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleFullName,
+            (SELECT EMAIL FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleEmail"), con);
+                cmd.Parameters.Add("@TicketId", SqlDbType.VarChar).Value = TicketId;
+                cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = UserId;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(dt);
+
+                await con.OpenAsync();
+
+                using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+                {
+                    if (rdr.HasRows)
+                    {
+                        while (rdr.Read())
+                        {
+                            string MainResponsibleFullName = rdr["MainResponsibleFullName"].ToString();
+                            string MainResponsibleEmail = rdr["MainResponsibleEmail"].ToString();
+                            string SubResponsibleFullName = rdr["SubResponsibleFullName"].ToString();
+                            string SubResponsibleEmail = rdr["SubResponsibleEmail"].ToString();
+
+                            _response = new r_getMainResponsibleInfo
+                            {
+                                status = true,
+                                MainResponsibleFullName = MainResponsibleFullName,
+                                MainResponsibleEmail = MainResponsibleEmail,
+                                SubResponsibleEmail = SubResponsibleEmail,
+                                SubResponsibleFullName = SubResponsibleFullName
+                            };
+                        }
+                       
+                    } else
+                    {
+                        _response = new r_getMainResponsibleInfo
+                        {
+                            status = false
+                        };
+                    }
+                }
+                con.Close();
+
+                return _response;
+
+            } catch
+            {
+                _response = new r_getMainResponsibleInfo
+                {
+                    status = false
+                };
+                return _response;
+            }
         }
 
     }
