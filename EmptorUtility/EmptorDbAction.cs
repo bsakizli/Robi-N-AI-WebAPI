@@ -453,12 +453,11 @@ ELSE
            try
             {
                 var tt = _appConfig.GetConnectionString("EmptorConnection");
-               
+                Boolean StatusCode = false;
                 DataTable dt = new DataTable();
                 SqlConnection con = new SqlConnection(tt);
 
                 SqlCommand cmd = new SqlCommand(String.Format(@"
-                GO
                 BEGIN TRANSACTION t1;
                 BEGIN TRY
                 --DECLARE @TicketIdDesc NVARCHAR(MAX), @ReasonId INT, @ReasonDate DATETIME;
@@ -523,11 +522,29 @@ ELSE
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
                 adapter.Fill(dt);
 
-                var aa = dt.Rows.Count;
+                await con.OpenAsync();
 
+                using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+                {
+                    if (rdr.HasRows)
+                    {
+                        while (rdr.Read())
+                        {
+
+                            StatusCode = Convert.ToBoolean(rdr["Result"]);
+
+                        }
+                    }
+                }
                 await con.CloseAsync();
+                return StatusCode;
 
-                return true;
+
+                //var aa = dt.Rows.Count;
+
+                //await con.CloseAsync();
+
+                //return true;
             } catch
             {
                 return false;
@@ -544,16 +561,16 @@ ELSE
                 DataTable dt = new DataTable();
                 SqlConnection con = new SqlConnection(tt);
                 SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @TICKET_ID VARCHAR(12), @ANASORUMLU_ID INT, @ALTSORUMLU_ID INT;
-            SET @TICKET_ID = @TicketId;
+SET @TICKET_ID = @TicketId;
 
-            SET @ANASORUMLU_ID= (SELECT RESPONSIBLEUSERID FROM CRMTBL_TICKET WHERE 1 = 1 AND ACTIVE=1 AND IDDESC=@TICKET_ID);
-            SET @ALTSORUMLU_ID = @UserId; --Robin Giriş Yapan
+SET @ANASORUMLU_ID= (SELECT RESPONSIBLEUSERID FROM CRMTBL_TICKET WITH (NOLOCK) WHERE 1 = 1 AND ACTIVE=1 AND IDDESC=@TICKET_ID);
+SET @ALTSORUMLU_ID = @UserId; --Robin Giriş Yapan
 
-            SELECT 
-            (SELECT FULLNAME FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleFullName,
-            (SELECT EMAIL FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleEmail,
-            (SELECT FULLNAME FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleFullName,
-            (SELECT EMAIL FROM BIZTBL_USER WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleEmail"), con);
+SELECT 
+(SELECT FULLNAME FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleFullName,
+(SELECT EMAIL FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleEmail,
+(SELECT FULLNAME FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleFullName,
+(SELECT EMAIL FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleEmail"), con);
                 cmd.Parameters.Add("@TicketId", SqlDbType.VarChar).Value = TicketId;
                 cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = UserId;
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
