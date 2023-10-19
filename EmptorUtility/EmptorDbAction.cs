@@ -7,10 +7,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 
+
 namespace EmptorUtility
 {
     public class EmptorDbAction
     {
+
+        
 
         private IConfiguration? _appConfig;
 
@@ -415,7 +418,9 @@ ELSE
   END;"), con);
             cmd.Parameters.Add("@TICKET_ID", SqlDbType.VarChar).Value = TicketId;
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+            adapter.SelectCommand.CommandTimeout = 500; // default is 30 seconds
             adapter.Fill(dt);
+
 
             await con.OpenAsync();
 
@@ -437,13 +442,13 @@ ELSE
                     }
                 }
             }
-            con.Close();
+            await con.CloseAsync();
             return _response;
            
         }
 
 
-        public async Task<Boolean> TicketWaiting(string TicketId, int ReasonId, DateTime ReasonDate)
+        public async Task<Boolean> TicketWaiting(string TicketIdDesc, int ReasonId, DateTime ReasonDate)
         {
            try
             {
@@ -453,19 +458,65 @@ ELSE
                 SqlConnection con = new SqlConnection(tt);
 
                 SqlCommand cmd = new SqlCommand(String.Format(@"
-                DECLARE @DateNow AS DATETIME;
+                GO
+                BEGIN TRANSACTION t1;
+                BEGIN TRY
+                --DECLARE @TicketIdDesc NVARCHAR(MAX), @ReasonId INT, @ReasonDate DATETIME;
+                --SET @TicketIdDesc='252009113467';
+                --SET @ReasonId=5;
+                --SET @ReasonDate= GETDATE();
+
+                DECLARE @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @C_TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
+                SET @UserId = 8535;
+                SET @C_TICKETSTATUSSUBID = 7;
+                SET @UserPositionId = 6445;
                 SET @DateNow = GETDATE();
+
+                SET @TicketId =
+                (
+                    SELECT ID
+                    FROM CRMTBL_TICKET
+                    WHERE 1 = 1
+                          AND IDDESC = @TicketIdDesc
+                          AND ACTIVE = 1
+                );
+                SET @NEWVALUE = CONVERT(NVARCHAR(10), 7) + '~~' + CONVERT(NVARCHAR(MAX), @DateNow, 121) + '~~' + CONVERT(NVARCHAR(10), @ReasonId) + '~~' + CONVERT(VARCHAR, @ReasonDate, 121);
+
+
+                EXEC [dbo].[BIZSP_ADDLOG_QUICK] 
+                     @TABLENAME = 'CRMTBL_TICKET', 
+                     @COLUMNNAMES = 'C_TICKETSTATUSSUBID,UPDATE_USER_TIME,C_WAITINGREASONID,C_BACKCALLDATE', 
+                     @NEWVALUES = @NEWVALUE, 
+                     @RECID = @TicketId, 
+                     @USERID = @UserId, 
+                     @POSITIONID = @UserPositionId;
+
                 EXEC sp_executesql 
                      N'UPDATE CRMTBL_TICKET SET C_TICKETSTATUSSUBID = @C_TICKETSTATUSSUBID, UPDATE_USER_ID=@UPDATE_USER_ID, UPDATE_USER_POSITION_ID=@UPDATE_USER_POSITION_ID, UPDATE_USER_TIME = @UPDATE_USER_TIME, C_WAITINGREASONID = @C_WAITINGREASONID, C_BACKCALLDATE = @C_BACKCALLDATE WHERE IDDESC = @IDDESC', 
                      N'@C_TICKETSTATUSSUBID int,@UPDATE_USER_TIME datetime,@C_WAITINGREASONID int, @UPDATE_USER_ID int, @UPDATE_USER_POSITION_ID int,@C_BACKCALLDATE datetime,@IDDESC nvarchar(12)', 
-                     @C_TICKETSTATUSSUBID = 7, 
+                     @C_TICKETSTATUSSUBID = @C_TICKETSTATUSSUBID, 
                      @UPDATE_USER_TIME = @DateNow, 
                      @C_WAITINGREASONID = @ReasonId, 
-                     @C_BACKCALLDATE = @ReasonDate,
-	                 @UPDATE_USER_POSITION_ID=6277,
-	                 @UPDATE_USER_ID=8535,
-                     @IDDESC = @TicketId;"), con);
-                cmd.Parameters.Add("@TicketId", SqlDbType.VarChar).Value = TicketId;
+                     @C_BACKCALLDATE = @ReasonDate, 
+                     @UPDATE_USER_POSITION_ID = @UserPositionId, 
+                     @UPDATE_USER_ID = @UserId, 
+                     @IDDESC = @TicketIdDesc;
+
+	                 SELECT CONVERT(bit,1) AS Result;
+
+                END TRY
+                BEGIN CATCH
+
+                SELECT CONVERT(bit,0) AS Result;
+
+                IF @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION t1;
+                END CATCH;
+                IF @@TRANCOUNT > 0
+                 COMMIT TRANSACTION t1
+                "), con);
+
+                cmd.Parameters.Add("@TicketIdDesc", SqlDbType.VarChar).Value = TicketIdDesc;
                 cmd.Parameters.Add("@ReasonId", SqlDbType.Int).Value = ReasonId;
                 cmd.Parameters.Add("@ReasonDate", SqlDbType.DateTime).Value = ReasonDate;
 

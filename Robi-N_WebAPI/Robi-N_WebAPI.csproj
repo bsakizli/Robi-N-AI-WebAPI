@@ -6,6 +6,7 @@
     <RootNamespace>Robi_N_WebAPI</RootNamespace>
     <TargetFramework>net7.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <UserSecretsId>8b660398-1e07-4970-a5dd-98621ec74115</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +41,7 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.0.0" />
     <PackageReference Include="Nancy" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="PortableWebDavLibrary" Version="1.1.9" />
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="7.0.1" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.3.0" />

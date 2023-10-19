@@ -338,11 +338,6 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-
-
-
-
-
         private responseCreateToken CreateToken(ApiUsers apiUsers, List<RBN_AI_SERVICE_ROLE> roles)
         {
             responseCreateToken responseCreateToken;

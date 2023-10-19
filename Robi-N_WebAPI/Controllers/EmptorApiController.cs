@@ -13,6 +13,10 @@ using Microsoft.Kiota.Abstractions;
 using Robi_N_WebAPI.Utility.Tables;
 using MailEntity;
 using EmptorUtility.Models.Response;
+using System.Net;
+using DecaTec.WebDav;
+using Google.Apis.Auth.OAuth2;
+using System.Net.Http.Headers;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -36,6 +40,44 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
+        [HttpGet("sqlquerytest")]
+        public async Task<IActionResult> getTest()
+        {
+            var credentials = new NetworkCredential("admin", "Baris3857++");
+            var webDavSession = new WebDavSession(@String.Format(@"https://drive.tospi.tech/remote.php/dav/files/{0}/",credentials.UserName), credentials);
+            var items = await webDavSession.ListAsync(@"BDH/SQL_QUERY/");
+
+            foreach (var item in items)
+            {
+                HttpClient client = new HttpClient();
+                Uri baseUri = new Uri(item.Uri.ToString());
+                client.BaseAddress = baseUri;
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.ConnectionClose = true;
+
+                ////Post body content
+                //var values = new List<KeyValuePair<string, string>>();
+                //values.Add(new KeyValuePair<string, string>(credentials.UserName, credentials.Password));
+                //var content = new FormUrlEncodedContent(values);
+
+                var authenticationString = $"{credentials.UserName}:{credentials.Password}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+
+                var response = await client.SendAsync(requestMessage);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+
+
+                var tt = item.ContentClass.ToString();
+            }
+
+            return Ok("Tamamdır");
+        }
+
 
         [HttpGet("getTicketById")]
         public IActionResult getTicketById(int Id)
@@ -55,8 +97,7 @@ namespace Robi_N_WebAPI.Controllers
             {
                 EmptorDbAction db = new EmptorDbAction(_configuration);
 
-
-                var _check = await db.TicketWaitingPreCheck(TicketId);
+               var _check = await db.TicketWaitingPreCheck(TicketId);
 
                 if (_check.StatusCode == 200)
                 {
