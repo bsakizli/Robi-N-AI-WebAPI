@@ -208,14 +208,19 @@ namespace Robi_N_WebAPI.Controllers
 
                             if (_wait)
                             {
-                                var _contactInformation = db.getMainResponsibleInfo((int)_request.UserId, _request.TicketId);
+                                var _contactInformation = await db.getMainResponsibleInfo((int)_request.UserId, _request.TicketId);
                                 if (_contactInformation != null)
                                 {
-                                    if (Convert.ToBoolean(_contactInformation.Result.status))
-                                    {
+                                   
+                                    //Ticket Waiting Logs
 
+
+
+
+                                    if (Convert.ToBoolean(_contactInformation.status))
+                                    {
                                         MailService mailService = new MailService();
-                                        var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation.Result, _company.Name, (DateTime)_reasonDate);
+                                        var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation, _company.Name, (DateTime)_reasonDate);
                                     }
 
                                     _response = new GlobalResponse

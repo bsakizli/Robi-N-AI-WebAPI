@@ -33,9 +33,6 @@ namespace Robi_N_WebAPI.Services
                 request.Headers.Add("Authorization", "Basic cm9iaW4tZWwtbWw6ckBiaW5NbEVs");
 
 
-               
-
-
                 using (var streamWriter = new StreamWriter(request.GetRequestStream()))
                 {
                     var _json = JsonConvert.SerializeObject(_request);
