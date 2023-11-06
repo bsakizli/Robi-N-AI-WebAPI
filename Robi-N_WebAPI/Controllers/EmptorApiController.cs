@@ -17,11 +17,12 @@ using System.Net;
 using DecaTec.WebDav;
 using Google.Apis.Auth.OAuth2;
 using System.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class EmptorApiController : ControllerBase
     {
@@ -30,6 +31,9 @@ namespace Robi_N_WebAPI.Controllers
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _hostingEnvironment;
+
+
+
 
         public EmptorApiController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration configuration, ILogger<IdentityCheckController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
@@ -40,43 +44,43 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-        [HttpGet("sqlquerytest")]
-        public async Task<IActionResult> getTest()
-        {
-            var credentials = new NetworkCredential("admin", "Baris3857++");
-            var webDavSession = new WebDavSession(@String.Format(@"https://drive.tospi.tech/remote.php/dav/files/{0}/",credentials.UserName), credentials);
-            var items = await webDavSession.ListAsync(@"BDH/SQL_QUERY/");
+        //[HttpGet("sqlquerytest")]
+        //public async Task<IActionResult> getTest()
+        //{
+        //    var credentials = new NetworkCredential("admin", "Baris3857++");
+        //    var webDavSession = new WebDavSession(@String.Format(@"https://drive.tospi.tech/remote.php/dav/files/{0}/",credentials.UserName), credentials);
+        //    var items = await webDavSession.ListAsync(@"BDH/SQL_QUERY/");
 
-            foreach (var item in items)
-            {
-                HttpClient client = new HttpClient();
-                Uri baseUri = new Uri(item.Uri.ToString());
-                client.BaseAddress = baseUri;
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.ConnectionClose = true;
+        //    foreach (var item in items)
+        //    {
+        //        HttpClient client = new HttpClient();
+        //        Uri baseUri = new Uri(item.Uri.ToString());
+        //        client.BaseAddress = baseUri;
+        //        client.DefaultRequestHeaders.Clear();
+        //        client.DefaultRequestHeaders.ConnectionClose = true;
 
-                ////Post body content
-                //var values = new List<KeyValuePair<string, string>>();
-                //values.Add(new KeyValuePair<string, string>(credentials.UserName, credentials.Password));
-                //var content = new FormUrlEncodedContent(values);
+        //        ////Post body content
+        //        //var values = new List<KeyValuePair<string, string>>();
+        //        //values.Add(new KeyValuePair<string, string>(credentials.UserName, credentials.Password));
+        //        //var content = new FormUrlEncodedContent(values);
 
-                var authenticationString = $"{credentials.UserName}:{credentials.Password}";
-                var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+        //        var authenticationString = $"{credentials.UserName}:{credentials.Password}";
+        //        var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
 
-                var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+        //        var requestMessage = new HttpRequestMessage(HttpMethod.Get, baseUri);
+        //        requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
 
-                var response = await client.SendAsync(requestMessage);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+        //        var response = await client.SendAsync(requestMessage);
+        //        response.EnsureSuccessStatusCode();
+        //        string responseBody = await response.Content.ReadAsStringAsync();
 
 
 
-                var tt = item.ContentClass.ToString();
-            }
+        //        var tt = item.ContentClass.ToString();
+        //    }
 
-            return Ok("Tamamdır");
-        }
+        //    return Ok("Tamamdır");
+        //}
 
 
         [HttpGet("getTicketById")]
@@ -90,8 +94,6 @@ namespace Robi_N_WebAPI.Controllers
         [HttpGet("GetWaitReasonsListFromTicketId")]
         public async Task<IActionResult> GetWaitReasonsListFromTicketId(string TicketId)
         {
-
-
             responseGetWaitReasonsListFromTicketId _response;
             try
             {
@@ -167,9 +169,17 @@ namespace Robi_N_WebAPI.Controllers
             GlobalResponse _response = new GlobalResponse();
             try
             {
+                var handler = new JwtSecurityTokenHandler();
+                string authHeader = Request.Headers["Authorization"];
+                authHeader = authHeader.Replace("Bearer ", "");
+                var jsonToken = handler.ReadToken(authHeader);
+                var tokenS = handler.ReadToken(authHeader) as JwtSecurityToken;
+                var UserId = tokenS.Claims.First(claim => claim.Type == "UserId").Value;
+                
+
                 EmptorDbAction db = new EmptorDbAction(_configuration);
                 DateTime? _reasonDate;
-                if (_request.TicketId != null && _request.ReasonId > 0 && _request.UserId > 0)
+                if (_request.TicketId != null && _request.ReasonId > 0 && Convert.ToInt32(UserId) > 0)
                 {
                     var _check = await db.TicketWaitingPreCheck(_request.TicketId);
                     var _company = await db.getCompanyFullName(_request.TicketId);
@@ -197,7 +207,6 @@ namespace Robi_N_WebAPI.Controllers
                                 {
                                     _reasonDate = DateTime.Now.AddDays(1).Date + hours;
                                 }
-
                             }
                             else
                             {
@@ -208,33 +217,55 @@ namespace Robi_N_WebAPI.Controllers
 
                             if (_wait)
                             {
-                                var _contactInformation = await db.getMainResponsibleInfo((int)_request.UserId, _request.TicketId);
+                                var _contactInformation = await db.getMainResponsibleInfo(Convert.ToInt32(UserId), _request.TicketId);
                                 if (_contactInformation != null)
                                 {
-                                   
-                                    //Ticket Waiting Logs
-
-
-
-
                                     if (Convert.ToBoolean(_contactInformation.status))
                                     {
                                         MailService mailService = new MailService();
                                         var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation, _company.Name, (DateTime)_reasonDate);
                                     }
 
-                                    _response = new GlobalResponse
+                                    //Ticket Waiting Logs
+                                    RBN_EMPTOR_WaitingTicketHistory _RBN_EMPTOR_WaitingTicketHistory = new RBN_EMPTOR_WaitingTicketHistory
                                     {
-                                        status = true,
-                                        statusCode = 200,
-                                        message = "Successfuly",
-                                        displayMessage = "Kayıt beklemeye alınmıştır."
+                                        TicketDesc = _request.TicketId,
+                                        Active = true,
+                                        CompanyId = _company.Id,
+                                        CompanyName = _company.Name,
+                                        MainUserFullName = _contactInformation.MainResponsibleFullName,
+                                        SubUserFullName = _contactInformation.SubResponsibleFullName,
+                                        WaitingDate = _reasonDate,
+                                        WaitingReason = _request.ReasonId,
+                                        TransactionDate = DateTime.Now
                                     };
-                                    return Ok(_response);
+                                    var lastRecord = _db.RBN_EMPTOR_WaitingTicketHistory.Add(_RBN_EMPTOR_WaitingTicketHistory);
+                                    await _db.SaveChangesAsync();
+                                    if (lastRecord != null)
+                                    {
+                                        _response = new GlobalResponse
+                                        {
+                                            status = true,
+                                            statusCode = 200,
+                                            message = "Successfuly",
+                                            displayMessage = "Kayıt beklemeye alınmıştır."
+                                        };
+                                        return Ok(_response);
+                                    } else {
+
+
+                                        _response = new GlobalResponse
+                                        {
+                                            status = false,
+                                            statusCode = 199,
+                                            message = "Successfuly",
+                                            displayMessage = "Kayıt beklemeye alınamadı!"
+                                        };
+                                        return BadRequest(_response);
+                                    }
 
                                 }
                             }
-                            
                             _response = new GlobalResponse
                             {
                                 status = false,
@@ -243,8 +274,6 @@ namespace Robi_N_WebAPI.Controllers
                                 displayMessage = "Kayıt beklemeye alınamadı!"
                             };
                             return BadRequest(_response);
-
-
                         }
                         else
                         {

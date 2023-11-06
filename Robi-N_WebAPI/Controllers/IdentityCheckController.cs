@@ -109,15 +109,15 @@ namespace Robi_N_WebAPI.Controllers
                             var credentials = new SigningCredentials(secKey, SecurityAlgorithms.HmacSha256);
 
                             var claimArray = new List<Claim>
-                         {
-                            new Claim(ClaimTypes.IsPersistent, _response.UserId),
-                            new Claim(ClaimTypes.Email, _response.Email),
-                            new Claim(ClaimTypes.Name, _response.FirstName),
-                            new Claim(ClaimTypes.GivenName, _response.UserFullName),
-                            new Claim(ClaimTypes.NameIdentifier, username!),
-                            new Claim(ClaimTypes.GroupSid, _response.PositionName!),
-                            //new Claim(ClaimTypes.Role, apiUsers.role!),
-                         };
+                             {
+                                new Claim("UserId", _response.UserId),
+                                new Claim("Email", _response.Email),
+                                new Claim("Name", _response.FirstName),
+                                new Claim("UserFullName", _response.UserFullName),
+                                new Claim("username", username!),
+                                new Claim("PositionName", _response.PositionName),
+                                //new Claim(ClaimTypes.Role, apiUsers.role!),
+                             };
 
                             claimArray.Add(new Claim(ClaimTypes.Role, "User"!));
 
@@ -146,8 +146,6 @@ namespace Robi_N_WebAPI.Controllers
                             var globalResponseResult = new JavaScriptSerializer().Serialize(response);
                             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
                             
-                            
-                            return Ok(response);
                             //Token Vereceksin.
                         }
                         else
@@ -160,9 +158,10 @@ namespace Robi_N_WebAPI.Controllers
                                 message = "Emptor Login Failed."
                             };
                             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
-                            return BadRequest(response);
+                            
                             //Hata Mesajı
                         }
+                        return Ok(response);
                     }
                     else
                     {
