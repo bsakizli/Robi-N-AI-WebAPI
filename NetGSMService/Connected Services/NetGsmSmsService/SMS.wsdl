@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://sms/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="SMS" targetNamespace="http://sms/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="http://soap.netgsm.com.tr:8080/Sms_webservis/SMS?xsd=1" namespace="http://sms/" />
+    </xsd:schema>
+    <xsd:schema>
+      <xsd:import schemaLocation="http://soap.netgsm.com.tr:8080/Sms_webservis/SMS?xsd=2" namespace="SMS" />
+    </xsd:schema>
+  </types>
+  <message name="sms_gonder_nn">
+    <part name="parameters" element="tns:sms_gonder_nn" />
+  </message>
+  <message name="sms_gonder_nnResponse">
+    <part name="parameters" element="tns:sms_gonder_nnResponse" />
+  </message>
+  <message name="smsGonderNNV2">
+    <part name="parameters" element="tns:smsGonderNNV2" />
+  </message>
+  <message name="smsGonderNNV2Response">
+    <part name="parameters" element="tns:smsGonderNNV2Response" />
+  </message>
+  <message name="smsGonderNNV3">
+    <part name="parameters" element="tns:smsGonderNNV3" />
+  </message>
+  <message name="smsGonderNNV3Response">
+    <part name="parameters" element="tns:smsGonderNNV3Response" />
+  </message>
+  <message name="sms_gonder_1n">
+    <part name="parameters" element="tns:sms_gonder_1n" />
+  </message>
+  <message name="sms_gonder_1nResponse">
+    <part name="parameters" element="tns:sms_gonder_1nResponse" />
+  </message>
+  <message name="smsGonder1NV3">
+    <part name="parameters" element="tns:smsGonder1NV3" />
+  </message>
+  <message name="smsGonder1NV3Response">
+    <part name="parameters" element="tns:smsGonder1NV3Response" />
+  </message>
+  <message name="kredi">
+    <part name="parameters" element="tns:kredi" />
+  </message>
+  <message name="krediResponse">
+    <part name="parameters" element="tns:krediResponse" />
+  </message>
+  <message name="paketkampanya">
+    <part name="parameters" element="tns:paketkampanya" />
+  </message>
+  <message name="paketkampanyaResponse">
+    <part name="parameters" element="tns:paketkampanyaResponse" />
+  </message>
+  <message name="rapor">
+    <part name="parameters" element="tns:rapor" />
+  </message>
+  <message name="raporResponse">
+    <part name="parameters" element="tns:raporResponse" />
+  </message>
+  <message name="rapor_v2">
+    <part name="parameters" element="tns:rapor_v2" />
+  </message>
+  <message name="rapor_v2Response">
+    <part name="parameters" element="tns:rapor_v2Response" />
+  </message>
+  <message name="raporV3">
+    <part name="parameters" element="tns:raporV3" />
+  </message>
+  <message name="raporV3Response">
+    <part name="parameters" element="tns:raporV3Response" />
+  </message>
+  <message name="gondericiadlari">
+    <part name="parameters" element="tns:gondericiadlari" />
+  </message>
+  <message name="gondericiadlariResponse">
+    <part name="parameters" element="tns:gondericiadlariResponse" />
+  </message>
+  <message name="gelensmsV2">
+    <part name="parameters" element="tns:gelensmsV2" />
+  </message>
+  <message name="gelensmsV2Response">
+    <part name="parameters" element="tns:gelensmsV2Response" />
+  </message>
+  <message name="smsGonder1NV2">
+    <part name="parameters" element="tns:smsGonder1NV2" />
+  </message>
+  <message name="smsGonder1NV2Response">
+    <part name="parameters" element="tns:smsGonder1NV2Response" />
+  </message>
+  <message name="gelensms">
+    <part name="parameters" element="tns:gelensms" />
+  </message>
+  <message name="gelensmsResponse">
+    <part name="parameters" element="tns:gelensmsResponse" />
+  </message>
+  <portType name="smsnn">
+    <operation name="sms_gonder_nn">
+      <input wsam:Action="http://sms/smsnn/sms_gonder_nnRequest" message="tns:sms_gonder_nn" />
+      <output wsam:Action="http://sms/smsnn/sms_gonder_nnResponse" message="tns:sms_gonder_nnResponse" />
+    </operation>
+    <operation name="smsGonderNNV2">
+      <input wsam:Action="http://sms/smsnn/smsGonderNNV2Request" message="tns:smsGonderNNV2" />
+      <output wsam:Action="http://sms/smsnn/smsGonderNNV2Response" message="tns:smsGonderNNV2Response" />
+    </operation>
+    <operation name="smsGonderNNV3">
+      <input wsam:Action="http://sms/smsnn/smsGonderNNV3Request" message="tns:smsGonderNNV3" />
+      <output wsam:Action="http://sms/smsnn/smsGonderNNV3Response" message="tns:smsGonderNNV3Response" />
+    </operation>
+    <operation name="sms_gonder_1n">
+      <input wsam:Action="http://sms/smsnn/sms_gonder_1nRequest" message="tns:sms_gonder_1n" />
+      <output wsam:Action="http://sms/smsnn/sms_gonder_1nResponse" message="tns:sms_gonder_1nResponse" />
+    </operation>
+    <operation name="smsGonder1NV3">
+      <input wsam:Action="http://sms/smsnn/smsGonder1NV3Request" message="tns:smsGonder1NV3" />
+      <output wsam:Action="http://sms/smsnn/smsGonder1NV3Response" message="tns:smsGonder1NV3Response" />
+    </operation>
+    <operation name="kredi">
+      <input wsam:Action="http://sms/smsnn/krediRequest" message="tns:kredi" />
+      <output wsam:Action="http://sms/smsnn/krediResponse" message="tns:krediResponse" />
+    </operation>
+    <operation name="paketkampanya">
+      <input wsam:Action="http://sms/smsnn/paketkampanyaRequest" message="tns:paketkampanya" />
+      <output wsam:Action="http://sms/smsnn/paketkampanyaResponse" message="tns:paketkampanyaResponse" />
+    </operation>
+    <operation name="rapor">
+      <input wsam:Action="http://sms/smsnn/raporRequest" message="tns:rapor" />
+      <output wsam:Action="http://sms/smsnn/raporResponse" message="tns:raporResponse" />
+    </operation>
+    <operation name="rapor_v2">
+      <input wsam:Action="http://sms/smsnn/rapor_v2Request" message="tns:rapor_v2" />
+      <output wsam:Action="http://sms/smsnn/rapor_v2Response" message="tns:rapor_v2Response" />
+    </operation>
+    <operation name="raporV3">
+      <input wsam:Action="http://sms/smsnn/raporV3Request" message="tns:raporV3" />
+      <output wsam:Action="http://sms/smsnn/raporV3Response" message="tns:raporV3Response" />
+    </operation>
+    <operation name="gondericiadlari">
+      <input wsam:Action="http://sms/smsnn/gondericiadlariRequest" message="tns:gondericiadlari" />
+      <output wsam:Action="http://sms/smsnn/gondericiadlariResponse" message="tns:gondericiadlariResponse" />
+    </operation>
+    <operation name="gelensmsV2">
+      <input wsam:Action="http://sms/smsnn/gelensmsV2Request" message="tns:gelensmsV2" />
+      <output wsam:Action="http://sms/smsnn/gelensmsV2Response" message="tns:gelensmsV2Response" />
+    </operation>
+    <operation name="smsGonder1NV2">
+      <input wsam:Action="http://sms/smsnn/smsGonder1NV2Request" message="tns:smsGonder1NV2" />
+      <output wsam:Action="http://sms/smsnn/smsGonder1NV2Response" message="tns:smsGonder1NV2Response" />
+    </operation>
+    <operation name="gelensms">
+      <input wsam:Action="http://sms/smsnn/gelensmsRequest" message="tns:gelensms" />
+      <output wsam:Action="http://sms/smsnn/gelensmsResponse" message="tns:gelensmsResponse" />
+    </operation>
+  </portType>
+  <binding name="smsnnPortBinding" type="tns:smsnn">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="sms_gonder_nn">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="smsGonderNNV2">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="smsGonderNNV3">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="sms_gonder_1n">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="smsGonder1NV3">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="kredi">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="paketkampanya">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="rapor">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="rapor_v2">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="raporV3">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="gondericiadlari">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="gelensmsV2">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="smsGonder1NV2">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="gelensms">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="SMS">
+    <port name="smsnnPort" binding="tns:smsnnPortBinding">
+      <soap:address location="http://soap.netgsm.com.tr:8080/Sms_webservis/SMS" />
+    </port>
+  </service>
+</definitions>

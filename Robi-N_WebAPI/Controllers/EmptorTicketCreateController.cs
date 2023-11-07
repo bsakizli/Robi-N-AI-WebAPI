@@ -13,7 +13,7 @@ namespace Robi_N_WebAPI.Controllers
     [ApiController]
     public class EmptorTicketCreateController : ControllerBase
     {
-        SMSService smsApi = new SMSService();
+       
         CallService callService = new CallService();
 
         // GET: api/<EmptorTicketCreateController>

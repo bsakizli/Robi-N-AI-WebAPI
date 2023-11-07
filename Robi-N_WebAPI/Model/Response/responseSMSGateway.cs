@@ -6,6 +6,7 @@ namespace Robi_N_WebAPI.Model.Response
     {
         public class responsesendSMSById : GlobalResponse {
             public RBN_SMS_TEMPLATES data { get; set; }
+            public long bulkid { get; set; }
         }
     }
 }

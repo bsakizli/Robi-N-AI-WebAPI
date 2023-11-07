@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://sms/" xmlns:ns1="SMS" targetNamespace="http://sms/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://soap.netgsm.com.tr:8080/Sms_webservis/SMS?xsd=2" namespace="SMS" />
+  <xs:element name="gelensms" type="tns:gelensms" />
+  <xs:element name="gelensmsResponse" type="tns:gelensmsResponse" />
+  <xs:element name="gelensmsV2" type="tns:gelensmsV2" />
+  <xs:element name="gelensmsV2Response" type="tns:gelensmsV2Response" />
+  <xs:element name="gondericiadlari" type="tns:gondericiadlari" />
+  <xs:element name="gondericiadlariResponse" type="tns:gondericiadlariResponse" />
+  <xs:element name="kredi" type="tns:kredi" />
+  <xs:element name="krediResponse" type="tns:krediResponse" />
+  <xs:element name="paketkampanya" type="tns:paketkampanya" />
+  <xs:element name="paketkampanyaResponse" type="tns:paketkampanyaResponse" />
+  <xs:element name="rapor" type="tns:rapor" />
+  <xs:element name="raporResponse" type="tns:raporResponse" />
+  <xs:element name="raporV3" type="tns:raporV3" />
+  <xs:element name="raporV3Response" type="tns:raporV3Response" />
+  <xs:element name="rapor_v2" type="tns:rapor_v2" />
+  <xs:element name="rapor_v2Response" type="tns:rapor_v2Response" />
+  <xs:element name="smsGonder1NV2" type="tns:smsGonder1NV2" />
+  <xs:element name="smsGonder1NV2Response" type="tns:smsGonder1NV2Response" />
+  <xs:element name="smsGonder1NV3" type="tns:smsGonder1NV3" />
+  <xs:element name="smsGonder1NV3Response" type="tns:smsGonder1NV3Response" />
+  <xs:element name="smsGonderNNV2" type="tns:smsGonderNNV2" />
+  <xs:element name="smsGonderNNV2Response" type="tns:smsGonderNNV2Response" />
+  <xs:element name="smsGonderNNV3" type="tns:smsGonderNNV3" />
+  <xs:element name="smsGonderNNV3Response" type="tns:smsGonderNNV3Response" />
+  <xs:element name="sms_gonder_1n" type="tns:sms_gonder_1n" />
+  <xs:element name="sms_gonder_1nResponse" type="tns:sms_gonder_1nResponse" />
+  <xs:element name="sms_gonder_nn" type="tns:sms_gonder_nn" />
+  <xs:element name="sms_gonder_nnResponse" type="tns:sms_gonder_nnResponse" />
+  <xs:complexType name="sms_gonder_1n">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="company" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" name="msg" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sms_gonder_1nResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sms_gonder_nn">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="company" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="msg" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="sms_gonder_nnResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:return" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonder1NV2">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" name="msg" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+      <xs:element name="filter" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonder1NV2Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonder1NV3">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" name="msg" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+      <xs:element name="filter" type="xs:int" />
+      <xs:element minOccurs="0" name="appkey" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonder1NV3Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gondericiadlari">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gondericiadlariResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="rapor_v2">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="bulkid" type="xs:string" />
+      <xs:element name="status" type="xs:int" />
+      <xs:element name="version" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="telno" nillable="true" type="xs:string" />
+      <xs:element name="detail" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="rapor_v2Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gelensms">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gelensmsResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonderNNV2">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="msg" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+      <xs:element name="filter" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonderNNV2Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="rapor">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="bulkid" type="xs:string" />
+      <xs:element name="status" type="xs:int" />
+      <xs:element name="version" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="raporResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonderNNV3">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="msg" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="gsm" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="encoding" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element minOccurs="0" name="bayikodu" type="xs:string" />
+      <xs:element name="filter" type="xs:int" />
+      <xs:element minOccurs="0" name="appkey" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="smsGonderNNV3Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="kredi">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="krediResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="paketkampanya">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="paketkampanyaResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gelensmsV2">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element name="type" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="gelensmsV2Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="raporV3">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string" />
+      <xs:element minOccurs="0" name="password" type="xs:string" />
+      <xs:element minOccurs="0" name="bulkid" type="xs:string" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="telno" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="header" type="xs:string" />
+      <xs:element minOccurs="0" name="startdate" type="xs:string" />
+      <xs:element minOccurs="0" name="stopdate" type="xs:string" />
+      <xs:element name="type" type="xs:int" />
+      <xs:element name="status" type="xs:int" />
+      <xs:element name="detail" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="raporV3Response">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

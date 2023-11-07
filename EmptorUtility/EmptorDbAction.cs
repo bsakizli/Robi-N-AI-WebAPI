@@ -555,13 +555,14 @@ ELSE
 SET @TICKET_ID = @TicketId;
 
 SET @ANASORUMLU_ID= (SELECT RESPONSIBLEUSERID FROM CRMTBL_TICKET WITH (NOLOCK) WHERE 1 = 1 AND ACTIVE=1 AND IDDESC=@TICKET_ID);
-SET @ALTSORUMLU_ID = @UserId; --Robin Giriş Yapan
-
+SET @ALTSORUMLU_ID = @UserId;
 SELECT 
+(SELECT ID FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleId,
 (SELECT FULLNAME FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleFullName,
 (SELECT EMAIL FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ANASORUMLU_ID AND ACTIVE=1) AS MainResponsibleEmail,
 (SELECT FULLNAME FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleFullName,
-(SELECT EMAIL FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleEmail"), con);
+(SELECT EMAIL FROM BIZTBL_USER WITH (NOLOCK) WHERE 1 = 1 AND ID=@ALTSORUMLU_ID AND ACTIVE=1) AS SubResponsibleEmail
+"), con);
                 cmd.Parameters.Add("@TicketId", SqlDbType.VarChar).Value = TicketId;
                 cmd.Parameters.Add("@UserId", SqlDbType.Int).Value = UserId;
                 SqlDataAdapter adapter = new SqlDataAdapter(cmd);
@@ -579,17 +580,18 @@ SELECT
                             string MainResponsibleEmail = rdr["MainResponsibleEmail"].ToString();
                             string SubResponsibleFullName = rdr["SubResponsibleFullName"].ToString();
                             string SubResponsibleEmail = rdr["SubResponsibleEmail"].ToString();
+                            string MainResponsibleFullNameId = rdr["MainResponsibleId"].ToString();
 
                             _response = new r_getMainResponsibleInfo
                             {
                                 status = true,
                                 MainResponsibleFullName = MainResponsibleFullName,
                                 MainResponsibleEmail = MainResponsibleEmail,
+                                SubResponsibleFullName = SubResponsibleFullName,
                                 SubResponsibleEmail = SubResponsibleEmail,
-                                SubResponsibleFullName = SubResponsibleFullName
+                                MainResponsibleId = Convert.ToInt32(MainResponsibleFullNameId)
                             };
                         }
-                       
                     } else
                     {
                         _response = new r_getMainResponsibleInfo

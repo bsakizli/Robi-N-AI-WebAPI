@@ -9,6 +9,7 @@ namespace EmptorUtility.Models.Response
     public class r_getMainResponsibleInfo
     {
         public Boolean? status { get; set; }
+        public int MainResponsibleId { get; set; }
         public string? MainResponsibleFullName { get; set; }
         public string? MainResponsibleEmail { get; set; }
         public string? SubResponsibleFullName { get; set; }

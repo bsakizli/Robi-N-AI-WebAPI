@@ -218,6 +218,7 @@ namespace Robi_N_WebAPI.Controllers
                             if (_wait)
                             {
                                 var _contactInformation = await db.getMainResponsibleInfo(Convert.ToInt32(UserId), _request.TicketId);
+
                                 if (_contactInformation != null)
                                 {
                                     if (Convert.ToBoolean(_contactInformation.status))
@@ -229,14 +230,18 @@ namespace Robi_N_WebAPI.Controllers
                                     //Ticket Waiting Logs
                                     RBN_EMPTOR_WaitingTicketHistory _RBN_EMPTOR_WaitingTicketHistory = new RBN_EMPTOR_WaitingTicketHistory
                                     {
-                                        TicketDesc = _request.TicketId,
+                                        TicketIdDesc = _request.TicketId,
                                         Active = true,
-                                        CompanyId = _company.Id,
-                                        CompanyName = _company.Name,
-                                        MainUserFullName = _contactInformation.MainResponsibleFullName,
-                                        SubUserFullName = _contactInformation.SubResponsibleFullName,
-                                        WaitingDate = _reasonDate,
-                                        WaitingReason = _request.ReasonId,
+                                        MainUserId = _contactInformation.MainResponsibleId,
+                                        UserId = Convert.ToInt32(UserId),
+                                        CallBackDate = _reasonDate,
+                                        WaitingReasonId = Convert.ToInt32(_request.ReasonId),
+                                        //CompanyId = _company.Id,
+                                        //CompanyName = _company.Name,
+                                        //MainUserFullName = _contactInformation.MainResponsibleFullName,
+                                        //SubUserFullName = _contactInformation.SubResponsibleFullName,
+                                        //WaitingDate = _reasonDate,
+                                        //WaitingReason = _request.ReasonId,
                                         TransactionDate = DateTime.Now
                                     };
                                     var lastRecord = _db.RBN_EMPTOR_WaitingTicketHistory.Add(_RBN_EMPTOR_WaitingTicketHistory);

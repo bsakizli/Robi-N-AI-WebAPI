@@ -59,7 +59,7 @@
     <ProjectReference Include="..\EmptorUtility\EmptorUtility.csproj" />
     <ProjectReference Include="..\GoogleCloudUtility\GoogleCloudUtility.csproj" />
     <ProjectReference Include="..\MailEntity\MailEntity.csproj" />
-    <ProjectReference Include="..\NetGSMService\NetGSMService.csproj" />
+    <ProjectReference Include="..\NetGsmAPI\NetGsmAPI.csproj" />
     <ProjectReference Include="..\RobinCore\RobinCore.csproj" />
   </ItemGroup>
 

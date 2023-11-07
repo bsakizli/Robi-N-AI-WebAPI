@@ -4,14 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Nancy.Json;
+using NetGsmAPI;
 using Robi_N_WebAPI.Model;
 using Robi_N_WebAPI.Model.Request;
 using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
 using SimpleCrypto;
+
 using System.Text.RegularExpressions;
 using static Robi_N_WebAPI.Model.Response.responseSMSGateway;
+
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -21,10 +24,13 @@ namespace Robi_N_WebAPI.Controllers
     public class SMSGatewayController : ControllerBase
     {
 
+
+        NetGsmService _smsService = new NetGsmService();
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly SMSService _smsService;
+
+      
 
         PBKDF2 crypto = new PBKDF2();
 
@@ -33,13 +39,14 @@ namespace Robi_N_WebAPI.Controllers
             _configuration = configuration;
             _logger = logger;
             _db = db;
-            _smsService = new SMSService();
+          
         }
 
         [HttpPost("sendSMSById")]
-        public IActionResult sendSMSById(long gsmNumber, int MessageId)
+        public async Task<IActionResult> sendSMSById(long gsmNumber, int MessageId)
         {
             responsesendSMSById response;
+
             try
             {
                 string _log = String.Format(@"GSM:{0} - MessageId: {1} ", gsmNumber, MessageId);
@@ -51,36 +58,59 @@ namespace Robi_N_WebAPI.Controllers
 
                 if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                 {
-                    var _sendSMSResponse = _smsService.SendSMS(gsmNumber, _getMessage.Message);
 
-                    if (_sendSMSResponse)
+                    Regex rgx = new Regex("#([A-Za-z0-9]+)#");
+                    if (rgx.Matches(_getMessage.Message).Count == 0)
                     {
+                        var _sendSMSResponse = await _smsService.sendSms(gsmNumber, _getMessage.Message);
+
+                        if (_sendSMSResponse.status)
+                        {
+                            response = new responsesendSMSById
+                            {
+                                status = true,
+                                statusCode = 200,
+                                message = "Message sent successfully.",
+                                data = _getMessage,
+                                bulkid = _sendSMSResponse.bulkid
+                            };
+                            textResult = new JavaScriptSerializer().Serialize(response);
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                            return Ok(response);
+                        }
+                        else
+                        {
+                            response = new responsesendSMSById
+                            {
+                                status = true,
+                                statusCode = 202,
+                                message = "The message could not be sent due to an ISP problem. Please provide information.",
+                                data = _getMessage
+                            };
+                            textResult = new JavaScriptSerializer().Serialize(response);
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                            return BadRequest(response);
+                        }
+                    } else
+                    {
+
                         response = new responsesendSMSById
                         {
-                            status = true,
-                            statusCode = 200,
-                            message = "Message sent successfully.",
-                            data = _getMessage
-                        };
-                        textResult = new JavaScriptSerializer().Serialize(response);
-                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                            status = false,
+                            statusCode = 203,
+                            message = "Unsuccessfully",
+                            displayMessage = "SMS içeriğinde değişken tanımı var, bu method üzerinden sms gönderilemez."
 
-                        return Ok(response);
-                    }
-                    else
-                    {
-                        response = new responsesendSMSById
-                        {
-                            status = true,
-                            statusCode = 202,
-                            message = "The message could not be sent due to an ISP problem. Please provide information.",
-                            data = _getMessage
                         };
+
                         textResult = new JavaScriptSerializer().Serialize(response);
                         _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
                         return BadRequest(response);
                     }
+                    
                 }
                 else
                 {
@@ -119,9 +149,8 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("sendSmsParameterById")]
-        public IActionResult sendSmsParameterById(requestSendSmsParameterById _request)
+        public async Task<IActionResult> sendSmsParameterById(requestSendSmsParameterById _request)
         {
-
             responsesendSMSById response;
             try
             {
@@ -180,9 +209,9 @@ namespace Robi_N_WebAPI.Controllers
                                 }
                             }
 
-                            var _sendSMSResponse = _smsService.SendSMS(_request.gsmNumber, _getMessage.Message);
+                            var _sendSMSResponse = await _smsService.sendSms(_request.gsmNumber, _MessageBody);
 
-                            if (_sendSMSResponse)
+                            if (_sendSMSResponse.status)
                             {
                                 _getMessage.Message = _MessageBody;
 
@@ -192,7 +221,8 @@ namespace Robi_N_WebAPI.Controllers
                                     statusCode = 200,
                                     message = "Message sent successfully.",
                                     displayMessage = "SMS Başarıyla Gönderilmiştir",
-                                    data = _getMessage
+                                    data = _getMessage,
+                                    bulkid = _sendSMSResponse.bulkid
                                 };
                                 textResult = new JavaScriptSerializer().Serialize(response);
                                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
@@ -212,13 +242,13 @@ namespace Robi_N_WebAPI.Controllers
                                 return BadRequest(response);
                             }
 
-                        }
+                        } else
                         {
                             response = new responsesendSMSById
                             {
                                 status = false,
                                 statusCode = 205,
-                                message = "",
+                                message = "Unsuccessful",
                                 displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
                             };
                             textResult = new JavaScriptSerializer().Serialize(response);
@@ -272,5 +302,47 @@ namespace Robi_N_WebAPI.Controllers
 
 
         }
+
+
+        //[HttpPost("smsReport")]
+        //public async Task<IActionResult> smsReport(long bulkId)
+        //{
+        //    responsesendSMSById response;
+
+        //    try
+        //    {
+        //        string _log = String.Format(@"BulkId:{0}", bulkId);
+        //        var textResult = new JavaScriptSerializer().Serialize(_log);
+        //        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+
+        //        if(bulkId > 0)
+        //        {
+        //            var tt = await _smsService.SmsReport(bulkId);
+
+        //            return Ok("evet");
+        //        } else
+        //        {
+        //            return Ok("hayır");
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        response = new responsesendSMSById
+        //        {
+        //            status = false,
+        //            statusCode = 500,
+        //            message = "System Error"
+        //        };
+
+        //        var textResult = new JavaScriptSerializer().Serialize(response);
+        //        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+        //        return BadRequest(response);
+
+        //    }
+
+
+        //}
     }
 }
