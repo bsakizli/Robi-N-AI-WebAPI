@@ -12,7 +12,7 @@ namespace Robi_N_WebAPI.Services
         //http://www.postaguvercini.com/api_http/sendsms.asp?user=aybarsyalcinotp&password=Qwe123**&gsm=905071310019&text=123123
         public static string _url = "www.postaguvercini.com";
 
-        public bool SendSMS(string gsm, string text)
+        public bool SendSMS(long gsm, string text)
         {
             bool _status = false;
             var myUri = new Uri(String.Format("http://{0}/api_http/sendsms.asp?user=aybarsyalcinotp&password=Qwe123**&gsm={1}&text={2}", _url, gsm, text));

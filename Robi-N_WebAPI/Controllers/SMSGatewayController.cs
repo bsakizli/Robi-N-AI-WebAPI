@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Nancy.Json;
 using Robi_N_WebAPI.Model;
+using Robi_N_WebAPI.Model.Request;
 using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
@@ -34,7 +35,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("sendSMSById")]
-        public IActionResult sendSMSById(string gsmNumber, int MessageId)
+        public IActionResult sendSMSById(long gsmNumber, int MessageId)
         {
             responsesendSMSById response;
             try
@@ -46,10 +47,10 @@ namespace Robi_N_WebAPI.Controllers
 
                 var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == MessageId);
 
-                if (_getMessage != null)
+                if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                 {
                     var _sendSMSResponse = _smsService.SendSMS(gsmNumber, _getMessage.Message);
-                   
+
                     if (_sendSMSResponse)
                     {
                         response = new responsesendSMSById
@@ -63,7 +64,8 @@ namespace Robi_N_WebAPI.Controllers
                         _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
                         return Ok(response);
-                    } else
+                    }
+                    else
                     {
                         response = new responsesendSMSById
                         {
@@ -77,7 +79,8 @@ namespace Robi_N_WebAPI.Controllers
 
                         return BadRequest(response);
                     }
-                } else
+                }
+                else
                 {
                     response = new responsesendSMSById
                     {
@@ -93,7 +96,8 @@ namespace Robi_N_WebAPI.Controllers
                     //Mesaj tanımı yok
                 }
 
-            } catch
+            }
+            catch
             {
                 response = new responsesendSMSById
                 {
@@ -109,7 +113,125 @@ namespace Robi_N_WebAPI.Controllers
 
             }
 
-           
+
+        }
+
+        [HttpPost("sendSmsParameterById")]
+        public IActionResult sendSmsParameterById(requestSendSmsParameterById _request)
+        {
+            responsesendSMSById response;
+            try
+            {
+                string _log = String.Format(@"GSM:{0} - MessageId: {1} ", _request.gsmNumber, _request.messageId);
+                var textResult = new JavaScriptSerializer().Serialize(_log);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                string _MessageBody = String.Empty;
+                if (_request != null && _request.parameters != null)
+                {
+
+                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId);
+
+                    if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
+                    {
+                        _MessageBody = _getMessage.Message;
+
+                        foreach (var parameter in _request.parameters)
+                        {
+                            if (!String.IsNullOrEmpty(parameter.value) && !String.IsNullOrEmpty(parameter.key))
+                            {
+                                _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
+                            } else
+                            {
+                                response = new responsesendSMSById
+                                {
+                                    status = false,
+                                    statusCode = 203,
+                                    message = "Parameter information is incorrect or missing.",
+                                    displayMessage = "Parametre bilgisi hatalı veya eksik."
+                                };
+                                textResult = new JavaScriptSerializer().Serialize(response);
+                                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                                return BadRequest(response);
+                            }
+                        }
+
+                        var _sendSMSResponse = _smsService.SendSMS(_request.gsmNumber, _getMessage.Message);
+
+                        if (_sendSMSResponse)
+                        {
+                            _getMessage.Message = _MessageBody;
+
+                            response = new responsesendSMSById
+                            {
+                                status = true,
+                                statusCode = 200,
+                                message = "Message sent successfully.",
+                                displayMessage = "SMS Başarıyla Gönderilmiştir",
+                                data = _getMessage
+                            };
+                            textResult = new JavaScriptSerializer().Serialize(response);
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                            
+                        }
+                        else
+                        {
+                            response = new responsesendSMSById
+                            {
+                                status = true,
+                                statusCode = 202,
+                                message = "The message could not be sent due to an ISP problem. Please provide information.",
+                                data = _getMessage
+                            };
+                            textResult = new JavaScriptSerializer().Serialize(response);
+                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                            return BadRequest(response);
+                        }
+                    }
+                    else
+                    {
+                        response = new responsesendSMSById
+                        {
+                            status = false,
+                            statusCode = 201,
+                            message = "The message could not be sent because there is no template defined for the Id number entered."
+                        };
+                        return BadRequest(response);
+                        //Mesaj tanımı yok
+                    }
+                } else
+                {
+                    response = new responsesendSMSById
+                    {
+                        status = false,
+                        statusCode = 404,
+                        message = "The message could not be sent because there is no template defined for the Id number entered."
+                    };
+                    return NotFound(response);
+                }
+
+
+                textResult = new JavaScriptSerializer().Serialize(response);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                return Ok(response);
+
+            }
+            catch
+            {
+                response = new responsesendSMSById
+                {
+                    status = false,
+                    statusCode = 500,
+                    message = "System Error"
+                };
+
+                var textResult = new JavaScriptSerializer().Serialize(response);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                return BadRequest(response);
+
+            }
+
+
         }
     }
 }
