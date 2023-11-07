@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Nancy.Json;
 using Robi_N_WebAPI.Model;
@@ -9,6 +10,7 @@ using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
 using SimpleCrypto;
+using System.Text.RegularExpressions;
 using static Robi_N_WebAPI.Model.Response.responseSMSGateway;
 
 namespace Robi_N_WebAPI.Controllers
@@ -119,6 +121,7 @@ namespace Robi_N_WebAPI.Controllers
         [HttpPost("sendSmsParameterById")]
         public IActionResult sendSmsParameterById(requestSendSmsParameterById _request)
         {
+
             responsesendSMSById response;
             try
             {
@@ -129,58 +132,94 @@ namespace Robi_N_WebAPI.Controllers
                 if (_request != null && _request.parameters != null)
                 {
 
-                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId);
+                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId && x.active == true);
 
                     if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                     {
                         _MessageBody = _getMessage.Message;
 
-                        foreach (var parameter in _request.parameters)
+                        List<string> _parameters = new List<string>();
+                        List<string> _requestParameters = new List<string>();
+
+                        Regex rgx = new Regex("#([A-Za-z0-9]+)#");
+                        foreach (Match match in rgx.Matches(_getMessage.Message))
                         {
-                            if (!String.IsNullOrEmpty(parameter.value) && !String.IsNullOrEmpty(parameter.key))
+                            _parameters.RemoveAll(x => x == match.Value);
+                            _parameters.Add(match.Value);
+                        }
+
+                        foreach (var item in _request.parameters)
+                        {
+                            if (!String.IsNullOrEmpty(item.key)) {
+                                _requestParameters.RemoveAll(x => x == item.key);
+                                _requestParameters.Add(item.key);
+                            }
+                        }
+
+                        if (_parameters.SequenceEqual(_requestParameters))
+                        {
+
+                            foreach (var parameter in _request.parameters)
                             {
-                                _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
-                            } else
+                                if (!String.IsNullOrEmpty(parameter.value) && !String.IsNullOrEmpty(parameter.key))
+                                {
+                                    _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
+                                }
+                                else
+                                {
+                                    response = new responsesendSMSById
+                                    {
+                                        status = false,
+                                        statusCode = 203,
+                                        message = "Parameter information is incorrect or missing.",
+                                        displayMessage = "Parametre bilgisi hatalı veya eksik."
+                                    };
+                                    textResult = new JavaScriptSerializer().Serialize(response);
+                                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                                    return BadRequest(response);
+                                }
+                            }
+
+                            var _sendSMSResponse = _smsService.SendSMS(_request.gsmNumber, _getMessage.Message);
+
+                            if (_sendSMSResponse)
+                            {
+                                _getMessage.Message = _MessageBody;
+
+                                response = new responsesendSMSById
+                                {
+                                    status = true,
+                                    statusCode = 200,
+                                    message = "Message sent successfully.",
+                                    displayMessage = "SMS Başarıyla Gönderilmiştir",
+                                    data = _getMessage
+                                };
+                                textResult = new JavaScriptSerializer().Serialize(response);
+                                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                            }
+                            else
                             {
                                 response = new responsesendSMSById
                                 {
-                                    status = false,
-                                    statusCode = 203,
-                                    message = "Parameter information is incorrect or missing.",
-                                    displayMessage = "Parametre bilgisi hatalı veya eksik."
+                                    status = true,
+                                    statusCode = 202,
+                                    message = "The message could not be sent due to an ISP problem. Please provide information.",
+                                    data = _getMessage
                                 };
                                 textResult = new JavaScriptSerializer().Serialize(response);
                                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                                 return BadRequest(response);
                             }
+
                         }
-
-                        var _sendSMSResponse = _smsService.SendSMS(_request.gsmNumber, _getMessage.Message);
-
-                        if (_sendSMSResponse)
-                        {
-                            _getMessage.Message = _MessageBody;
-
-                            response = new responsesendSMSById
-                            {
-                                status = true,
-                                statusCode = 200,
-                                message = "Message sent successfully.",
-                                displayMessage = "SMS Başarıyla Gönderilmiştir",
-                                data = _getMessage
-                            };
-                            textResult = new JavaScriptSerializer().Serialize(response);
-                            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
-                            
-                        }
-                        else
                         {
                             response = new responsesendSMSById
                             {
-                                status = true,
-                                statusCode = 202,
-                                message = "The message could not be sent due to an ISP problem. Please provide information.",
-                                data = _getMessage
+                                status = false,
+                                statusCode = 205,
+                                message = "",
+                                displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
                             };
                             textResult = new JavaScriptSerializer().Serialize(response);
                             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
