@@ -756,5 +756,80 @@ namespace Robi_N_WebAPI.Controllers
             }
         }
 
+        [HttpPost("addlog")]
+        public async Task<IActionResult> addlog(requestAddLog _request)
+        {
+            GlobalResponse response;
+
+            try
+            {
+                var payLoadResult = new JavaScriptSerializer().Serialize(_request);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - PayloadData: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), payLoadResult));
+
+                if (!String.IsNullOrEmpty(_request.uniqId) && !String.IsNullOrEmpty(_request.log))
+                {
+
+                    var _record = new RBN_IVR_LOGS()
+                    {
+                        active = true,
+                        log = _request.log,
+                        uniqId = _request.uniqId,
+                        addDate = DateTime.Now,
+                    };
+                    var lastRecord = _db.RBN_IVR_LOGS.Add(_record);
+                    await _db.SaveChangesAsync();
+                    if (lastRecord != null)
+                    {
+                        response = new GlobalResponse
+                        {
+                            status = true,
+                            statusCode = 200,
+                            displayMessage = "Log kaydı yapılmıştır.",
+                            message = "Successful"
+                        };
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response = new GlobalResponse
+                        {
+                            status = false,
+                            statusCode = 201,
+                            displayMessage = "Log kaydı yapılamadı.",
+                            message = "Unsuccessful"
+                        };
+                    }
+                }
+                else
+                {
+                    response = new GlobalResponse
+                    {
+                        status = false,
+                        statusCode = 202,
+                        displayMessage = "Log parametrelerini kontrol ediniz.",
+                        message = "Unsuccessful"
+                    };
+                }
+
+                var _responseText = new JavaScriptSerializer().Serialize(response);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                return BadRequest(response);
+
+            }
+            catch (Exception ex)
+            {
+                response = new GlobalResponse
+                {
+                    status = false,
+                    statusCode = 202,
+                    displayMessage = $"Log parametrelerini kontrol ediniz. - Error {ex.Message}",
+                    message = "Unsuccessful"
+                };
+                var _responseText = new JavaScriptSerializer().Serialize(response);
+                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+                return BadRequest(response);
+            }
+        }
+
     }
 }
