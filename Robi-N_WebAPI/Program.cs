@@ -519,9 +519,7 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 
 //builder.Services.AddCors();
 
-builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true
-    
-    );
+builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 var app = builder.Build();
 

@@ -26,6 +26,7 @@ namespace Robi_N_WebAPI.Controllers
 
 
         NetGsmService _smsService = new NetGsmService();
+        MobilDevService _mobilDevService = new MobilDevService();
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
@@ -43,7 +44,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("sendSMSById")]
-        public async Task<IActionResult> sendSMSById(long gsmNumber, int MessageId)
+        public async Task<IActionResult> sendSMSById(string gsmNumber, int MessageId)
         {
             responsesendSMSById response;
 
@@ -62,7 +63,7 @@ namespace Robi_N_WebAPI.Controllers
                     Regex rgx = new Regex("#([A-Za-z0-9]+)#");
                     if (rgx.Matches(_getMessage.Message).Count == 0)
                     {
-                        var _sendSMSResponse = await _smsService.sendSms(gsmNumber, _getMessage.Message);
+                        var _sendSMSResponse = await _mobilDevService.sendSms(gsmNumber, _getMessage.Message);
 
                         if (_sendSMSResponse.status)
                         {
@@ -209,7 +210,7 @@ namespace Robi_N_WebAPI.Controllers
                                 }
                             }
 
-                            var _sendSMSResponse = await _smsService.sendSms(_request.gsmNumber, _MessageBody);
+                            var _sendSMSResponse = await _mobilDevService.sendSms(_request.gsmNumber, _MessageBody);
 
                             if (_sendSMSResponse.status)
                             {

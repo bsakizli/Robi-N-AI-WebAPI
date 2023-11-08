@@ -11,13 +11,13 @@ namespace NetGsmAPI
 
         smsnnClient smsnnClient = new smsnnClient();
 
-        public async Task<responseSendSms>  sendSms(long gsmNumber, string message)
+        public async Task<responseSendSms>  sendSms(string gsmNumber, string message)
         {
             responseSendSms response = new responseSendSms();
            
             try
             {
-                string[] numbers = { Convert.ToString(gsmNumber) };
+                string[] numbers = { Convert.ToString(gsmNumber.Replace(" ","")) };
                 smsGonder1NV3Request request = new smsGonder1NV3Request
                 {
                     username = _username,

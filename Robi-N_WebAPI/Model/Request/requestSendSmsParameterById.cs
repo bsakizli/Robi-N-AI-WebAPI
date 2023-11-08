@@ -3,7 +3,7 @@
     public class requestSendSmsParameterById
     {
         public long messageId { get; set; }
-        public long gsmNumber { get; set; }
+        public string gsmNumber { get; set; }
         public List<smsParameter>? parameters { get; set; }
 
     }

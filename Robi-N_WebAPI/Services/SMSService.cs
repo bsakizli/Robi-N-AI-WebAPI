@@ -4,9 +4,11 @@ using Nancy;
 using Newtonsoft.Json;
 using Robi_N_WebAPI.Model.Service.Response;
 using System.Net;
+using Robi_N_WebAPI.Model.Request;
 
 namespace Robi_N_WebAPI.Services
 {
+
     //public class SMSService
     //{
     //    //http://www.postaguvercini.com/api_http/sendsms.asp?user=aybarsyalcinotp&password=Qwe123**&gsm=905071310019&text=123123
@@ -42,4 +44,9 @@ namespace Robi_N_WebAPI.Services
            
     //    }
     //}
+
+
+
+
+
 }
