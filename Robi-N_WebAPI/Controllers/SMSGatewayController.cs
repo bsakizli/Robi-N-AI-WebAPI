@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
+using Microsoft.Office.Interop.Excel;
 using Nancy.Json;
 using NetGsmAPI;
 using Robi_N_WebAPI.Model;
@@ -19,7 +20,7 @@ using static Robi_N_WebAPI.Model.Response.responseSMSGateway;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class SMSGatewayController : ControllerBase
     {
@@ -149,8 +150,10 @@ namespace Robi_N_WebAPI.Controllers
 
         }
 
+
+        
         [HttpPost("sendSmsParameterById")]
-        public async Task<IActionResult> sendSmsParameterById(requestSendSmsParameterById _request)
+        public async Task<IActionResult> sendSmsParameterById([FromBody] requestSendSmsParameterById _request)
         {
             responsesendSMSById response;
             try
@@ -186,7 +189,7 @@ namespace Robi_N_WebAPI.Controllers
                             }
                         }
 
-                        if (_parameters.SequenceEqual(_requestParameters))
+                        if (_parameters.All(_requestParameters.Contains))
                         {
 
                             foreach (var parameter in _request.parameters)
@@ -303,6 +306,8 @@ namespace Robi_N_WebAPI.Controllers
 
 
         }
+
+
 
 
         //[HttpPost("smsReport")]

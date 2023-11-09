@@ -757,7 +757,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("addlog")]
-        public async Task<IActionResult> addlog(requestAddLog _request)
+        public async Task<IActionResult> addlog([FromBody] requestAddLog _request)
         {
             GlobalResponse response;
 
