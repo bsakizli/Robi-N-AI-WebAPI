@@ -772,6 +772,7 @@ namespace Robi_N_WebAPI.Controllers
                     var _record = new RBN_IVR_LOGS()
                     {
                         active = true,
+                        logKey = _request.logKey,
                         log = _request.log,
                         uniqId = _request.uniqId,
                         addDate = DateTime.Now,

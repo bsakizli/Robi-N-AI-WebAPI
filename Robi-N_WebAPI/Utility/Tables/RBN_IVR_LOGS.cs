@@ -8,6 +8,7 @@ namespace Robi_N_WebAPI.Utility.Tables
     {
         [Key]
         public int Id { get; set; }
+        public int logKey { get; set; }
         public string? uniqId { get; set; }
         public string? log { get; set; }
         public DateTime? addDate { get; set; }

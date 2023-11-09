@@ -3,6 +3,7 @@
     public class requestAddLog
     {
         public string? uniqId { get; set; }
+        public int logKey { get; set; }
         public string? log { get; set; }
     }
 }
