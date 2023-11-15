@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class HrAppApiController : ControllerBase
     {

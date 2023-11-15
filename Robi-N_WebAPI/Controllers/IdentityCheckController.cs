@@ -86,18 +86,18 @@ namespace Robi_N_WebAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("emptorLogin")]
-        public IActionResult emptorLogin(string username, string password)
+        public IActionResult emptorLogin([FromBody] requestTokenCreation _request)
         {
             responseEmptorLoginUser response;
-            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), username +" - " +password));
+            _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _request.username + " - " + _request.password));
            
             try
             {
                 
-                if(!String.IsNullOrEmpty(username) && !String.IsNullOrEmpty(password))
+                if(!String.IsNullOrEmpty(_request.username) && !String.IsNullOrEmpty(_request.password))
                 {
                     //Emptor Login Service
-                    var _response = _emptorService.emptorLoginUserCheck(username, Helper.Helper.Base64Decode(password));
+                    var _response = _emptorService.emptorLoginUserCheck(_request.username, Helper.Helper.Base64Decode(_request.password));
 
                     if (_response != null)
                     {
@@ -114,12 +114,12 @@ namespace Robi_N_WebAPI.Controllers
                                 new Claim("Email", _response.Email),
                                 new Claim("Name", _response.FirstName),
                                 new Claim("UserFullName", _response.UserFullName),
-                                new Claim("username", username!),
+                                new Claim("username", _request.username!),
                                 new Claim("PositionName", _response.PositionName),
-                                //new Claim(ClaimTypes.Role, apiUsers.role!),
+                                new Claim(ClaimTypes.Role,"Emptor Operation Web Service"!),
                              };
-
-                            claimArray.Add(new Claim(ClaimTypes.Role, "User"!));
+                            
+                            //claimArray.Add(new Claim(ClaimTypes.Role, "User"!));
 
                             var token = new JwtSecurityToken(
                                 _JwtSettings.Issuer,

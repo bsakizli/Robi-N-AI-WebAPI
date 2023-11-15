@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Robi_N_WebAPI.Model.Request;
 using Robi_N_WebAPI.Services;
@@ -8,6 +9,7 @@ using Robi_N_WebAPI.Services;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class RegistrationInformationCallSingleNumber : ControllerBase
     {

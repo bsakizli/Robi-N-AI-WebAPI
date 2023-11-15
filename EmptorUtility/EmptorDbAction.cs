@@ -451,14 +451,15 @@ ELSE
                 SqlCommand cmd = new SqlCommand(String.Format(@"
                 BEGIN TRANSACTION t1;
                 BEGIN TRY
+
                 --DECLARE @TicketIdDesc NVARCHAR(MAX), @ReasonId INT, @ReasonDate DATETIME;
-                --SET @TicketIdDesc='252009113467';
+                --SET @TicketIdDesc='252009195317';
                 --SET @ReasonId=5;
                 --SET @ReasonDate= GETDATE();
 
-                DECLARE @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @C_TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
+                DECLARE @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
                 SET @UserId = 8624;
-                SET @C_TICKETSTATUSSUBID = 7;
+                SET @TICKETSTATUSSUBID = 7;
                 SET @UserPositionId = 6445;
                 SET @DateNow = GETDATE();
 
@@ -472,8 +473,7 @@ ELSE
                 );
                 SET @NEWVALUE = CONVERT(NVARCHAR(10), 7) + '~~' + CONVERT(NVARCHAR(MAX), @DateNow, 121) + '~~' + CONVERT(NVARCHAR(10), @ReasonId) + '~~' + CONVERT(VARCHAR, @ReasonDate, 121);
 
-
-                EXEC [dbo].[BIZSP_ADDLOG_QUICK] 
+                EXEC [dbo].[BIZSP_ADDLOG_QUICK]
                      @TABLENAME = 'CRMTBL_TICKET', 
                      @COLUMNNAMES = 'C_TICKETSTATUSSUBID,UPDATE_USER_TIME,C_WAITINGREASONID,C_BACKCALLDATE', 
                      @NEWVALUES = @NEWVALUE, 
@@ -481,18 +481,16 @@ ELSE
                      @USERID = @UserId, 
                      @POSITIONID = @UserPositionId;
 
-                EXEC sp_executesql 
-                     N'UPDATE CRMTBL_TICKET SET C_TICKETSTATUSSUBID = @C_TICKETSTATUSSUBID, UPDATE_USER_ID=@UPDATE_USER_ID, UPDATE_USER_POSITION_ID=@UPDATE_USER_POSITION_ID, UPDATE_USER_TIME = @UPDATE_USER_TIME, C_WAITINGREASONID = @C_WAITINGREASONID, C_BACKCALLDATE = @C_BACKCALLDATE WHERE IDDESC = @IDDESC', 
-                     N'@C_TICKETSTATUSSUBID int,@UPDATE_USER_TIME datetime,@C_WAITINGREASONID int, @UPDATE_USER_ID int, @UPDATE_USER_POSITION_ID int,@C_BACKCALLDATE datetime,@IDDESC nvarchar(12)', 
-                     @C_TICKETSTATUSSUBID = @C_TICKETSTATUSSUBID, 
-                     @UPDATE_USER_TIME = @DateNow, 
-                     @C_WAITINGREASONID = @ReasonId, 
-                     @C_BACKCALLDATE = @ReasonDate, 
-                     @UPDATE_USER_POSITION_ID = @UserPositionId, 
-                     @UPDATE_USER_ID = @UserId, 
-                     @IDDESC = @TicketIdDesc;
+	                EXEC SP_UPDATE_TICKET_TO_WAIT
+		                @C_TICKETSTATUSSUBID = @TICKETSTATUSSUBID,
+		                @UPDATE_USER_TIME = @DateNow,
+		                @C_WAITINGREASONID = @ReasonId,
+		                @UPDATE_USER_ID = @UserId,
+		                @UPDATE_USER_POSITION_ID = @UserPositionId,
+		                @C_BACKCALLDATE = @ReasonDate,
+		                @IDDESC = @TicketIdDesc;
 
-	                 SELECT CONVERT(bit,1) AS Result;
+                     SELECT CONVERT(bit,1) AS Result;
 
                 END TRY
                 BEGIN CATCH

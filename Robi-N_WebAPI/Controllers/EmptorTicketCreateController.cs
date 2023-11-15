@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Robi_N_WebAPI.Model.Request;
 using Robi_N_WebAPI.Model.Response;
@@ -10,6 +11,7 @@ using System.Text;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class EmptorTicketCreateController : ControllerBase
     {

@@ -18,7 +18,7 @@ using static Robi_N_WebAPI.Model.Response.responseVoiceIVRApplication;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class SMSTemplateController : ControllerBase
     {

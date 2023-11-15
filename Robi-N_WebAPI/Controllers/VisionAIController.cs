@@ -2,6 +2,7 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.TextToSpeech.V1;
 using Google.Cloud.Vision.V1;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Robi_N_WebAPI.Utility;
@@ -10,6 +11,7 @@ using Image = Google.Cloud.Vision.V1.Image;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class VisionAIController : ControllerBase
     {

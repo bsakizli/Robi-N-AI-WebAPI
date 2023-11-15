@@ -22,7 +22,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin,Emptor Operation Web Service")]
     [ApiController]
     public class EmptorApiController : ControllerBase
     {
@@ -83,12 +83,12 @@ namespace Robi_N_WebAPI.Controllers
         //}
 
 
-        [HttpGet("getTicketById")]
-        public IActionResult getTicketById(int Id)
-        {
-            EmptorDbAction db = new EmptorDbAction(_configuration);
-            return Ok(db.getEmptorTicketId(Id));
-        }
+        //[HttpGet("getTicketById")]
+        //public IActionResult getTicketById(int Id)
+        //{
+        //    EmptorDbAction db = new EmptorDbAction(_configuration);
+        //    return Ok(db.getEmptorTicketId(Id));
+        //}
 
 
         [HttpGet("GetWaitReasonsListFromTicketId")]

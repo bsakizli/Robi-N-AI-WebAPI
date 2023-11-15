@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text;
 using Robi_N_WebAPI.Services;
+using ExtendedXmlSerializer;
 
 namespace Robi_N_WebAPI.Authentication.basic
 {
@@ -30,6 +31,7 @@ namespace Robi_N_WebAPI.Authentication.basic
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             string username = null;
+            
             try
             {
                 var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
@@ -37,8 +39,32 @@ namespace Robi_N_WebAPI.Authentication.basic
                 username = credentials.FirstOrDefault();
                 var password = credentials.LastOrDefault();
 
-                if (!_userService.ValidateCredentials(username, password))
+                 var _result = _userService.ValidateCredentials(username, password);
+                
+                if (!_result.status)
                     throw new ArgumentException("Invalid credentials");
+
+
+                var claimArray = new List<Claim>
+                             {
+                                new Claim("UserId", _result.user!.Id.ToString()),
+                                new Claim("Name", _result.user.username!),
+                                new Claim("UserFullName", _result.user.username!),
+                                new Claim("username", _result.user.username!)
+                             };
+
+                foreach (var item in _result.roles)
+                {
+                    claimArray.Add(new Claim(ClaimTypes.Role, item.RoleName!));
+                }
+
+                var identity = new ClaimsIdentity(claimArray, Scheme.Name);
+                var principal = new ClaimsPrincipal(identity);
+                var ticket = new AuthenticationTicket(principal, Scheme.Name);
+
+                return AuthenticateResult.Success(ticket);
+
+
             }
             catch (Exception ex)
             {
@@ -48,11 +74,10 @@ namespace Robi_N_WebAPI.Authentication.basic
             var claims = new[] {
                 new Claim(ClaimTypes.Name, username)
             };
-            var identity = new ClaimsIdentity(claims, Scheme.Name);
-            var principal = new ClaimsPrincipal(identity);
-            var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-            return AuthenticateResult.Success(ticket);
+
+
+           
         }
 
     }

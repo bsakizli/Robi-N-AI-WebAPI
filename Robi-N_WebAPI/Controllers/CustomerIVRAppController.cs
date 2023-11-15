@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Nancy.Json;
 using Robi_N_WebAPI.Model;
 using Robi_N_WebAPI.Utility;
 
+
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,IVR Read Only Web Service,IVR Full Authorization")]
     [ApiController]
     public class CustomerIVRAppController : ControllerBase
     {

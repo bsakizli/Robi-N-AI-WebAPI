@@ -21,7 +21,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin,IVR Read Only Web Service")]
     [ApiController]
     
 
@@ -41,8 +41,6 @@ namespace Robi_N_WebAPI.Controllers
             _logger = logger;
             _db = db;
         }
-
-       
 
         [HttpPost("customVocalization")]
         [SwaggerOperation("SSML supported voice-over.", "Link: https://cloud.google.com/text-to-speech/docs/ssml", OperationId = "customVocalization")]

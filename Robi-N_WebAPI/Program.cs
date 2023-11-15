@@ -562,8 +562,9 @@ app.UseStatusCodePages(async context =>
         await context.HttpContext.Response.WriteAsync(JsonConvert.SerializeObject(new
         {
             status = 403,
+            displayMessage = "Yetkisiz İşlem",
             description = "Unauthorized transaction."
-        }));
+        })) ;
 
         //JsonResult result = new JsonResult(new { msg = "Some example message." });
 
