@@ -18,7 +18,7 @@ namespace MailEntity
         //_configuration.GetValue<string>("IronBarCode.LicenseKey");
 
 
-        public bool WaitingEmptorSendMail(string TicketId, r_getMainResponsibleInfo _request, string CompanyName, DateTime WaitingDate)
+        public bool WaitingEmptorSendMail(string TicketId, r_getMainResponsibleInfo _request, string CompanyName, DateTime WaitingDate, string ReasonName)
         {
             try
             {
@@ -30,19 +30,193 @@ namespace MailEntity
 
                 message.From.Add(MailboxAddress.Parse("robin@bdh.com.tr"));
 
-                message.Subject = String.Format("{0} numaralı kayıt beklemeye alınmıştır.",TicketId);
+                message.Subject = String.Format("📣📣 {0} numaralı kayıt beklemeye alınmıştır... ✅", TicketId);
 
 
                 //We will say we are sending HTML. But there are options for plaintext etc. 
                 message.Body = new TextPart(TextFormat.Html)
                 {
 
-                    Text = String.Format(@"Sayın <b>{0}</b>,</br></br>
+                    Text = String.Format($@"<div style=""background-color:#eee !important;font-family:'system-ui' , '-apple-system' , 'blinkmacsystemfont' , 'segoe ui' , 'roboto' , 'oxygen' , 'ubuntu' , 'cantarell' , 'open sans' , 'helvetica neue' , sans-serif;margin:0"">
+    <table border='0' style='border-collapse:collapse;margin:20px auto 20px auto;max-width:750px;width:100%'>
+      <tbody>
+        <tr style='background-color:#009ca6;height:105px;width:100%'>
+          <td>
+            <table style='color:#fff;width:100%'>
+              <tbody>
+                <tr>
+                  <td style='padding-left:30px;width:170px'>
+                    <a href='https://www.bdh.com/' data-link-id='96' target='_blank' rel='noopener noreferrer'>
+                      <img alt='bdh-logo' src='https://www.bdh.com.tr/wp-content/uploads/2019/08/BDHLogo2019_160w.png' style='max-width:170px'>
+                    </a>
+                  </td>
+                  <td style='padding-right:30px;text-align:right'>Kaydın Ana Sorumlusu : <b>{_request.MainResponsibleFullName}</b>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr style='background-color:#fff;width:100%'>
+          <td style='padding:1rem'>
+            <table style='color:#000;padding-bottom:0px;width:100%'>
+              <tbody>
+                <tr>
+                  <td style='font-size:21px;padding-bottom:1rem;text-align:left;width:100%'> Sayın; <b>{_request.SubResponsibleFullName}</b>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table style='color:#000;font-size:18px;margin-top:10px;padding-bottom:25px;text-align:left'>
+              <tbody>
+                <tr>
+                  <td>
 
-Talebiniz üzerine <b>{1}</b> numaralı ilgili firması <b>{2}</b> olan kayıt bekleme prosedürü sebebi ile <font color='red'><b>{3}</b></font>'a kadar beklemeye alınmıştır.
-</br></br>
-İyi Çalışmalar.</br>
-Robi-N", _request.SubResponsibleFullName, TicketId, CompanyName, WaitingDate)
+<b>{TicketId}</b> numaralı kayıt <b>{DateTime.Now.ToString("dd.MM.yyyy HH:mm")}</b> itibari ile <b>{WaitingDate.ToString("dd.MM.yyyy HH:mm")}</b> kadar kadar ürün parça bekliyor istemiyle beklemeye alınmıştır.  <br> <br> Teşekkürler,<br> <b>Profosyonel Hizmetler</b>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table style='border:0;border-collapse:collapse;margin-bottom:10px;margin-top:10px;text-align:center;width:100%'>
+              <thead style='background-color:#009ca6;color:#fff;font-weight:normal;width:100%'>
+                <tr style='font-weight:normal'>
+                  <th style='border:1px solid #009ca6;font-weight:normal;padding:0.5rem;text-align:center;'> Kayıt Numarası </th>
+                  <th style='border:1px solid #009ca6;font-weight:normal;padding:0.5rem;text-align:center;width:40%'> İlgili Firma </th>
+                  <th style='border:1px solid #009ca6;font-weight:normal;padding:0.5rem;text-align:center;width:30%'> Bekleme Çıkış Zamanı </th>
+                 
+                </tr>
+              </thead>
+              <tbody style='color:#505050;width:100%'>
+                <tr style='color:#505050'>
+                  <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center;color:red;'> <b>{TicketId}</b> </td>
+                  <td style='border:1px solid #505050;margin-left:5px;padding:0.4rem 0.7rem 0.4rem 0.7rem;text-align:center'> {CompanyName} </td>
+                  <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center'> {WaitingDate} </td>
+                </tr>
+              </tbody>
+            </table>
+            <table style='display: none;'>
+              <thead>
+                <tr>
+                  <th style='padding:1rem'> &nbsp; </th>
+                </tr>
+              </thead>
+            </table>
+            <table style='display:none;background-color:#f3f3f3;color:#000;font-size:15px;width:750px;' >
+              <tbody>
+                <tr style='background-color:#f3f3f3;width:400px'>
+                  <td style='float:left;padding-top:4px;width:30%'>
+                    <b>Sipariş Döviz Cinsi</b>
+                    <span style='float:right'>:</span>
+                  </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> USD </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
+                </tr>
+                <tr style='background-color:#f3f3f3;width:400px'>
+                  <td style='float:left;padding-top:4px;width:30%'>
+                    <b>Döviz Kuru</b>
+                    <span style='float:right'>:</span>
+                  </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> 1 USD : 28,67 TL </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
+                </tr>
+                <tr style='background-color:#f3f3f3;width:400px'>
+                  <td style='float:left;padding-top:4px;width:30%'>
+                    <b>Ödeme Tipi</b>
+                    <span style='float:right'>:</span>
+                  </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> Havale </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
+                </tr>
+                <tr style='background-color:#f3f3f3;width:400px'>
+                  <td style='float:left;padding-top:4px;width:30%'>
+                    <b>Teslimat Tipi</b>
+                    <span style='float:right'>:</span>
+                  </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> Karşı Ödemeli Aras Kargo </td>
+                  <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
+                </tr>
+              </tbody>
+              <tbody style='margin-bottom:20px;min-width:100%'></tbody>
+            </table>
+            <table style='display: none;border:0;border-collapse:collapse;margin-bottom:10px;margin-top:10px;width:100%'>
+              <thead style='background-color:#009ca6;border:1px solid #009ca6;width:100%'>
+                <tr>
+                  <th style='color:#fff;font-weight:bolder;padding:1rem;text-transform:uppercase;width:50%'></th>
+                  <th style='color:#fff;font-weight:bolder;padding:1rem;text-transform:uppercase;width:50%'></th>
+                </tr>
+              </thead>
+              <tbody style='margin-bottom:10px;width:100%'>
+                <tr style='margin-bottom:10px;text-align:center'>
+                  <td style='border:1px solid #2c2c2c;padding:1rem 1rem 0.3rem 1rem'>
+                    <table>
+                      <tbody>
+                        <tr style='width:100%'>
+                          <td style='text-align:left;width:100%'></td>
+                        </tr>
+                        <tr style='text-align:left;width:100%'>
+                          <td style='width:100%'>
+                            <span style='float:left;font-weight:700;min-width:10%'>Tel <span style='float:right;margin-left:auto'>:</span>
+                            </span>
+                            <span style='margin-left:10px'>
+                              <span class='wmi-callto'></span>
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                  <td style='border:1px solid #2c2c2c;padding:1rem'>
+                    <table>
+                      <tbody>
+                        <tr style='width:100%'>
+                          <td style='text-align:left;width:100%'></td>
+                        </tr>
+                        <tr style='text-align:left;width:100%'>
+                          <td style='width:100%'>
+                            <span style='float:left;font-weight:700;min-width:10%'>Tel <span style='float:right;margin-left:auto'>:</span>
+                            </span>
+                            <span style='margin-left:10px'>
+                              <span class='wmi-callto'></span>
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            
+            
+            <table style='margin:10px 0px 10px 0px'>
+              <tbody>
+                <tr>
+                  <td style='text-align:center'> Bu e-posta kişiye özel olup <span style='color:#009ca6'>
+                      <b> Profosyonel Hizmetler</b>
+                    </span> tarafın'dan gönderilmiştir. Bir yanlışlık olduğunu düşünüyorsanız lütfen bu e-postayı dikkate almayınız. </td>
+                </tr>
+              </tbody>
+            </table>
+            <table style='background-color:#e2e2e2;margin:0 auto 0 auto;max-width:750px;padding:5px 0 5px 0'>
+              <thead>
+                <tr>
+                  <th style='border-right-color:black;border-right-width:1px;font-size:0.8rem;padding:0'>BDH Bilişim Destek Hizmetleri A.Ş</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style='border-right-color:black;border-right-width:1px;font-size:0.7rem;font-weight:600;padding:0 20px 0 20px;text-align:center'> Bağlarbaşı Mahallesi, Cemal Bey Caddesi
+                    No:110, 34844 Maltepe/İstanbul <span class='wmi-callto'>(0212) 500 17 00</span> (Pbx) - <a href='mailto:info@bdh.com.tr' target='_blank' rel='noopener noreferrer'>info@bdh.com.tr</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>", _request.SubResponsibleFullName, TicketId, CompanyName, WaitingDate)
                 };
 
                 //Be careful that the SmtpClient class is the one from Mailkit not the framework!

@@ -184,6 +184,7 @@ namespace Robi_N_WebAPI.Controllers
                     var _check = await db.TicketWaitingPreCheck(_request.TicketId);
                     var _company = await db.getCompanyFullName(_request.TicketId);
                    
+
                     if (_check.StatusCode == 200 && _company.Name != null)
                     {
                         var item = await _db.RBN_WAITING_TIMES.Where(x => x.EmptorTicketWaitingReasonId == _request.ReasonId).FirstOrDefaultAsync();
@@ -224,7 +225,7 @@ namespace Robi_N_WebAPI.Controllers
                                     if (Convert.ToBoolean(_contactInformation.status))
                                     {
                                         MailService mailService = new MailService();
-                                        var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation, _company.Name, (DateTime)_reasonDate);
+                                        var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation, _company.Name, (DateTime)_reasonDate, "");
                                     }
 
                                     //Ticket Waiting Logs
