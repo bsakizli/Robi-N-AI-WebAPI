@@ -3,9 +3,11 @@ using ExtendedXmlSerializer.ExtensionModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -288,8 +290,22 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"))
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 //builder.Services.AddControllers();
-builder.Services.AddMvc().AddXmlDataContractSerializerFormatters();
+
+
+
+builder.Services.AddControllers(options =>
+{
+    options.RespectBrowserAcceptHeader = true;
+    options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
+    options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+});
+
 builder.Services.AddControllers().AddXmlSerializerFormatters();
+builder.Services.AddMvc().AddXmlSerializerFormatters();
+
+builder.Services.AddMvc().AddXmlDataContractSerializerFormatters();
+
+
 //builder.Services.AddControllersWithViews();
 
 
@@ -494,6 +510,7 @@ builder.Services.AddEndpointsApiExplorer();
 //Log.Logger = new LoggerConfiguration()
 //    .ReadFrom.Configuration(builder.Configuration)
 //    .CreateLogger();
+
 
 
 

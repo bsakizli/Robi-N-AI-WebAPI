@@ -192,27 +192,30 @@ namespace Robi_N_WebAPI.Controllers
                         {
                             TimeSpan hours = new TimeSpan(10, 00, 0);
 
-                            if (item.Overtime)
-                            {
-                                int _now = (int)DateTime.Now.DayOfWeek;
+                            //if (item.Overtime)
+                            //{
+                            //    int _now = (int)DateTime.Now.DayOfWeek;
 
-                                if (_now == 5)
-                                {
-                                    _reasonDate = DateTime.Now.AddDays(3).Date + hours;
-                                }
-                                else if (_now == 6)
-                                {
-                                    _reasonDate = DateTime.Now.AddDays(2).Date + hours;
-                                }
-                                else
-                                {
-                                    _reasonDate = DateTime.Now.AddDays(1).Date + hours;
-                                }
-                            }
-                            else
-                            {
-                                _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
-                            }
+                            //    if (_now == 5)
+                            //    {
+                            //        _reasonDate = DateTime.Now.AddDays(3).Date + hours;
+                            //    }
+                            //    else if (_now == 6)
+                            //    {
+                            //        _reasonDate = DateTime.Now.AddDays(2).Date + hours;
+                            //    }
+                            //    else
+                            //    {
+                            //        _reasonDate = DateTime.Now.AddDays(1).Date + hours;
+                            //    }
+
+                            //}
+                            //else
+                            //{
+                            //    _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
+                            //}
+
+                            _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
 
                             var _wait = await db.TicketWaiting(_request.TicketId, (int)_request.ReasonId, (DateTime)_reasonDate);
 

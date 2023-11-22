@@ -13,7 +13,7 @@ namespace EmptorUtility
     public class EmptorDbAction
     {
 
-        
+       
 
         private IConfiguration? _appConfig;
 
@@ -257,7 +257,8 @@ IF(@PARENT_ID NOT IN(270855, 2677399, 6136368,363460))
             r_TicketWaitingPreCheck _response = null;
             DataTable dt = new DataTable();
             SqlConnection con = new SqlConnection(tt);
-            SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE
+            SqlCommand cmd = new SqlCommand(String.Format(@"
+DECLARE
 @STATUS INT,
 @KAYIT_NUMARASI_ID_DESC VARCHAR(12),
 @ID_DESC INT,
@@ -273,7 +274,8 @@ IF(@PARENT_ID NOT IN(270855, 2677399, 6136368,363460))
 
 SET @R_USERID = 123; --TEKNİSYEN VEYA ANA SORUMLU EMPTOR_ID
 SET @KAYIT_NUMARASI_ID_DESC = @TICKET_ID;
---SET @KAYIT_NUMARASI_ID_DESC = '252009194097';
+
+--SET @KAYIT_NUMARASI_ID_DESC = '252009212295';
 
 
 (SELECT
@@ -344,8 +346,6 @@ SET @BEKLEYE_ALINMA_SAYISI =
 --	  END
 --  END
 
-
-
 IF(@STATUS = 1)
   BEGIN
     IF(@KAYIT_STATU IN(1, 8, 7))
@@ -357,14 +357,17 @@ IF(@STATUS = 1)
 		IF((SELECT TOP 1
 			CASE
 			WHEN 
-		     (DATEPART(WEEKDAY, CA.CREATE_USER_TIME) = 6 
-                AND CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) >= '17:30:00' )
-            OR
-            (DATEPART(WEEKDAY, CA.CREATE_USER_TIME) = 2 
-                AND CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) < '08:00:00'  )
-        THEN 1
-        ELSE 0
-		END AS 'result'
+			(DATEPART(WEEKDAY, CA.CREATE_USER_TIME) IN (2,3,4,5,6) 
+			AND CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) >= '17:30:00' 
+			OR CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) < '08:00:00')
+
+			OR 
+			(DATEPART(WEEKDAY, CA.CREATE_USER_TIME) IN (7,1) 
+              AND CAST(CONVERT(TIME, CA.CREATE_USER_TIME) AS DATETIME) >= '00:00:00' 	  
+			 )
+			THEN 1
+			ELSE 0
+			END AS 'result'
 
 			FROM CRMTBL_ACTIVITY AS CA
 			WHERE 1 = 1
@@ -407,7 +410,8 @@ ELSE
   BEGIN
     SELECT 199 AS StatusCode, 
                        'Böyle bir kayıt numarası bulunamadı.' AS StatusMessage;
-  END;"), con);
+  END;
+"), con);
             cmd.Parameters.Add("@TICKET_ID", SqlDbType.VarChar).Value = TicketId;
             SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             adapter.SelectCommand.CommandTimeout = 500; // default is 30 seconds

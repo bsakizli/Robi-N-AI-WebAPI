@@ -25,6 +25,7 @@ namespace MailEntity
                 var message = new MimeMessage();
                 message.To.Add(MailboxAddress.Parse(_request.SubResponsibleEmail));
                 message.Cc.Add(MailboxAddress.Parse(_request.MainResponsibleEmail));
+                message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
                 //message.Cc.Add(MailboxAddress.Parse("kemal.yurdakul@bdh.com.tr"));
                 //message.From.AddRange(emailMessage.FromAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
 
