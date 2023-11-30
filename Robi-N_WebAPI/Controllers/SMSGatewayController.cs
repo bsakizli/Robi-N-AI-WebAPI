@@ -11,12 +11,15 @@ using Robi_N_WebAPI.Model.Request;
 using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
+using Robi_N_WebAPI.Utility.Tables;
 using SimpleCrypto;
+using RobinCore._3rdService.dub;
 
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using static Robi_N_WebAPI.Model.Response.responseSMSGateway;
-
+using RobinCore._3rdService.dub.Models.request;
+using ExtendedXmlSerializer;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -33,7 +36,7 @@ namespace Robi_N_WebAPI.Controllers
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
 
-      
+
 
         PBKDF2 crypto = new PBKDF2();
 
@@ -42,7 +45,7 @@ namespace Robi_N_WebAPI.Controllers
             _configuration = configuration;
             _logger = logger;
             _db = db;
-          
+
         }
 
 
@@ -57,7 +60,7 @@ namespace Robi_N_WebAPI.Controllers
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
 
-                if (!String.IsNullOrEmpty(_request.gsmNumber) && _request!= null && _request.messageId > 0)
+                if (!String.IsNullOrEmpty(_request.gsmNumber) && _request != null && _request.messageId > 0)
                 {
                     var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId);
 
@@ -94,7 +97,7 @@ namespace Robi_N_WebAPI.Controllers
                                     message = "The message could not be sent due to an ISP problem. Please provide information.",
                                     data = _getMessage
                                 };
-                              
+
                             }
                         }
                         else
@@ -119,7 +122,8 @@ namespace Robi_N_WebAPI.Controllers
                             message = "The message could not be sent because there is no template defined for the Id number entered."
                         };
                     }
-                } else
+                }
+                else
                 {
                     response = new responsesendSMSById
                     {
@@ -157,22 +161,28 @@ namespace Robi_N_WebAPI.Controllers
         }
 
 
-        
+
         [HttpPost("sendSmsParameterById")]
         public async Task<IActionResult> sendSmsParameterById([FromBody] requestSendSmsParameterById _request)
         {
             responsesendSMSById response;
             try
             {
-                string _log = String.Format(@"GSM:{0} - MessageId: {1} ", _request.gsmNumber, _request.messageId);
+               
+                string _log = String.Format(@"GSM:{0} - MessageId: {1} - Params: {2}", _request.gsmNumber, _request.messageId, new JavaScriptSerializer().Serialize(_request));
                 var textResult = new JavaScriptSerializer().Serialize(_log);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                 string _MessageBody = String.Empty;
-                if (_request != null && _request.parameters != null)
+
+
+                if (_request != null && _request.parameters != null && _request.gsmNumber != null)
                 {
 
                     var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId && x.active == true);
 
+                    Regex rgx_CargoTrackingNumber = new Regex("{CargoTrackingNumber}");
+
+                    
                     if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                     {
                         _MessageBody = _getMessage.Message;
@@ -180,9 +190,7 @@ namespace Robi_N_WebAPI.Controllers
                         List<string> _parameters = new List<string>();
                         List<string> _requestParameters = new List<string>();
 
-
-
-                        Regex rgx = new Regex("#([A-Za-z0-9]+)#");
+                        Regex rgx = new Regex("{([A-Za-z0-9]+)}");
 
                         if (rgx.Matches(_getMessage.Message).Count > 0)
                         {
@@ -201,30 +209,67 @@ namespace Robi_N_WebAPI.Controllers
                                 }
                             }
 
-                            if (_parameters.All(_requestParameters.Contains))
+
+                            //Bak buraya
+                            var _cargoFirms = new RBN_CARGO_COMPANY_LIST();
+                            string _trackingUrl = String.Empty;
+                            bool _setLinkStatus = false;
+                            foreach (var parameter in _request.parameters)
                             {
 
-                                foreach (var parameter in _request.parameters)
+                                if(rgx_CargoTrackingNumber.Match(_getMessage.Message).Success)
                                 {
-                                    if (!String.IsNullOrEmpty(parameter.value) && !String.IsNullOrEmpty(parameter.key))
+                                 
+                                    if (!_setLinkStatus)
                                     {
-                                        _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
-                                    }
-                                    else
-                                    {
-                                        response = new responsesendSMSById
+                                        if (_requestParameters.Contains("{CargoCompany}"))
                                         {
-                                            status = false,
-                                            statusCode = 203,
-                                            message = "Parameter information is incorrect or missing.",
-                                            displayMessage = "Parametre bilgisi hatalı veya eksik."
-                                        };
-                                        textResult = new JavaScriptSerializer().Serialize(response);
-                                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
-                                        return BadRequest(response);
+                                            var _temp = _request.parameters.Where(x => x.key == "{CargoCompany}").FirstOrDefault();
+                                            _cargoFirms = _db.RBN_CARGO_COMPANY_LIST.Where(x => x.active == true && x.cargoName == _temp.value).FirstOrDefault();
+                                            if (_cargoFirms == null)
+                                            {
+                                                _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", "");
+                                            }
+                                        }
+
+                                        if (_requestParameters.Contains("{CargoTrackingNumber}"))
+                                        {
+                                            var _temp = _request.parameters.Where(x => x.key == "{CargoTrackingNumber}").FirstOrDefault();
+
+                                            if (_cargoFirms != null && _cargoFirms.trackingUrl != null)
+                                            {
+                                                string _defaultTrackingUrl = _cargoFirms.trackingUrl.Replace("{tracking_no}", _temp.value);
+
+                                                dubService dubService = new dubService();
+                                                requestSetLink.Root requestSetLink = new requestSetLink.Root
+                                                {
+                                                    url = _defaultTrackingUrl,
+                                                    archived = false,
+                                                    title = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    description = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    comments = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    expiresAt = DateTime.Now.AddDays(_cargoFirms.validityPeriod).ToString("yyyy-MM-dd")
+                                                };
+                                                var _dobResponse = await dubService.setLink(requestSetLink);
+                                                if (_dobResponse.status && !String.IsNullOrEmpty(_dobResponse.url))
+                                                {
+                                                    _setLinkStatus = _dobResponse.status;
+                                                    _trackingUrl = _dobResponse.url;
+                                                    _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", _trackingUrl);
+                                                }
+                                            }
+                                        } 
                                     }
                                 }
 
+                                if (!String.IsNullOrEmpty(parameter.key) && !String.IsNullOrEmpty(parameter.value))
+                                {
+                                    _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
+                                }
+                            }
+
+                            if (!rgx.IsMatch(_MessageBody))
+                            {
                                 var _sendSMSResponse = await _mobilDevService.sendSms(_request.gsmNumber, _MessageBody);
 
                                 if (_sendSMSResponse.status)
@@ -258,22 +303,45 @@ namespace Robi_N_WebAPI.Controllers
                                     return BadRequest(response);
                                 }
 
-                            }
-                            else
+                            } else
                             {
                                 response = new responsesendSMSById
                                 {
                                     status = false,
                                     statusCode = 205,
                                     message = "Unsuccessful",
-                                    displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
+                                    displayMessage = "Gönderilen mesajın parametre bilgisi eşleşmedi ve parametre bilgisi değiştirilemedi. Mesaj gönderilemedi"
                                 };
                                 textResult = new JavaScriptSerializer().Serialize(response);
                                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                                 return BadRequest(response);
+
                             }
 
-                        } else
+
+
+                            //if (_parameters.All(_requestParameters.Contains))
+                            //{
+
+
+
+                            //}
+                            //else
+                            //{
+                            //    response = new responsesendSMSById
+                            //    {
+                            //        status = false,
+                            //        statusCode = 205,
+                            //        message = "Unsuccessful",
+                            //        displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
+                            //    };
+                            //    textResult = new JavaScriptSerializer().Serialize(response);
+                            //    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                            //    return BadRequest(response);
+                            //}
+
+                        }
+                        else
                         {
                             response = new responsesendSMSById
                             {
@@ -296,7 +364,8 @@ namespace Robi_N_WebAPI.Controllers
                         return BadRequest(response);
                         //Mesaj tanımı yok
                     }
-                } else
+                }
+                else
                 {
                     response = new responsesendSMSById
                     {

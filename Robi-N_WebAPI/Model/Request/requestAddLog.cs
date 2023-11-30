@@ -10,7 +10,7 @@ namespace Robi_N_WebAPI.Model.Request
         public string? key { get; set; }
 
         [XmlElement(ElementName = "value")]
-        public string value { get; set; }
+        public string? value { get; set; }
     }
 
     [XmlRoot(ElementName = "requestAddLog")]

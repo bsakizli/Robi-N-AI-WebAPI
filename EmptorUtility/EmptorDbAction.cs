@@ -5,7 +5,9 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection;
 using System.Security.Cryptography;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 
 namespace EmptorUtility
@@ -444,7 +446,34 @@ ELSE
         }
 
 
-        public async Task<Boolean> TicketWaiting(string TicketIdDesc, int ReasonId, DateTime ReasonDate)
+
+        public async Task<Boolean> TicketWaitingHistoryAdded(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
+        {
+            try
+            {
+                var _config = _appConfig.GetConnectionString("EmptorConnection");
+                using (SqlConnection cn = new SqlConnection(_config))
+                using (SqlCommand cmd = new SqlCommand("INSERT INTO RBN_EMPTOR_WaitingTicketHistory(TicketId,MainUserId,TicketIdDesc,CallBackDate,TransactionDate,Active,UserId,WaitingReasonId)\r\nVALUES (@TicketId,@AnaSorumlu,@TicketIdDesc,@ReasonDate,@DateNow,1,@RequestingPerson,@ReasonId);", cn))
+                {
+                    // define parameters and their values
+                    cmd.Parameters.Add("@TicketIdDesc", SqlDbType.VarChar).Value = TicketIdDesc;
+                    cmd.Parameters.Add("@ReasonId", SqlDbType.Int).Value = ReasonId;
+                    cmd.Parameters.Add("@ReasonDate", SqlDbType.DateTime).Value = ReasonDate;
+                    cmd.Parameters.Add("@RequestingPerson", SqlDbType.Int).Value = RequestingPerson;
+                    // open connection, execute INSERT, close connection
+                    await cn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                    await cn.CloseAsync();
+                    return true;
+                }
+            } catch
+            {
+                return false;
+            }
+        }
+
+
+        public async Task<Boolean> TicketWaiting(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
         {
            try
             {
@@ -457,12 +486,13 @@ ELSE
                 BEGIN TRANSACTION t1;
                 BEGIN TRY
 
-                --DECLARE @TicketIdDesc NVARCHAR(MAX), @ReasonId INT, @ReasonDate DATETIME;
+                --DECLARE @RequestingPerson INT, @TicketIdDesc NVARCHAR(MAX), @ReasonId INT, @ReasonDate DATETIME;
                 --SET @TicketIdDesc='252009195317';
                 --SET @ReasonId=5;
                 --SET @ReasonDate= GETDATE();
+                --SET @RequestingPerson=1234;
 
-                DECLARE @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
+                DECLARE @AnaSorumlu INT, @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
                 SET @UserId = 8624;
                 SET @TICKETSTATUSSUBID = 7;
                 SET @UserPositionId = 6445;
@@ -476,6 +506,9 @@ ELSE
                           AND IDDESC = @TicketIdDesc
                           AND ACTIVE = 1
                 );
+
+                SET @AnaSorumlu = (SELECT RESPONSIBLEUSERID FROM CRMTBL_TICKET WITH(NOLOCK) WHERE ID=@TicketId);
+
                 SET @NEWVALUE = CONVERT(NVARCHAR(10), 7) + '~~' + CONVERT(NVARCHAR(MAX), @DateNow, 121) + '~~' + CONVERT(NVARCHAR(10), @ReasonId) + '~~' + CONVERT(VARCHAR, @ReasonDate, 121);
 
                 EXEC [dbo].[BIZSP_ADDLOG_QUICK]
@@ -486,14 +519,18 @@ ELSE
                      @USERID = @UserId, 
                      @POSITIONID = @UserPositionId;
 
-	                EXEC SP_UPDATE_TICKET_TO_WAIT
-		                @C_TICKETSTATUSSUBID = @TICKETSTATUSSUBID,
-		                @UPDATE_USER_TIME = @DateNow,
-		                @C_WAITINGREASONID = @ReasonId,
-		                @UPDATE_USER_ID = @UserId,
-		                @UPDATE_USER_POSITION_ID = @UserPositionId,
-		                @C_BACKCALLDATE = @ReasonDate,
-		                @IDDESC = @TicketIdDesc;
+                    EXEC SP_UPDATE_TICKET_TO_WAIT
+                        @C_TICKETSTATUSSUBID = @TICKETSTATUSSUBID,
+                        @UPDATE_USER_TIME = @DateNow,
+                        @C_WAITINGREASONID = @ReasonId,
+                        @UPDATE_USER_ID = @UserId,
+                        @UPDATE_USER_POSITION_ID = @UserPositionId,
+                        @C_BACKCALLDATE = @ReasonDate,
+                        @IDDESC = @TicketIdDesc;
+
+		                INSERT INTO RBN_EMPTOR_WaitingTicketHistory(TicketId,MainUserId,TicketIdDesc,CallBackDate,TransactionDate,Active,UserId,WaitingReasonId)
+		                VALUES (@TicketId,@AnaSorumlu,@TicketIdDesc,@ReasonDate,@DateNow,1,@RequestingPerson,@ReasonId);
+
 
                      SELECT CONVERT(bit,1) AS Result;
 
@@ -506,30 +543,32 @@ ELSE
                 ROLLBACK TRANSACTION t1;
                 END CATCH;
                 IF @@TRANCOUNT > 0
-                 COMMIT TRANSACTION t1
+                 COMMIT TRANSACTION t1  
                 "), con);
 
                 cmd.Parameters.Add("@TicketIdDesc", SqlDbType.VarChar).Value = TicketIdDesc;
                 cmd.Parameters.Add("@ReasonId", SqlDbType.Int).Value = ReasonId;
+                cmd.Parameters.Add("@RequestingPerson", SqlDbType.Int).Value = RequestingPerson;
                 cmd.Parameters.Add("@ReasonDate", SqlDbType.DateTime).Value = ReasonDate;
 
-                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(dt);
+                //SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                //adapter.Fill(dt);
 
                 await con.OpenAsync();
 
-                using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+                SqlDataReader rdr = await cmd.ExecuteReaderAsync();
+                while (rdr.Read())
                 {
-                    if (rdr.HasRows)
-                    {
-                        while (rdr.Read())
-                        {
-
-                            StatusCode = Convert.ToBoolean(rdr["Result"]);
-
-                        }
-                    }
+                    StatusCode = Convert.ToBoolean(rdr["Result"]);
                 }
+
+                //using ()
+                //{
+                //    if (rdr.HasRows)
+                //    {
+                        
+                //    }
+                //}
                 await con.CloseAsync();
                 return StatusCode;
 
@@ -539,7 +578,7 @@ ELSE
                 //await con.CloseAsync();
 
                 //return true;
-            } catch
+            } catch (Exception ex)
             {
                 return false;
             }

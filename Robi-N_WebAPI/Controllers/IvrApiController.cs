@@ -42,7 +42,7 @@ using Org.BouncyCastle.Utilities;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize(Roles = "Admin,IVR Read Only Web Service,IVR Full Authorization")]
+    [Authorize(Roles = "Admin,IVR Read Only Web Service,IVR Full Authorization")]
     [ApiController]
     public class IvrApiController : ControllerBase
     {
@@ -161,7 +161,6 @@ namespace Robi_N_WebAPI.Controllers
                             message = "Unsuccessful"
                         };
                     }
-
                 } else
                 {
                     response = new GlobalResponse

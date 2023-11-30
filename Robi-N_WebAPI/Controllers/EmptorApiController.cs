@@ -217,7 +217,7 @@ namespace Robi_N_WebAPI.Controllers
 
                             _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
 
-                            var _wait = await db.TicketWaiting(_request.TicketId, (int)_request.ReasonId, (DateTime)_reasonDate);
+                            var _wait = await db.TicketWaiting(_request.TicketId, (int)_request.ReasonId, (DateTime)_reasonDate, Convert.ToInt32(UserId));
 
                             if (_wait)
                             {
