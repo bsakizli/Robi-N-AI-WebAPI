@@ -299,12 +299,16 @@ namespace MailEntity
                 var bodyBuilder = new BodyBuilder();
                 bodyBuilder.HtmlBody = html;
                 var message = new MimeMessage();
-                message.To.Add(MailboxAddress.Parse("gamze.ozen@bdh.com.tr"));
+
+                //message.To.Add(MailboxAddress.Parse("bdh_dl@bdh.com.tr"));
+
                 message.To.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
+                message.To.Add(MailboxAddress.Parse("aysenur.kocar@bdh.com.tr"));
                 message.To.Add(MailboxAddress.Parse("hakan.dansik@bdh.com.tr"));
+          
                 //message.From.AddRange(emailMessage.FromAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
 
-                message.From.Add(MailboxAddress.Parse("robin@bdh.com.tr"));
+                message.From.Add(MailboxAddress.Parse("ik@bdh.com.tr"));
 
                 message.Subject = subject;
                 //We will say we are sending HTML. But there are options for plaintext etc. 
@@ -319,7 +323,7 @@ namespace MailEntity
                     //Remove any OAuth functionality as we won't be using it. 
                     emailClient.AuthenticationMechanisms.Remove("XOAUTH2");
 
-                    emailClient.Authenticate("robin@bdh.com.tr", "ea3zCPD998");
+                    emailClient.Authenticate("ik@bdh.com.tr", "BdhHR2023");
 
 
                     var tt = emailClient.Send(message);

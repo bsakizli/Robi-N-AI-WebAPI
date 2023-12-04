@@ -79,7 +79,8 @@ namespace RobinCore
 
                 string MonthName = DateTime.Now.ToString("MMMM", System.Globalization.CultureInfo.CreateSpecificCulture("tr-TR"));
 
-                string _subject = String.Format("Aramıza Yeni Katılan Çalışma Arkadaşlarımız.. - {0}", MonthName + " " + DateTime.Now.Year);
+                //string _subject = String.Format("Aramıza Yeni Katılan Çalışma Arkadaşlarımız.. - {0}", MonthName  + " " + DateTime.Now.Year);
+                string _subject = String.Format("Aramıza Yeni Katılan Çalışma Arkadaşlarımız.. - {0}", "Kasım" + " " + DateTime.Now.Year);
 
                 bool status = mailService.SendMailHtml(_result, _subject);
 
