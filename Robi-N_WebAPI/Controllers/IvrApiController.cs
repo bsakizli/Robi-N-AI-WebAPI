@@ -75,31 +75,19 @@ namespace Robi_N_WebAPI.Controllers
 
                         if(_request.logs.Count > 0)
                         {
-
                             List<addLogTemplate> logs = new List<addLogTemplate>();
                             foreach (var item in _request.logs)
                             {
-                                if (!String.IsNullOrEmpty(item.key) && !String.IsNullOrEmpty(item.value))
-
+                                if (!String.IsNullOrEmpty(item.key))
                                 {
                                     logs.Add(new addLogTemplate { logName = item.key, content = item.value });
                                 }
-                                else
-                                {
-                                    response = new GlobalResponse
-                                    {
-                                        status = true,
-                                        statusCode = 201,
-                                        displayMessage = "Log parametreleri hatalı lütfen kontrol ediniz.",
-                                        message = "Successful"
-                                    };
-                                }
                             }
 
-                            var list = new List<KeyValuePair<string, string>>();
-                            list.Add(new KeyValuePair<string, string>("Cat", "1"));
-                            list.Add(new KeyValuePair<string, string>("Dog", "2"));
-                            list.Add(new KeyValuePair<string, string>("Dog", "3"));
+                            //var list = new List<KeyValuePair<string, string>>();
+                            //list.Add(new KeyValuePair<string, string>("Cat", "1"));
+                            //list.Add(new KeyValuePair<string, string>("Dog", "2"));
+                            //list.Add(new KeyValuePair<string, string>("Dog", "3"));
 
 
                            

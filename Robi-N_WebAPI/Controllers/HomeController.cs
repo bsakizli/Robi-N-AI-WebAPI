@@ -31,6 +31,14 @@ namespace Robi_N_WebAPI.Controllers
 
         public IActionResult Privacy()
         {
+           
+
+
+            //var httpContext = context.GetHttpContext();
+
+            //// Allow all authenticated users to see the Dashboard (potentially dangerous).
+            //return httpContext.User.Identity?.IsAuthenticated ?? false;
+
             return View();
         }
 

@@ -1,5 +1,8 @@
 ﻿using EmptorUtility;
 using ExtendedXmlSerializer.ExtensionModel;
+using Hangfire;
+using Hangfire.Dashboard;
+using HangfireBasicAuthenticationFilter;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -144,11 +147,11 @@ builder.Services.AddAuthentication(opt =>
 {
     options.ForwardDefaultSelector = context =>
     {
-      
+
         string authorization = context.Request.Headers[HeaderNames.Authorization];
         {
 
-            if(authorization != null)
+            if (authorization != null)
             {
                 var tt = authorization.Contains("Bearer");
 
@@ -219,17 +222,17 @@ builder.Services.AddSwaggerGen(c =>
 
 
 
-        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-        {
-            In = ParameterLocation.Header,
-            Scheme = "Bearer",
-            BearerFormat = "JWT",
-            Description = "Please insert JWT with Bearer into field",
-            Name = "Authorization",
-            Type = SecuritySchemeType.ApiKey
-        });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "Please insert JWT with Bearer into field",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
 
-        c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement {
         {
          new OpenApiSecurityScheme
          {
@@ -293,6 +296,11 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 
 
+//Hangfire
+builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddHangfireServer();
+
+
 builder.Services.AddControllers(options =>
 {
     options.RespectBrowserAcceptHeader = true;
@@ -314,12 +322,15 @@ builder.Services.AddDbContext<AIServiceDbContext>(options =>
 );
 
 
+
 //builder.Services.AddDbContext<EmptorDbContext>(options =>
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("EmptorConnection"))
 //);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
+#region Test
 
 
 
@@ -512,6 +523,8 @@ builder.Services.AddEndpointsApiExplorer();
 //    .CreateLogger();
 
 
+#endregion
+
 
 
 Log.Logger = new LoggerConfiguration()
@@ -581,7 +594,7 @@ app.UseStatusCodePages(async context =>
             status = 403,
             displayMessage = "Yetkisiz İşlem",
             description = "Unauthorized transaction."
-        })) ;
+        }));
 
         //JsonResult result = new JsonResult(new { msg = "Some example message." });
 
@@ -611,6 +624,28 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+
+
+
+
+app.UseHangfireServer(new BackgroundJobServerOptions());
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    DashboardTitle = "Robi-N Zamanlayıcı",
+    IsReadOnlyFunc = (DashboardContext context) => true,
+    //Authorization = new[] { new MyAuthorizationFilter() }
+    Authorization = new[]
+        {
+                new HangfireCustomBasicAuthenticationFilter{
+                    User = "admin",
+                    Pass = "admin"
+                }
+            }
+});
+
+
+
+
 
 
 

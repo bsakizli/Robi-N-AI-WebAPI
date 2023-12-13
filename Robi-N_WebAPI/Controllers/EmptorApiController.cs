@@ -341,6 +341,30 @@ namespace Robi_N_WebAPI.Controllers
 
         }
 
+        [HttpPost("closeTicket")]
+        public async Task<IActionResult> closeTicket()
+        {
+            return Ok("");
+        }
+
+        //[HttpGet("getCloseTicketList")]
+        //public async Task<IActionResult> getCloseTicketList()
+        //{
+        //    return Ok("");
+        //}
+
+
+        //[HttpPost("getCloseTicket")]
+        //public async Task<IActionResult> getCloseTicket()
+        //{
+        //    return Ok("");
+        //}
+
+        //[HttpDelete("getCloseTicket")]
+        //public async Task<IActionResult> getCloseTicket()
+        //{
+        //    return Ok("");
+        //}
 
     }
 }

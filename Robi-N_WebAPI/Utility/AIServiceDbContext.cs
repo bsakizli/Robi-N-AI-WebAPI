@@ -17,5 +17,6 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_WAITING_TIMES> RBN_WAITING_TIMES { get; set; }  
         public DbSet<RBN_EMPTOR_WaitingTicketHistory> RBN_EMPTOR_WaitingTicketHistory { get; set; }  
         public DbSet<RBN_CARGO_COMPANY_LIST> RBN_CARGO_COMPANY_LIST { get; set; }  
+        public DbSet<RBN_EMPTOR_ClosedTicketHistory> RBN_EMPTOR_ClosedTicketHistory { get; set; }  
     }
 }

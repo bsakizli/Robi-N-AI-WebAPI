@@ -495,7 +495,7 @@ ELSE
                 DECLARE @AnaSorumlu INT, @TicketId INT, @DateNow DATETIME, @UserId INT, @UserPositionId INT, @TICKETSTATUSSUBID INT, @NEWVALUE NVARCHAR(MAX);
                 SET @UserId = 8624;
                 SET @TICKETSTATUSSUBID = 7;
-                SET @UserPositionId = 6445;
+                SET @UserPositionId = 6484;
                 SET @DateNow = GETDATE();
 
                 SET @TicketId =
