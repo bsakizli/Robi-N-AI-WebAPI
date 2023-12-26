@@ -28,6 +28,9 @@ namespace Robi_N_WebAPI.Controllers
         [HttpGet("AutomaticTicketClosingList")]
         public async Task<IActionResult> AutomaticTicketClosingList()
         {
+
+         
+
             return Ok("");
         }
 

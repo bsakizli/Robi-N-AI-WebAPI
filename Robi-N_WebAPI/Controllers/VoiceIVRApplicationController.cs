@@ -221,44 +221,54 @@ namespace Robi_N_WebAPI.Controllers
                 
                 //var _csqs = await Task.Run(() => webService.getCSQList().Result);
 
-                var _csqs = await webService.getCSQList();
-                if (_csqs.Csq.Count > 0)
-                {
-                    List<responseListCSQ.csq> _csqList = new List<responseListCSQ.csq>();
-                    foreach (var item in _csqs.Csq)
-                    {
-                        responseListCSQ.csq csq = new responseListCSQ.csq
-                        {
-                            name = item.Name
-                        };
-                        _csqList.Add(csq);
-                    }
 
-                    response = new responseListCSQ
-                    {
-                        status = true,
-                        statusCode = 200,
-                        message = "CSQ List achievement.",
-                        csqs = _csqList
-                    };
+					var _csqs = await webService.getCSQList();
 
 
-                    var _responseText = new JavaScriptSerializer().Serialize(response);
-                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
-                    return Ok(response);
-                }
-                else
-                {
-                    response = new responseListCSQ
-                    {
-                        status = false,
-                        statusCode = 201,
-                        message = "CSQ Defined"
-                    };
-                    var _responseText = new JavaScriptSerializer().Serialize(response);
-                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
-                    return BadRequest(response);
-                }
+
+
+					if (_csqs.Csq.Count > 0)
+					{
+						List<responseListCSQ.csq> _csqList = new List<responseListCSQ.csq>();
+						foreach (var item in _csqs.Csq)
+						{
+							responseListCSQ.csq csq = new responseListCSQ.csq
+							{
+								name = item.Name
+							};
+							_csqList.Add(csq);
+						}
+
+						response = new responseListCSQ
+						{
+							status = true,
+							statusCode = 200,
+							message = "CSQ List achievement.",
+							displayMessage = "Kuyruk listelemesi yapılmıştır.",
+							csqs = _csqList
+						};
+
+
+						var _responseText = new JavaScriptSerializer().Serialize(response);
+						_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+						return Ok(response);
+					}
+					else
+					{
+						response = new responseListCSQ
+						{
+							status = false,
+							statusCode = 201,
+							message = "CSQ Defined"
+						};
+						var _responseText = new JavaScriptSerializer().Serialize(response);
+						_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), _responseText));
+						return BadRequest(response);
+					}
+
+				
+
+                
 
             }
             catch (Exception ex)
@@ -435,25 +445,66 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpGet("getholidayDayList")]
-        public async Task<IActionResult> getholidayDayList()
+        public async Task<IActionResult> getholidayDayList(string csq, int page = 1, int pageSize = 250, int year = 0)
         {
-            getholidayDayList response;
+
+			getholidayDayList response;
             try
             {
-                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.ToListAsync();
-                response = new responseVoiceIVRApplication.getholidayDayList
+                if (pageSize <= 500 && page >=1)
                 {
-                    statusCode = 200,
-                    message = "The listing was done successfully.",
-                    status = true,
-                    data = _holidays
+					var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.ToListAsync();
+					
+                    if (!String.IsNullOrEmpty(csq))
+                    {
+                        _holidays = _holidays.Where(x => x.csq == csq).ToList();
+					}
 
-                };
+					if (Convert.ToInt32(year) != 0 )
+					{
+						_holidays = _holidays.Where(x => x.years == year).ToList();
+					}
 
-                var textResult = new JavaScriptSerializer().Serialize(response);
-                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
-                return Ok(response);
+					var _count = _holidays.Count();
+					double pageCount = (double)((decimal)_count / Convert.ToDecimal(pageSize));
+					var skip = (page - 1) * pageSize;
+
+                    List<RBN_IVR_HOLIDAY_DAYS> holidays = _holidays.Skip(skip).Take(pageSize).ToList();
+
+
+					response = new responseVoiceIVRApplication.getholidayDayList
+					{
+						statusCode = 200,
+						message = "The listing was done successfully.",
+						status = true,
+                        totalcount = _count,
+                        activepage = page,
+                        totalpagecount = (int)Math.Ceiling(pageCount),
+                        listcount = holidays.Count(),
+                        pagesize = pageSize,
+						data = holidays
+
+					};
+
+					var textResult = new JavaScriptSerializer().Serialize(response);
+					_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+					return Ok(response);
+
+				} else
+                {
+					response = new responseVoiceIVRApplication.getholidayDayList
+					{
+						statusCode = 402,
+						message = String.Format("The listing limit error."),
+						status = false,
+                        displayMessage = "Bir sayfa içinde maximum 500 kayıt olabilir."
+					};
+					var textResult = new JavaScriptSerializer().Serialize(response);
+					_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+					return BadRequest(response);
+				}
 
             } catch(Exception e)
             {

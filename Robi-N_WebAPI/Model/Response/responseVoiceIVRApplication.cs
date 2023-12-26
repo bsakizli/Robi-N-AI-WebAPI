@@ -69,8 +69,13 @@ namespace Robi_N_WebAPI.Model.Response
 
         public class getholidayDayList : GlobalResponse
         {
-            public List<RBN_IVR_HOLIDAY_DAYS>? data { get; set; }
-        }
+            public int totalcount { get; set; }
+            public int activepage { get; set; }
+            public int totalpagecount { get; set; }
+            public int listcount { get; set; }
+            public int pagesize { get; set; }
+			public List<RBN_IVR_HOLIDAY_DAYS>? data { get; set; }
+		}
 
         public class getholidayDay : GlobalResponse
         {
