@@ -549,6 +549,7 @@ namespace Robi_N_WebAPI.Controllers
                         endDate = Convert.ToDateTime(item.end.date),
                         holidayName = item.summary,
                         years = Convert.ToInt32(_startDate.Year),
+                        userRecord = false,
                         startDate = Convert.ToDateTime(item.start.date)
                     });
                     await _db.SaveChangesAsync();
@@ -584,6 +585,7 @@ namespace Robi_N_WebAPI.Controllers
                         displayName = item.displayName,
                         endDate = Convert.ToDateTime(item.endDate),
                         holidayName = item.displayName,
+                        userRecord = true,
                         startDate = Convert.ToDateTime(item.startDate)
                     };
                     var lastRecord = _db.RBN_IVR_HOLIDAY_DAYS.Add(_record);

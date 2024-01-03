@@ -19,6 +19,7 @@ namespace Robi_N_WebAPI.Utility.Tables
         public DateTime startDate { get; set; }
        
         public DateTime endDate { get; set; }
+        public bool userRecord { get; set; }
        
 
         public int? years { get; set; }
