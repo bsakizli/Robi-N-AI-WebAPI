@@ -6,8 +6,9 @@ namespace Robi_N_WebAPI.Utility
 {
     public class AIServiceDbContext : DbContext
     {
-        public AIServiceDbContext(DbContextOptions<AIServiceDbContext> options) : base(options) { }
-        public DbSet<ApiUsers> RBN_AI_SERVICE_USERS { get; set; }  
+        //public AIServiceDbContext() : base() { }
+		public AIServiceDbContext(DbContextOptions<AIServiceDbContext> options) : base(options) { }
+		public DbSet<ApiUsers> RBN_AI_SERVICE_USERS { get; set; }  
         public DbSet<RBN_AI_SERVICE_ROLES_MAP> RBN_AI_SERVICE_ROLES_MAP { get; set; }  
         public DbSet<RBN_AI_SERVICE_ROLE> RBN_AI_SERVICE_ROLE { get; set; }  
         public DbSet<RBN_IVR_HOLIDAY_DAYS> RBN_IVR_HOLIDAY_DAYS { get; set; }  
@@ -18,5 +19,7 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_EMPTOR_WaitingTicketHistory> RBN_EMPTOR_WaitingTicketHistory { get; set; }  
         public DbSet<RBN_CARGO_COMPANY_LIST> RBN_CARGO_COMPANY_LIST { get; set; }  
         public DbSet<RBN_EMPTOR_ClosedTicketHistory> RBN_EMPTOR_ClosedTicketHistory { get; set; }  
+        public DbSet<RBN_EMPTOR_AUTOTICKETCLOSEDScheduler> RBN_EMPTOR_AUTOTICKETCLOSEDScheduler { get; set; }  
+        public DbSet<RBN_EMPTOR_AUTOCLOSEDTICKET> RBN_EMPTOR_AUTOCLOSEDTICKET { get; set; }  
     }
 }

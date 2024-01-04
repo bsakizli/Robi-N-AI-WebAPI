@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RobinCore", "RobinCore\Robi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmptorUtility", "EmptorUtility\EmptorUtility.csproj", "{F3A3E695-1352-45E1-BFA5-6EC736914343}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetGsmAPI", "NetGsmAPI\NetGsmAPI.csproj", "{D02C5CFF-A24F-4902-A872-4E8DA0A56E7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetGsmAPI", "NetGsmAPI\NetGsmAPI.csproj", "{D02C5CFF-A24F-4902-A872-4E8DA0A56E7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundJob", "BackgroundJob\BackgroundJob.csproj", "{F649C76E-60A4-400B-A056-6660294E7DD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{D02C5CFF-A24F-4902-A872-4E8DA0A56E7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D02C5CFF-A24F-4902-A872-4E8DA0A56E7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D02C5CFF-A24F-4902-A872-4E8DA0A56E7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F649C76E-60A4-400B-A056-6660294E7DD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F649C76E-60A4-400B-A056-6660294E7DD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F649C76E-60A4-400B-A056-6660294E7DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F649C76E-60A4-400B-A056-6660294E7DD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

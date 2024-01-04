@@ -27,13 +27,16 @@ using System.Collections;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text;
-
+using Robi_N_WebAPI.BackgroundJob.Schedules;
+using Google.Api;
+using DocumentFormat.OpenXml.InkML;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+
 // Add services to the container.
-
-
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -51,7 +54,10 @@ builder.Services.AddAuthentication(opt =>
     int readByte = 0;
     rsa.ImportSubjectPublicKeyInfo(publicKey, out readByte);
 
-    options.TokenValidationParameters = new TokenValidationParameters
+   
+
+
+	options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -625,10 +631,8 @@ app.UseEndpoints(endpoints =>
     endpoints.MapControllers();
 });
 
-
-
-
 app.UseHangfireServer(new BackgroundJobServerOptions());
+
 app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     DashboardTitle = "Robi-N Zamanlayıcı",
@@ -640,14 +644,13 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
                     User = "admin",
                     Pass = "admin"
                 }
-            }
+	}
 });
 
 
 
 
-
-
+RecurringJobs.AutomaticTicketClosedOperation();
 
 app.MapControllerRoute(
     name: "default",

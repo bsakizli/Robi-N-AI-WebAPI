@@ -7,7 +7,8 @@ namespace Robi_N_WebAPI.Utility.Tables
         [Key]
         public int Id { get; set; }
 
-        public int  TicketId { get; set; }
+		public int autoTicketId { get; set; }
+		public long  TicketId { get; set; }
         public string?  TicketIdDesc { get; set; }
         public DateTime closedDate { get; set; }
         public DateTime addDate { get; set; }

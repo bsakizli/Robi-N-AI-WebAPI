@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240103153019_AutoMaticTicketClosedTableCreateCron4")]
+    partial class AutoMaticTicketClosedTableCreateCron4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,28 +146,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.ToTable("RBN_CARGO_COMPANY_LIST");
                 });
 
-            modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_AUTOCLOSEDTICKET", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AutoClosedId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("TicketId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("closedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RBN_EMPTOR_AUTOCLOSEDTICKET");
-                });
-
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler", b =>
                 {
                     b.Property<int>("Id")
@@ -183,6 +164,9 @@ namespace Robi_N_WebAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("oneClosedTicketCount")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("process")
@@ -207,8 +191,8 @@ namespace Robi_N_WebAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("TicketId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TicketIdDesc")
                         .HasColumnType("nvarchar(max)");
@@ -218,9 +202,6 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.Property<DateTime>("addDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("autoTicketId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("closedDate")
                         .HasColumnType("datetime2");

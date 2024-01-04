@@ -445,8 +445,6 @@ ELSE
            
         }
 
-
-
         public async Task<Boolean> TicketWaitingHistoryAdded(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
         {
             try
@@ -471,7 +469,6 @@ ELSE
                 return false;
             }
         }
-
 
         public async Task<Boolean> TicketWaiting(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
         {
@@ -655,6 +652,107 @@ SELECT
                 return _response;
             }
         }
+
+
+		public async Task<Boolean> InventoryStillSaveClose(long TicketId)
+		{
+			Boolean _response = false;
+			try
+			{
+				var tt = _appConfig.GetConnectionString("EmptorConnection");
+
+				DataTable dt = new DataTable();
+				SqlConnection con = new SqlConnection(tt);
+				SqlCommand cmd = new SqlCommand(String.Format(@"EXEC	[dbo].[ENVANTER_HAREKETSIZ_KAYITLARI_OTOMATIK_STATU_COZULDU_YAPMA]
+		@TicketId = @_TicketId,
+		@UserId = 8624,
+		@UserPositionId = 6484
+"), con);
+				cmd.Parameters.Add("@_TicketId", SqlDbType.BigInt).Value = TicketId;
+				SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+				adapter.Fill(dt);
+
+				await con.OpenAsync();
+
+				using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+				{
+					if (rdr.HasRows)
+					{
+						while (rdr.Read())
+						{
+							string Result = rdr["Result"].ToString();
+							
+                            if(Convert.ToBoolean(Result))
+                            {
+                                _response = true;
+                            } else
+                            {
+                                _response = false;
+                            }
+						}
+					}
+					else
+					{
+                        _response = false;
+					}
+				}
+				con.Close();
+
+				return _response;
+
+			}
+			catch
+			{
+                _response = false;
+				return _response;
+			}
+		}
+
+		public async Task<List<long>> getTicketClosedList(string SqlQuery)
+        {
+			List<long> ticketIds = new List<long>();
+			try
+			{
+				
+				var tt = _appConfig.GetConnectionString("EmptorConnection");
+
+				DataTable dt = new DataTable();
+				SqlConnection con = new SqlConnection(tt);
+				SqlCommand cmd = new SqlCommand(String.Format(SqlQuery), con);
+				
+				SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+				adapter.Fill(dt);
+
+				await con.OpenAsync();
+
+				using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+				{
+					if (rdr.HasRows)
+					{
+						while (rdr.Read())
+						{
+							string _TicketId = rdr["TicketId"].ToString();
+
+                            ticketIds.Add((long)Convert.ToDouble(_TicketId));
+						}
+					}
+					else
+					{
+                        return ticketIds;
+					}
+				}
+				con.Close();
+
+				return ticketIds;
+
+			}
+			catch
+			{
+				return ticketIds;
+			}
+		}
+
+
 
     }
 }

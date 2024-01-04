@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240104112635_AutoTicketTableCreater")]
+    partial class AutoTicketTableCreater
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -207,8 +210,8 @@ namespace Robi_N_WebAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long>("TicketId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
 
                     b.Property<string>("TicketIdDesc")
                         .HasColumnType("nvarchar(max)");
@@ -218,9 +221,6 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.Property<DateTime>("addDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("autoTicketId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("closedDate")
                         .HasColumnType("datetime2");
