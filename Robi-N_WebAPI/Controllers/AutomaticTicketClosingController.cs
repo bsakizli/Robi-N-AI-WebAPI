@@ -29,7 +29,6 @@ namespace Robi_N_WebAPI.Controllers
 		
 
 
-
 		public AutomaticTicketClosingController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IConfiguration configuration, ILogger<IdentityCheckController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
         
@@ -87,14 +86,14 @@ namespace Robi_N_WebAPI.Controllers
             }
         }
 
-        [HttpGet("AutomaticTicketClosing/{Id}")]
-        public async Task<IActionResult> AutomaticTicketClosing(int Id)
+        [HttpGet("AutomaticTicketClosing/{id}")]
+        public async Task<IActionResult> AutomaticTicketClosing(int id)
         {
             responseSingleAutomaticTicketClosingList _response;
 
             try
             {
-				var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == Id).FirstOrDefaultAsync();
+				var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == id).FirstOrDefaultAsync();
                 
                 if (job !=null)
                 {
@@ -137,13 +136,13 @@ namespace Robi_N_WebAPI.Controllers
 			}
         }
 
-        [HttpGet("AutomaticTicketClosing/{Id}/ticketList")]
-        public async Task<IActionResult> AutomaticTicketClosingTicketList(int Id)
+        [HttpGet("AutomaticTicketClosing/{id}/ticketList")]
+        public async Task<IActionResult> AutomaticTicketClosingTicketList(int id)
         {
             responseAutomaticTicketList _response;
             try
             {
-                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (job != null)
                 {
                     if(!String.IsNullOrEmpty(job.ticketQuery))
@@ -197,7 +196,6 @@ namespace Robi_N_WebAPI.Controllers
 			}
            
         }
-
 
 		[HttpPost("AutomaticTicketClosing")]
 		public async Task<IActionResult> addAutomaticTicketClosingList([FromBody] RBN_EMPTOR_AUTOTICKETCLOSEDScheduler data)
@@ -272,14 +270,13 @@ namespace Robi_N_WebAPI.Controllers
 			}
 		}
 
-
 		[HttpPut("AutomaticTicketClosing/{Id}")]
-        public async Task<IActionResult> UpdateAutomaticTicketClosing(int Id, [FromBody] RBN_EMPTOR_AUTOTICKETCLOSEDScheduler data)
+        public async Task<IActionResult> UpdateAutomaticTicketClosing(int id, [FromBody] RBN_EMPTOR_AUTOTICKETCLOSEDScheduler data)
         {
             responseSingleAutomaticTicketClosingList _response;
             try
             {
-                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == id).FirstOrDefaultAsync();
                 if (job != null)
                 {
                     job = data;
@@ -332,18 +329,17 @@ namespace Robi_N_WebAPI.Controllers
 			}
         }
 
-        [HttpDelete("AutomaticTicketClosing/{Id}")]
-        public async Task<IActionResult> DeleteAutomaticTicketClosing(int Id)
+        [HttpDelete("AutomaticTicketClosing/{id}")]
+        public async Task<IActionResult> DeleteAutomaticTicketClosing(int id)
 		{
 			responseSingleAutomaticTicketClosingList _response;
 
 			try
             {
-                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == Id).FirstOrDefaultAsync();
+                var job = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == id).FirstOrDefaultAsync();
 				if (job != null)
 				{
-
-					if (await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == Id).ExecuteDeleteAsync() == 1)
+					if (await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.Id == id).ExecuteDeleteAsync() == 1)
                     {
 						_response = new responseSingleAutomaticTicketClosingList
 						{

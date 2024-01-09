@@ -30,6 +30,7 @@ using System.Text;
 using Robi_N_WebAPI.BackgroundJob.Schedules;
 using Google.Api;
 using DocumentFormat.OpenXml.InkML;
+using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -641,12 +642,29 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
     Authorization = new[]
         {
                 new HangfireCustomBasicAuthenticationFilter{
-                    User = "admin",
-                    Pass = "admin"
+                    User = "bdh",
+                    Pass = "Bdhpass1!"
                 }
 	}
 });
 
+GlobalConfiguration.Configuration
+				.UseColouredConsoleLogProvider()
+				.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+				.UseSimpleAssemblyNameTypeSerializer()
+				.UseRecommendedSerializerSettings()
+				.UseResultsInContinuations()
+				.UseSqlServerStorage(@builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+				{
+				
+					CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+					QueuePollInterval = TimeSpan.Zero,
+					SlidingInvisibilityTimeout = TimeSpan.FromMinutes(1),
+					UseRecommendedIsolationLevel = true,
+					UsePageLocksOnDequeue = true,
+					DisableGlobalLocks = true,
+					EnableHeavyMigrations = true
+				});
 
 
 

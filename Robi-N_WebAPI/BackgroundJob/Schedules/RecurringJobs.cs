@@ -28,8 +28,6 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 		public async static void AutomaticTicketClosedOperation()
 		{
 
-			
-
 			//IConfiguration configuration = new ConfigurationBuilder()
 			//.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
 			//.Build();

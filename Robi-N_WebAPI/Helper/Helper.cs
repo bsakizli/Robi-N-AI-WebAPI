@@ -3,6 +3,7 @@ using System.Net;
 using Robi_N_WebAPI.Model.Response;
 using Nancy.Json;
 using Robi_N_WebAPI.Model;
+using DocumentFormat.OpenXml.Bibliography;
 
 namespace Robi_N_WebAPI.Helper
 {
@@ -52,8 +53,13 @@ namespace Robi_N_WebAPI.Helper
         {
             var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-        }
+		}
 
 
-    }
+
+        
+
+
+
+	}
 }
