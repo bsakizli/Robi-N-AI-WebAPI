@@ -56,6 +56,13 @@ namespace Robi_N_WebAPI.Controllers
             _db = db;
         }
 
+
+        [HttpGet("getDate")]
+        public async Task<IActionResult> getDate()
+        {
+            return Ok(DateTime.Now);
+        }
+
         [HttpGet("getHolidayDayCheckNowCsq")]
         public async Task<IActionResult> getHolidayDayCheckNowCsq(string csq)
         {

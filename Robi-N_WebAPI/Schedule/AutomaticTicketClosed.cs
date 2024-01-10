@@ -60,9 +60,9 @@ namespace Robi_N_WebAPI.Shecles
 											{
 												active = true,
 												TicketId = ticket,
-												addDate = DateTime.UtcNow,
+												addDate = DateTime.Now,
 												autoTicketId = item.Id,
-												closedDate = DateTime.UtcNow
+												closedDate = DateTime.Now
 											};
 											var lastRecord = _db.RBN_EMPTOR_ClosedTicketHistory.Add(_ticketItem);
 											if (await _db.SaveChangesAsync() == 1)
