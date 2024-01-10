@@ -60,51 +60,50 @@ namespace Robi_N_WebAPI.Controllers
         public async Task<IActionResult> getHolidayDayCheckNowCsq(string csq)
         {
             GlobalResponse globalResponse;
+			
 			try
 			{
+				var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == DateTime.Now.Date && x.csq == csq);
+				var _workHours = await _db.RNB_IVR_WORKING_HOURS.Where(x => x.csqname == csq).FirstOrDefaultAsync();
+				//Holiday Start Time Control
 				var _date = DateTime.Now.Date;
 				var _time = DateTime.Now.TimeOfDay.Ticks;
 
-				var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == _date.Date && x.csq == csq);
-				var _workHours = await _db.RNB_IVR_WORKING_HOURS.Where(x => x.csqname == csq).FirstOrDefaultAsync();
-				//Holiday Start Time Control
-
 				if (_holidays != null)
 				{
-                    if(_workHours == null)
-                    {
+					if (_workHours == null)
+					{
 						globalResponse = new GlobalResponse
 						{
 							statusCode = 200,
-							status = true,
+							status = false,
 							message = "You are in working hours."
 						};
 
-					} else
-                    {
+					}
+					else
+					{
 						globalResponse = new GlobalResponse
 						{
 							statusCode = 201,
-							status = false,
+							status = true,
 							message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
 						};
 					}
-
 					var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
 					_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), globalResponseResult));
 					return Ok(globalResponse);
 				}
 				else
 				{
-					int _now = (int)_date.DayOfWeek;
-					
+					int _now = (int)DateTime.Now.Date.DayOfWeek;
 
 					if (_workHours == null)
 					{
 						globalResponse = new GlobalResponse
 						{
 							statusCode = 200,
-							status = true,
+							status = false,
 							message = "You are in working hours."
 						};
 					}
@@ -114,23 +113,21 @@ namespace Robi_N_WebAPI.Controllers
 						globalResponse = new GlobalResponse
 						{
 							statusCode = 200,
-							status = false,
+							status = true,
 							message = "We're out of office hours."
 						};
-						return BadRequest(globalResponse);
 					}
 					else
 					{
 
 						if (_workHours != null)
 						{
-
-							if (_workHours.starthours <= _date.TimeOfDay && _workHours.endhours >= _date.TimeOfDay)
+							if (_workHours.starthours <= DateTime.Now.TimeOfDay && _workHours.endhours >= DateTime.Now.TimeOfDay)
 							{
 								globalResponse = new GlobalResponse
 								{
 									statusCode = 200,
-									status = true,
+									status = false,
 									message = "You are in working hours."
 								};
 							}
@@ -139,10 +136,9 @@ namespace Robi_N_WebAPI.Controllers
 								globalResponse = new GlobalResponse
 								{
 									statusCode = 200,
-									status = false,
+									status = true,
 									message = "We're out of office hours."
 								};
-                                return BadRequest(globalResponse);
 							}
 						}
 						else
@@ -150,7 +146,7 @@ namespace Robi_N_WebAPI.Controllers
 							globalResponse = new GlobalResponse
 							{
 								statusCode = 200,
-								status = true,
+								status = false,
 								message = "You are in working hours."
 							};
 						}

@@ -664,9 +664,7 @@ SELECT
 				DataTable dt = new DataTable();
 				SqlConnection con = new SqlConnection(tt);
 				SqlCommand cmd = new SqlCommand(String.Format(@"EXEC	[dbo].[ENVANTER_HAREKETSIZ_KAYITLARI_OTOMATIK_STATU_COZULDU_YAPMA]
-		@TicketId = @_TicketId,
-		@UserId = 8624,
-		@UserPositionId = 6484
+		@TicketId = @_TicketId
 "), con);
 				cmd.Parameters.Add("@_TicketId", SqlDbType.BigInt).Value = TicketId;
 				SqlDataAdapter adapter = new SqlDataAdapter(cmd);
