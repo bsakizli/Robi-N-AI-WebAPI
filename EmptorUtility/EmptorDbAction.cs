@@ -730,7 +730,6 @@ SELECT
 						while (rdr.Read())
 						{
 							string _TicketId = rdr["TicketId"].ToString();
-
                             ticketIds.Add((long)Convert.ToDouble(_TicketId));
 						}
 					}

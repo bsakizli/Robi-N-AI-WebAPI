@@ -22,5 +22,6 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_EMPTOR_AUTOTICKETCLOSEDScheduler> RBN_EMPTOR_AUTOTICKETCLOSEDScheduler { get; set; }  
         public DbSet<RBN_EMPTOR_AUTOCLOSEDTICKET> RBN_EMPTOR_AUTOCLOSEDTICKET { get; set; }  
         public DbSet<RNB_IVR_WORKING_HOURS> RNB_IVR_WORKING_HOURS { get; set; }  
+        public DbSet<RBN_SGK_VisitingIntroductionInformation> RBN_SGK_VisitingIntroductionInformation { get; set; }  
     }
 }
