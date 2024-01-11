@@ -6,6 +6,7 @@ namespace Robi_N_WebAPI.Utility.Tables
     {
         [Key]
         public int id { get; set; }
+        public string? region { get; set; }
         public string? username { get; set; }
         public string? workplaceCode { get; set; }
         public string? workplacePassword { get; set; }
