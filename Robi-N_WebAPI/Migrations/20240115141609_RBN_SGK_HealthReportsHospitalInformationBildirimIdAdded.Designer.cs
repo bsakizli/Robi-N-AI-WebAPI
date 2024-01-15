@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240115141609_RBN_SGK_HealthReportsHospitalInformationBildirimIdAdded")]
+    partial class RBN_SGK_HealthReportsHospitalInformationBildirimIdAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -393,9 +396,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<long>("MEDULARAPORID")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("OnaylamaTarihi")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("POLIKLINIKTAR")
                         .HasColumnType("datetime2");
 
@@ -434,9 +434,6 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.Property<DateTime>("YATRAPBITTAR")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("process")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240115100304_RBN_SGK_HealthReportsUpdate")]
+    partial class RBN_SGK_HealthReportsUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -369,12 +372,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<int>("ARSIV")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("BASHEKIMONAYTARIHI")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("BildirimId")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("DOGUMONCBASTAR")
                         .HasColumnType("datetime2");
 
@@ -384,22 +381,13 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<DateTime>("ISKAZASITARIHI")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ISVERENEBILDIRILDIGITARIH")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("ISYERIKODU")
                         .HasColumnType("int");
 
                     b.Property<long>("MEDULARAPORID")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("OnaylamaTarihi")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("POLIKLINIKTAR")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("RAPORBITTAR")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RAPORDURUMU")
@@ -417,12 +405,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<long>("TCKIMLIKNO")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("TESISADI")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("TESISKODU")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("VAKA")
                         .HasColumnType("int");
 
@@ -434,9 +416,6 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.Property<DateTime>("YATRAPBITTAR")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("process")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
