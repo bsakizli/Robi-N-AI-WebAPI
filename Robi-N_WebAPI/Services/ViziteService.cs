@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Robi_N_WebAPI.Utility;
+using Robi_N_WebAPI.Utility.Tables;
 using SgkViziteReference;
 using System.Text.RegularExpressions;
 using DateTime = System.DateTime;
