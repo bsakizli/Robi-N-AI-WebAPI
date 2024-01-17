@@ -14,9 +14,9 @@ namespace Robi_N_WebAPI.Shecles
 	{
 		private readonly IConfiguration _configuration;
 		private readonly AIServiceDbContext _db;
-		private readonly ILogger<IdentityCheckController> _logger;
+		private readonly ILogger<AutomaticTicketClosed> _logger;
 
-		public AutomaticTicketClosed(AIServiceDbContext db, IConfiguration configuration, ILogger<IdentityCheckController> logger)
+		public AutomaticTicketClosed(AIServiceDbContext db, IConfiguration configuration, ILogger<AutomaticTicketClosed> logger)
 		{
 			_configuration = configuration;
 			_logger = logger;

@@ -4704,7 +4704,7 @@ namespace SgkViziteReference
         {
             if ((endpointConfiguration == EndpointConfiguration.ViziteGonder))
             {
-                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                System.ServiceModel.BasicHttpsBinding result = new System.ServiceModel.BasicHttpsBinding();
                 result.MaxBufferSize = int.MaxValue;
                 result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
                 result.MaxReceivedMessageSize = int.MaxValue;
@@ -4718,7 +4718,7 @@ namespace SgkViziteReference
         {
             if ((endpointConfiguration == EndpointConfiguration.ViziteGonder))
             {
-                return new System.ServiceModel.EndpointAddress("http://uyg.sgk.gov.tr/Ws_Vizite/services/ViziteGonder");
+                return new System.ServiceModel.EndpointAddress("https://uyg.sgk.gov.tr/Ws_Vizite/services/ViziteGonder");
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }

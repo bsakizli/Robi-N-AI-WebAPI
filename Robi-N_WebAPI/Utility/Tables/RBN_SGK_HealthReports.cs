@@ -33,6 +33,9 @@ namespace Robi_N_WebAPI.Utility.Tables
         public long? BildirimId { get; set; }
         public DateTime? OnaylamaTarihi { get; set; }
         public int? process { get; set; }
+        public DateTime? addDate { get; set; }
+        public Boolean? active { get; set; }
+        public Boolean? mailSend { get; set; }
 
 
 

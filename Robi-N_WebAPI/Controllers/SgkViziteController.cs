@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Robi_N_WebAPI.Services;
+using Robi_N_WebAPI.Shecles;
 using Robi_N_WebAPI.Utility;
 
 namespace Robi_N_WebAPI.Controllers
@@ -14,12 +15,13 @@ namespace Robi_N_WebAPI.Controllers
 
         private readonly AIServiceDbContext _db;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<SgkViziteController> _logger;
 
-        
 
-        public SgkViziteController(AIServiceDbContext db, IConfiguration configuration)
+
+        public SgkViziteController(AIServiceDbContext db, IConfiguration configuration, ILogger<SgkViziteController> logger)
         {
-           
+            _logger = logger;
             _db = db;
             _configuration = configuration;
         }
