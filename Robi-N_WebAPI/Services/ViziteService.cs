@@ -1,16 +1,7 @@
-﻿using Google.Type;
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Kiota.Abstractions;
-using Microsoft.Office.Interop.Excel;
-using Newtonsoft.Json.Linq;
-using Robi_N_WebAPI.Controllers;
-using Robi_N_WebAPI.Shecles;
 using Robi_N_WebAPI.Utility;
-using Robi_N_WebAPI.Utility.Tables;
 using SgkViziteReference;
-using System.ServiceModel;
 using System.Text.RegularExpressions;
 using DateTime = System.DateTime;
 
@@ -18,9 +9,9 @@ namespace Robi_N_WebAPI.Services
 {
 
 
-    public  class   ViziteService
+    public class ViziteService
     {
-        
+
         ViziteGonderClient _sgkClient = new ViziteGonderClient();
 
         private readonly AIServiceDbContext _db;
@@ -44,10 +35,10 @@ namespace Robi_N_WebAPI.Services
 
         public async Task<raporAramaTarihileResponse> getSGKraporAramaTarihileAsync(string username, string workplaceCode, string token, DateTime date)
         {
-            return await _sgkClient.raporAramaTarihileAsync(username, workplaceCode, token, date.ToString());
+            return await _sgkClient.raporAramaTarihileAsync(username, workplaceCode, token, date.ToString("dd.MM.yyyy"));
         }
 
-        public async  Task<raporAramaKimlikNoResponse> getSGKraporAramaKimlikNoAsync(string username, string workplaceCode, string token, long kimlikNumarasi)
+        public async Task<raporAramaKimlikNoResponse> getSGKraporAramaKimlikNoAsync(string username, string workplaceCode, string token, long kimlikNumarasi)
         {
             return await _sgkClient.raporAramaKimlikNoAsync(username, workplaceCode, token, kimlikNumarasi.ToString());
         }
@@ -56,7 +47,7 @@ namespace Robi_N_WebAPI.Services
         {
             Regex rgx = new Regex("(?<=medulaRaporId: |bildirimId: )[0-9]+");
 
-            
+
             var getService = await _sgkClient.raporOnayAsync(username, workplaceCode, token, kimlikNumarasi.ToString(), vaka.ToString(), medulaRaporId.ToString(), nitelikDurumu, raporBitisTarihi.ToString("dd.MM.yyyy"));
             string _BildirimId = rgx.Matches(getService.raporOnayReturn.sonucAciklama)[1].ToString();
             raporOnayResponseCustom raporOnayResponseCustom = new raporOnayResponseCustom
@@ -67,12 +58,12 @@ namespace Robi_N_WebAPI.Services
             };
             //return await _sgkClient.raporOnayAsync(username,workplaceCode,token,kimlikNumarasi.ToString(),vaka.ToString(),medulaRaporId.ToString(),nitelikDurumu, raporBitisTarihi.ToString("dd.MM.yyyy"));
             return raporOnayResponseCustom;
-           
+
         }
 
         public async Task<raporOkunduKapatResponse> getSGKraporOkunduKapatAsync(string username, string workplaceCode, string token, long medulaRaporId)
         {
-            
+
 
             return await _sgkClient.raporOkunduKapatAsync(username, workplaceCode, token, medulaRaporId.ToString());
         }
@@ -87,8 +78,7 @@ namespace Robi_N_WebAPI.Services
             var firms = _db.RBN_SGK_VisitingIntroductionInformation.Where(x => x.active == true).ToList();
             if (firms.Count > 0)
             {
-
-               
+                #region Rapor Kontrol ve Onay 
                 foreach (var item in firms)
                 {
                     #region Rapor KOntrol ve Otomatik Onay
@@ -239,7 +229,13 @@ namespace Robi_N_WebAPI.Services
                     }
                     #endregion
 
+                }
+                #endregion
 
+
+                #region Tarih Bazlı Rapor Onay
+                foreach (var item in firms)
+                {
                     #region Rapor Tarih Kontrol Onay & Otomatik Onay
                     var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId != null && x.RAPORBITTAR == DateTime.Now && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
                     if (getDateReports.Count() > 0)
@@ -252,8 +248,8 @@ namespace Robi_N_WebAPI.Services
                                 string _token = _sgkToken.wsLoginReturn.wsToken;
 
                                 //Rapor Onay
-                                var sgkConfirmReport = await getSGKraporOnay(item.username,item.workplaceCode,_token, report.TCKIMLIKNO,report.VAKA.ToString(),report.MEDULARAPORID,report.RAPORBITTAR,"0");
-                                if(sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
+                                var sgkConfirmReport = await getSGKraporOnay(item.username, item.workplaceCode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID, report.RAPORBITTAR, "0");
+                                if (sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
                                 {
                                     if (sgkConfirmReport.raporOnayResponse.raporOnayReturn.sonucKod == 0)
                                     {
@@ -269,14 +265,13 @@ namespace Robi_N_WebAPI.Services
                                         }
                                     }
                                 }
-
                             }
                         }
                     }
                     #endregion
-
                 }
-               
+                #endregion
+
             }
         }
 

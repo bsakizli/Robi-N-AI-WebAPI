@@ -38,6 +38,7 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 			/*  RemoveIfExists yöntemini çağırarak var olan yinelenen bir işi kaldırabilirsiniz. 
 				Böyle tekrar eden bir iş olmadığında bir istisna oluşturmaz */
 
+
 			RecurringJob.AddOrUpdate<AutomaticTicketClosed>(nameof(AutomaticTicketClosed),
 					job => job.Process(), "*/30 * * * *", TimeZoneInfo.Local);
 
