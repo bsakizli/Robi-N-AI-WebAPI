@@ -14,16 +14,12 @@ namespace EmptorUtility
 {
     public class EmptorDbAction
     {
-
-       
-
         private IConfiguration? _appConfig;
 
         public EmptorDbAction(IConfiguration appSettings)
         {
             _appConfig = appSettings;
         }
-
 
         public string getEmptorTicketId(int _Id)
         {
@@ -653,7 +649,6 @@ SELECT
             }
         }
 
-
 		public async Task<Boolean> InventoryStillSaveClose(long TicketId)
 		{
 			Boolean _response = false;
@@ -748,8 +743,6 @@ SELECT
 				return ticketIds;
 			}
 		}
-
-
 
     }
 }
