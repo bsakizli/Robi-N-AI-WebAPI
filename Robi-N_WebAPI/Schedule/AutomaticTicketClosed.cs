@@ -99,7 +99,6 @@ namespace Robi_N_WebAPI.Shecles
 							}
 						}
 					}
-
 				}
 			}
 		}
