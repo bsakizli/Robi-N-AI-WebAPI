@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report ScriptLanguage="CSharp" ReportInfo.Created="01/17/2024 16:30:07" ReportInfo.Modified="01/22/2024 14:39:59" ReportInfo.CreatorVersion="2024.1.0.0" PrintSettings.PageRange="PageNumbers" PrintSettings.PageNumbers="1">
+<Report ScriptLanguage="CSharp" ReportInfo.Created="01/17/2024 16:30:07" ReportInfo.Modified="01/22/2024 17:21:36" ReportInfo.CreatorVersion="2024.1.3.0" PrintSettings.PageRange="PageNumbers" PrintSettings.PageNumbers="1">
   <Dictionary>
     <BusinessObjectDataSource Name="Reports" ReferenceName="Reports" DataType="System.Int32" Enabled="true">
       <Column Name="Id" DataType="System.Int32"/>
@@ -48,7 +48,7 @@
       <TextObject Name="Text6" Left="555.55" Top="164.65" Width="198.45" Height="18.9" Text="Medula ID Numarası:" Font="Arial, 11pt"/>
     </PageHeaderBand>
     <DataBand Name="Data1" Top="285.6" Width="718.2" Height="557.55" DataSource="Reports">
-      <TextObject Name="Text7" Top="18.9" Width="718.2" Height="198.45" Text="Sayın Yetkili,&#13;&#10;&#13;&#10;&lt;b&gt;[Reports.TCKIMLIKNO]&lt;/b&gt; kimlik numaralı &lt;b&gt;[Reports.AD] [Reports.SOYAD]&lt;/b&gt; adlı personeliniz &lt;b&gt; [FormatDateTime([Reports.ABASTAR])]  - [FormatDateTime([Reports.RAPORBITTAR])] &lt;/b&gt; tarihleri arasında &lt;font color=&quot;red&quot;&gt;&lt;b&gt; [Reports.TESISADI] &lt;/b&gt;&lt;/font&gt; tarafından &lt;b&gt; [Reports.VAKAADI] &lt;/b&gt; nitelik durumu ile rapor aldığı tespit edilmiş ve sistem tarafından &lt;font color=&quot;green&quot;&gt;&lt;b&gt;[Reports.OnaylamaTarihi] &lt;/b&gt;&lt;/font&gt; tarihinde otomatik onay verilmiştir. &#13;&#10;&#13;&#10;" Font="Arial, 12pt" TextRenderType="HtmlTags">
+      <TextObject Name="Text7" Left="18.9" Top="9.9" Width="670.95" Height="198.45" Text="Sayın Yetkili,&#13;&#10;&#13;&#10;&lt;b&gt;[Reports.TCKIMLIKNO]&lt;/b&gt; kimlik numaralı &lt;b&gt;[Reports.AD] [Reports.SOYAD]&lt;/b&gt; adlı personeliniz &lt;b&gt; [FormatDateTime([Reports.ABASTAR])]  - [FormatDateTime([Reports.RAPORBITTAR])] &lt;/b&gt; tarihleri arasında &lt;font color=&quot;red&quot;&gt;&lt;b&gt; [Reports.TESISADI] &lt;/b&gt;&lt;/font&gt; tarafından &lt;b&gt; [Reports.VAKAADI] &lt;/b&gt; nitelik durumu ile rapor aldığı tespit edilmiş ve sistem tarafından &lt;font color=&quot;green&quot;&gt;&lt;b&gt;[Reports.OnaylamaTarihi] &lt;/b&gt;&lt;/font&gt; tarihinde otomatik onay verilmiştir. &#13;&#10;&#13;&#10;" HorzAlign="Justify" Font="Arial, 12pt" TextRenderType="HtmlTags">
         <Formats>
           <GeneralFormat/>
           <GeneralFormat/>
