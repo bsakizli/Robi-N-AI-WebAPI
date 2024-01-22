@@ -220,12 +220,10 @@ namespace Robi_N_WebAPI.Services
                                                                 //Veri Tabanına Onay Bilgileri Kayıt Edilemedi
                                                             }
                                                         }
-
                                                     }
 
                                                     #endregion Rapor Onaylama Bitiş
                                                 }
-
                                             }
                                             else
                                             {

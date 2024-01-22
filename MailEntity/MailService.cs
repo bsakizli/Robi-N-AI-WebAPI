@@ -258,8 +258,10 @@ namespace MailEntity
                 message.To.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
                 message.Cc.Add(MailboxAddress.Parse("hakan.dansik@bdh.com.tr"));
                 message.Cc.Add(MailboxAddress.Parse("kaya.aslan@bdh.com.tr"));
-                message.Cc.Add(MailboxAddress.Parse("gamze.ozen@bdh.com.tr"));
-                message.Cc.Add(MailboxAddress.Parse("mehmet.adiyaman@bdh.com.tr"));
+                
+                
+                //message.Cc.Add(MailboxAddress.Parse("gamze.ozen@bdh.com.tr"));
+                //message.Cc.Add(MailboxAddress.Parse("mehmet.adiyaman@bdh.com.tr"));
                 //message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
                 //message.Cc.Add(MailboxAddress.Parse("kemal.yurdakul@bdh.com.tr"));
                 //message.From.AddRange(emailMessage.FromAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
