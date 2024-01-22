@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Nancy.Json;
+using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Shecles;
 using Robi_N_WebAPI.Utility;
@@ -15,7 +17,7 @@ using System.Data;
 
 namespace Robi_N_WebAPI.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class SgkViziteController : ControllerBase
@@ -90,6 +92,56 @@ namespace Robi_N_WebAPI.Controllers
             var tt = mailService.SGKOnayMailGonder(stream, emailReports);
 
             return File(stream, "application/pdf", Path.GetFileNameWithoutExtension("SGK-Onay-Bildirgesi") + ".pdf");
+        }
+
+
+        [HttpGet("getpdfpassword")]
+        public async Task<ActionResult> getpdfpassword()
+        {
+            try
+            {
+                getPdfPasswordResponse _response;
+
+                long _password = Convert.ToInt64(await Helper.Helper.PdfPasswordGenerator());
+                if(_password != null && _password > 0)
+                {
+                    _response = new getPdfPasswordResponse
+                    {
+                        status = true,
+                        statusCode = 200,
+                        displayMessage = "Şifre üretilmiştir.",
+                        message = "Successfuly",
+                        date =  DateTime.Now.Date,
+                        password = _password
+                    };
+                    return Ok(_response);
+                } else
+                {
+                    _response = new getPdfPasswordResponse
+                    {
+                        status = true,
+                        statusCode = 404,
+                        displayMessage = "Şifre hatası, lütfen değeleri kontrol edin ve tekrar deneyiniz.",
+                        message = "Unsuccessfuly",
+                        date = DateTime.Now.Date
+                    };
+                    return BadRequest(_response);
+                }
+            } catch
+            {
+                getPdfPasswordResponse _response;
+                _response = new getPdfPasswordResponse
+                {
+                    status = true,
+                    statusCode = 404,
+                    displayMessage = "Şifre hatası, lütfen değeleri kontrol edin ve tekrar deneyiniz.",
+                    message = "Unsuccessfuly",
+                    date = DateTime.Now.Date
+                };
+                return BadRequest(_response);
+
+            }
+           
         }
 
 

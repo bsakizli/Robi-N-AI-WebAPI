@@ -111,7 +111,7 @@ namespace Robi_N_WebAPI.Services
                                 {
                                     foreach (var report in reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0"))
                                     {
-                                        System.Threading.Thread.Sleep(2000);
+                                        //System.Threading.Thread.Sleep(2000);
                                         var reportCheck = await _db.RBN_SGK_HealthReports.Where(x => x.MEDULARAPORID == Convert.ToInt64(report.MEDULARAPORID)).FirstOrDefaultAsync();
                                         if (reportCheck == null)
                                         {
@@ -311,8 +311,8 @@ namespace Robi_N_WebAPI.Services
                 PdfDocument document = PdfReader.Open(stream);
                 PdfSecuritySettings securitySettings = document.SecuritySettings;
 
-                securitySettings.UserPassword = "bdh";
-                securitySettings.OwnerPassword = "bdh";
+                securitySettings.UserPassword = await Helper.Helper.PdfPasswordGenerator();
+                securitySettings.OwnerPassword = "Bdhpass!.";
 
                 securitySettings.PermitAccessibilityExtractContent = false;
                 securitySettings.PermitAnnotations = false;

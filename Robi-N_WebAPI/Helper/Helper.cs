@@ -5,6 +5,7 @@ using Nancy.Json;
 using Robi_N_WebAPI.Model;
 using DocumentFormat.OpenXml.Bibliography;
 using System.Data;
+using System.Windows.Forms;
 
 namespace Robi_N_WebAPI.Helper
 {
@@ -99,6 +100,34 @@ namespace Robi_N_WebAPI.Helper
                 return textvalue;
             }
 
+        }
+
+
+
+        public async static Task<string> PdfPasswordGenerator()
+        {
+            // Şifre oluşturulacak tarih
+            DateTime tarih = DateTime.Now;
+
+            // Tarih bilgilerini al
+            int yil = tarih.Year;
+            int ay = tarih.Month;
+            int gun = tarih.Day;
+
+            // Tarihi şifreye dönüştür
+            string sifre = GeneratePassword(yil, ay, gun);
+            // Oluşturulan şifreyi ekrana yazdır
+            return sifre;
+
+
+        }
+
+        static string GeneratePassword(int year, int month, int day)
+        {
+            // Yıl, ay ve gün bilgilerini kullanarak şifre oluştur
+            string sifre = $"{year % 254:00}{month:00}{day:00}";
+
+            return sifre;
         }
 
 
