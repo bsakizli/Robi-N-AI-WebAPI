@@ -1,10 +1,19 @@
-﻿using Hangfire;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using FastReport.Export.PdfSimple;
+using FastReport.Web;
+using Hangfire;
+using MailEntity;
 using Microsoft.EntityFrameworkCore;
 using Robi_N_WebAPI.Utility;
 using Robi_N_WebAPI.Utility.Tables;
 using SgkViziteReference;
+using System.Data;
 using System.Text.RegularExpressions;
 using DateTime = System.DateTime;
+using MailEntity.Models;
+using PdfSharpCore.Pdf;
+using PdfSharpCore.Pdf.IO;
+using PdfSharpCore.Pdf.Security;
 
 namespace Robi_N_WebAPI.Services
 {
@@ -14,11 +23,14 @@ namespace Robi_N_WebAPI.Services
     {
 
         ViziteGonderClient _sgkClient = new ViziteGonderClient();
-
+        MailService _MailService = new MailService();
         private readonly AIServiceDbContext _db;
+        private readonly IWebHostEnvironment _appEnvironment;
+        
 
-        public ViziteService(AIServiceDbContext db)
+        public ViziteService(IWebHostEnvironment appEnvironment,AIServiceDbContext db)
         {
+            _appEnvironment = appEnvironment;
             _db = db;
         }
 
@@ -107,6 +119,7 @@ namespace Robi_N_WebAPI.Services
                                             var _record = new RBN_SGK_HealthReports()
                                             {
                                                 ISYERIKODU = Convert.ToInt32(item.workplaceCode),
+                                                ISYERIADI = item.region.ToUpper(),
                                                 TCKIMLIKNO = Convert.ToInt64(report.TCKIMLIKNO),
                                                 AD = report.AD.TrimEnd(),
                                                 SOYAD = report.SOYAD.TrimEnd(),
@@ -238,7 +251,7 @@ namespace Robi_N_WebAPI.Services
                 foreach (var item in firms)
                 {
                     #region Rapor Tarih Kontrol Onay & Otomatik Onay
-                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId != null && x.RAPORBITTAR == DateTime.Now && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
+                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId != null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
                     if (getDateReports.Count() > 0)
                     {
                         foreach (var report in getDateReports)
@@ -274,6 +287,87 @@ namespace Robi_N_WebAPI.Services
                 #endregion
 
             }
+
+            #region Mail Gönderme ve Bilgilendirme
+            //Mail Gönderme Süreçleri
+            var _reports = await _db.RBN_SGK_HealthReports.Where(x => x.active == true && x.process == 0 && x.BildirimId != null && x.mailSend == true && x.active == true).ToListAsync();
+            if (_reports.Count > 0)
+            {
+                //MemoryStream stream;
+                string webRootPath = _appEnvironment.WebRootPath; // Get the path to the wwwroot folder
+                WebReport webReport = new WebReport(); // Create a Web Report Object
+                webReport.Report.Load(webRootPath + "/reports/SgkViziteOnayFormu.frx"); // Load the report into the WebReport object
+                var dataSet = new DataSet(); 
+                webReport.Report.RegisterData(_reports, "Reports"); // Register the data source in the report
+                webReport.Report.GetDataSource("Reports").Enabled = true;
+
+                webReport.Report.Prepare();
+
+                Stream stream = new MemoryStream();
+                webReport.Report.Export(new PDFSimpleExport(), stream);
+
+                stream.Position = 0;
+
+
+                PdfDocument document = PdfReader.Open(stream);
+                PdfSecuritySettings securitySettings = document.SecuritySettings;
+
+                securitySettings.UserPassword = "bdh";
+                securitySettings.OwnerPassword = "bdh";
+
+                securitySettings.PermitAccessibilityExtractContent = false;
+                securitySettings.PermitAnnotations = false;
+                securitySettings.PermitAssembleDocument = false;
+                securitySettings.PermitExtractContent = false;
+                securitySettings.PermitFormsFill = true;
+                securitySettings.PermitFullQualityPrint = false;
+                securitySettings.PermitModifyDocument = true;
+                securitySettings.PermitPrint = false;
+
+
+                MemoryStream streamPdf = new MemoryStream();
+                document.Save(streamPdf, false);
+                byte[] bytes = streamPdf.ToArray();
+
+                document.Save(stream, false);
+
+
+                List<EmailReports> emailReports = new List<EmailReports>();
+                foreach (var item in _reports)
+                {
+                    EmailReports _mailReport = new EmailReports
+                    {
+                        AdSoyad = item.AD +" " +item.SOYAD,
+                        KimlikNumarasi = Helper.Helper.tcToMask(item.TCKIMLIKNO.ToString(), true),
+                        MedulaRaporId = item.MEDULARAPORID,
+                        RaporTakipNumarasi = item.RAPORTAKIPNO,
+                        OnayReferansId = item.BildirimId,
+                        RaporBaslamaTarihi = item.ABASTAR,
+                        RaporBirisTarihi = item.RAPORBITTAR
+                    };
+                    emailReports.Add(_mailReport);
+                }
+
+                var _mailSend = _MailService.SGKOnayMailGonder(streamPdf, emailReports);
+
+                if (_mailSend)
+                {
+                    _reports.ForEach(a => { a.mailSend = false; });
+                    if (_db.SaveChanges() == 1)
+                    {
+                        //Tüm Süreç Tamamlandı
+                    }
+                }
+                else
+                {
+                    //Mail Gönderilemedi
+                }
+
+            }
+            #endregion
+
+
+
         }
 
     }

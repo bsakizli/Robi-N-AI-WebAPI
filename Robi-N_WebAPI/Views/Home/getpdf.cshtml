@@ -1,0 +1,10 @@
+﻿@using Robi_N_WebAPI.Controllers;
+@model HomeModel
+
+@{
+    Layout = null;
+}
+
+<div class="webreport">
+    @await Model.WebReport.Render()
+</div>

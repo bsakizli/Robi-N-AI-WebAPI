@@ -6,6 +6,7 @@ namespace Robi_N_WebAPI.Utility.Tables
     {
         [Key]
         public int Id { get; set; }
+        public string? ISYERIADI { get; set; }
         public int ISYERIKODU { get; set; }
         public long TCKIMLIKNO { get; set; }
         public string? AD { get; set; }

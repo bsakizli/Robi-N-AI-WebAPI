@@ -38,27 +38,26 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 			/*  RemoveIfExists yöntemini çağırarak var olan yinelenen bir işi kaldırabilirsiniz. 
 				Böyle tekrar eden bir iş olmadığında bir istisna oluşturmaz */
 
-
 			RecurringJob.AddOrUpdate<AutomaticTicketClosed>(nameof(AutomaticTicketClosed),
 					job => job.Process(), "*/30 * * * *", TimeZoneInfo.Local);
 
 
-            RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
-                    job => job.RaporSorgulaOnay(), "*/3 * * * *", TimeZoneInfo.Local);
+			RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
+					job => job.RaporSorgulaOnay(), "*/3 * * * *", TimeZoneInfo.Local);
 
-            //var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
-            //optionsBuilder.UseSqlServer(_database);
-            //var _db = new AIServiceDbContext(optionsBuilder.Options);
+			//var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
+			//optionsBuilder.UseSqlServer(_database);
+			//var _db = new AIServiceDbContext(optionsBuilder.Options);
 
-            //var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
-            //if (Jobs.Count > 0)
-            //{
-            //	foreach (var item in Jobs)
-            //	{
+			//var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
+			//if (Jobs.Count > 0)
+			//{
+			//	foreach (var item in Jobs)
+			//	{
 
-            //	}
-            //}
+			//	}
+			//}
 
-        }
+		}
 	}
 }

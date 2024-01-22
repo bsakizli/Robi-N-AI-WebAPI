@@ -253,7 +253,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-
     //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     //{
     //    Description = "Please insert JWT with pas Bearer into field",
@@ -273,6 +272,7 @@ builder.Services.AddSwaggerGen(c =>
     //        new string[] { }
     //    }
     //});
+
 });
 
 //builder.Services.AddAuthentication("basicAuthentication")
@@ -303,6 +303,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 
 
+//Hangfire
 //Hangfire
 builder.Services.AddHangfire(x => x.UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddHangfireServer();
@@ -545,7 +546,7 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 
-
+builder.Services.AddFastReport();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
@@ -556,6 +557,7 @@ builder.Services.AddCors(p => p.AddPolicy("corspolicy", build =>
 
 //builder.Services.AddCors();
 
+//builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true).AddRazorRuntimeCompilation();
 builder.Services.AddControllersWithViews(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 
 var app = builder.Build();
@@ -674,5 +676,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
+app.UseFastReport();
 app.Run();

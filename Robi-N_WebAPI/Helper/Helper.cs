@@ -4,6 +4,7 @@ using Robi_N_WebAPI.Model.Response;
 using Nancy.Json;
 using Robi_N_WebAPI.Model;
 using DocumentFormat.OpenXml.Bibliography;
+using System.Data;
 
 namespace Robi_N_WebAPI.Helper
 {
@@ -16,6 +17,32 @@ namespace Robi_N_WebAPI.Helper
             return memoryStream.ToArray();
         }
 
+
+        public static DataSet ToDataSet<T>(this IList<T> list)
+        {
+            Type elementType = typeof(T);
+            DataSet ds = new DataSet();
+            DataTable t = new DataTable();
+            ds.Tables.Add(t);
+
+            //add a column to table for each public property on T
+            foreach (var propInfo in elementType.GetProperties())
+            {
+                t.Columns.Add(propInfo.Name, propInfo.PropertyType);
+            }
+
+            //go through each property on T and add each value to the table
+            foreach (T item in list)
+            {
+                DataRow row = t.NewRow();
+                foreach (var propInfo in elementType.GetProperties())
+                {
+                    row[propInfo.Name] = propInfo.GetValue(item, null);
+                }
+            }
+
+            return ds;
+        }
 
         public static async Task<responseVoiceIVRApplication.GoogleCalender.Root>? getGoogleTurkeyHolidays()
         {
@@ -57,9 +84,27 @@ namespace Robi_N_WebAPI.Helper
 
 
 
-        
+        public static string tcToMask(string textvalue, bool check)
+        {
+            if (check)
+            {
+                var first = textvalue.Substring(0, 2);
+                var last = textvalue.Substring(textvalue.Length - 2, 2);
+                var mask = new string('*', textvalue.Length - first.Length - last.Length);
+                var masked = string.Concat(first, mask, last);
+                return masked.ToString();
+            }
+            else
+            {
+                return textvalue;
+            }
+
+        }
 
 
 
-	}
+
+
+
+    }
 }

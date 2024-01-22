@@ -387,6 +387,9 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<DateTime>("ISVERENEBILDIRILDIGITARIH")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ISYERIADI")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ISYERIKODU")
                         .HasColumnType("int");
 
