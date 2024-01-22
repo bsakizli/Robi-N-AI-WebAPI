@@ -249,7 +249,7 @@ namespace Robi_N_WebAPI.Services
                 foreach (var item in firms)
                 {
                     #region Rapor Tarih Kontrol Onay & Otomatik Onay
-                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId != null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
+                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 0 && x.BildirimId != null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
                     if (getDateReports.Count() > 0)
                     {
                         foreach (var report in getDateReports)
@@ -267,6 +267,7 @@ namespace Robi_N_WebAPI.Services
                                     {
                                         report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
                                         report.process = 0;
+                                        report.mailSend = true;
                                         if (await _db.SaveChangesAsync() == 1)
                                         {
                                             var confirmOkunduKapat = await getSGKraporOkunduKapatAsync(item.username, item.workplaceCode, _token, report.MEDULARAPORID);
