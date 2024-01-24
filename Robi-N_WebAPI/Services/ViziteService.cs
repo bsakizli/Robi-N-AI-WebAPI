@@ -249,7 +249,7 @@ namespace Robi_N_WebAPI.Services
                 foreach (var item in firms)
                 {
                     #region Rapor Tarih Kontrol Onay & Otomatik Onay
-                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 0 && x.BildirimId != null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
+                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId == null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(item.workplaceCode)).ToListAsync();
                     if (getDateReports.Count() > 0)
                     {
                         foreach (var report in getDateReports)
@@ -267,6 +267,7 @@ namespace Robi_N_WebAPI.Services
                                     {
                                         report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
                                         report.process = 0;
+                                        report.OnaylamaTarihi = DateTime.Now;
                                         report.mailSend = true;
                                         if (await _db.SaveChangesAsync() == 1)
                                         {
@@ -311,7 +312,7 @@ namespace Robi_N_WebAPI.Services
                 PdfDocument document = PdfReader.Open(stream);
                 PdfSecuritySettings securitySettings = document.SecuritySettings;
 
-                securitySettings.UserPassword = await Helper.Helper.PdfPasswordGenerator();
+                securitySettings.UserPassword = await Helper.Helper.PdfGenerateCustomPassword(DateTime.Now);
                 securitySettings.OwnerPassword = "Bdhpass!.";
 
                 securitySettings.PermitAccessibilityExtractContent = false;
@@ -320,8 +321,8 @@ namespace Robi_N_WebAPI.Services
                 securitySettings.PermitExtractContent = false;
                 securitySettings.PermitFormsFill = true;
                 securitySettings.PermitFullQualityPrint = false;
-                securitySettings.PermitModifyDocument = true;
-                securitySettings.PermitPrint = false;
+                securitySettings.PermitModifyDocument = false;
+                securitySettings.PermitPrint = true;
 
 
                 MemoryStream streamPdf = new MemoryStream();
@@ -348,7 +349,6 @@ namespace Robi_N_WebAPI.Services
                 }
 
                 var _mailSend = _MailService.SGKOnayMailGonder(streamPdf, emailReports);
-
                 if (_mailSend)
                 {
                     _reports.ForEach(a => { a.mailSend = false; });

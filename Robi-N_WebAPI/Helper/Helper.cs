@@ -102,7 +102,17 @@ namespace Robi_N_WebAPI.Helper
 
         }
 
+        public async static Task<string> PdfGenerateCustomPassword(DateTime date)
+        {
+            // Tarih bilgisini kullanarak özel algoritmayla şifre oluşturun
+            string dayPart = (date.Day * 2).ToString();
+            string monthPart = (date.Month * 2).ToString();
+            string yearPart = (date.Year - 2).ToString();
 
+            string password = dayPart + monthPart + yearPart;
+
+            return password;
+        }
 
         public async static Task<string> PdfPasswordGenerator()
         {

@@ -46,12 +46,9 @@ namespace Robi_N_WebAPI.Controllers
 
             ViziteService viziteService = new ViziteService(_appEnvironment, _db);
             await viziteService.RaporSorgulaOnay();
-
             return Ok(true);
+
         }
-
-       
-
 
 
         [HttpGet("getsgk")]
@@ -102,7 +99,7 @@ namespace Robi_N_WebAPI.Controllers
             {
                 getPdfPasswordResponse _response;
 
-                long _password = Convert.ToInt64(await Helper.Helper.PdfPasswordGenerator());
+                long _password = Convert.ToInt64(await Helper.Helper.PdfGenerateCustomPassword(DateTime.Now));
                 if(_password != null && _password > 0)
                 {
                     _response = new getPdfPasswordResponse
@@ -115,6 +112,7 @@ namespace Robi_N_WebAPI.Controllers
                         password = _password
                     };
                     return Ok(_response);
+
                 } else
                 {
                     _response = new getPdfPasswordResponse
