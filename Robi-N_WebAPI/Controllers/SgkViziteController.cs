@@ -13,6 +13,7 @@ using Robi_N_WebAPI.Model.Response;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Shecles;
 using Robi_N_WebAPI.Utility;
+using RobinCore;
 using System.Data;
 
 namespace Robi_N_WebAPI.Controllers
@@ -28,15 +29,16 @@ namespace Robi_N_WebAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly ILogger<SgkViziteController> _logger;
+        private IAppSettings _appConfig;
 
 
-
-        public SgkViziteController(AIServiceDbContext db, IWebHostEnvironment appEnvironment, IConfiguration configuration, ILogger<SgkViziteController> logger)
+        public SgkViziteController(AIServiceDbContext db, IWebHostEnvironment appEnvironment, IConfiguration configuration, ILogger<SgkViziteController> logger, IAppSettings appConfig)
         {
             _appEnvironment = appEnvironment;
             _logger = logger;
             _db = db;
             _configuration = configuration;
+            _appConfig = appConfig;
         }
 
 
@@ -44,7 +46,7 @@ namespace Robi_N_WebAPI.Controllers
         public async Task<ActionResult> confirmReports()
         {
 
-            ViziteService viziteService = new ViziteService(_appEnvironment, _db);
+            ViziteService viziteService = new ViziteService(_appEnvironment, _db, _appConfig);
             await viziteService.RaporSorgulaOnay();
             return Ok(true);
 

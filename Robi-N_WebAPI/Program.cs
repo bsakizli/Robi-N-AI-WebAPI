@@ -31,11 +31,12 @@ using Robi_N_WebAPI.BackgroundJob.Schedules;
 using Google.Api;
 using DocumentFormat.OpenXml.InkML;
 using Hangfire.SqlServer;
+using RobinCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
+builder.Services.AddSingleton<IAppSettings, AppSettingsRepo>();
 
 // Add services to the container.
 
