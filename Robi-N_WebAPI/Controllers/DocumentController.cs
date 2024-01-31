@@ -127,7 +127,7 @@ namespace Robi_N_WebAPI.Controllers
 
 
         [HttpGet("getsgkpdf")]
-        public async Task<ActionResult> getpdf(DateTime date)
+        public async Task<ActionResult> getsgkpdf(DateTime date)
         {
             string webRootPath = _appEnvironment.WebRootPath; // Get the path to the wwwroot folder
             WebReport webReport = new WebReport(); // Create a Web Report Object
