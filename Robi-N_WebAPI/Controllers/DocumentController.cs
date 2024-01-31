@@ -145,23 +145,26 @@ namespace Robi_N_WebAPI.Controllers
             webReport.Report.Export(new PDFSimpleExport(), stream);
             stream.Position = 0;
 
-            List<EmailReports> emailReports = new List<EmailReports>();
-            foreach (var item in data)
-            {
-                EmailReports _mailReport = new EmailReports
-                {
-                    AdSoyad = item.AD + " " + item.SOYAD,
-                    KimlikNumarasi = item.TCKIMLIKNO.ToString(),
-                    MedulaRaporId = item.MEDULARAPORID,
-                    RaporTakipNumarasi = item.RAPORTAKIPNO,
-                    OnayReferansId = item.BildirimId,
-                    RaporBaslamaTarihi = item.ABASTAR,
-                    RaporBirisTarihi = item.RAPORBITTAR
-                };
-                emailReports.Add(_mailReport);
-            }
+            #region MailSend
+            //List<EmailReports> emailReports = new List<EmailReports>();
+            //foreach (var item in data)
+            //{
+            //    EmailReports _mailReport = new EmailReports
+            //    {
+            //        AdSoyad = item.AD + " " + item.SOYAD,
+            //        KimlikNumarasi = item.TCKIMLIKNO.ToString(),
+            //        MedulaRaporId = item.MEDULARAPORID,
+            //        RaporTakipNumarasi = item.RAPORTAKIPNO,
+            //        OnayReferansId = item.BildirimId,
+            //        RaporBaslamaTarihi = item.ABASTAR,
+            //        RaporBirisTarihi = item.RAPORBITTAR
+            //    };
+            //    emailReports.Add(_mailReport);
+            //}
 
-            var tt = mailService.SGKOnayMailGonder(stream, emailReports);
+            //var tt = mailService.SGKOnayMailGonder(stream, emailReports);
+            #endregion
+
 
             return File(stream, "application/pdf", Path.GetFileNameWithoutExtension("SGK-Onay-Bildirgesi") + ".pdf");
         }
