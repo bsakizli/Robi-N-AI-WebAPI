@@ -131,9 +131,9 @@ namespace Robi_N_WebAPI.Services
                                 var reports = await getSGKraporAramaTarihileAsync(azureKey.username, azureKey.workcode, _token, DateTime.Now);
                                 if (reports.raporAramaTarihileReturn.sonucKod == 0)
                                 {
-                                    if (reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0").Count() > 0)
+                                    if (reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0" && x.VAKA == "3").Count() > 0)
                                     {
-                                        foreach (var report in reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0"))
+                                        foreach (var report in reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0" && x.VAKA == "3"))
                                         {
                                             //System.Threading.Thread.Sleep(2000);
                                             var reportCheck = await _db.RBN_SGK_HealthReports.Where(x => x.MEDULARAPORID == Convert.ToInt64(report.MEDULARAPORID)).FirstOrDefaultAsync();

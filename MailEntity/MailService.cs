@@ -359,43 +359,7 @@ namespace MailEntity
                               </tr>
                             </thead>
                           </table>
-                          <table style='display:none;background-color:#f3f3f3;color:#000;font-size:15px;width:750px;' >
-                            <tbody>
-                              <tr style='background-color:#f3f3f3;width:400px'>
-                                <td style='float:left;padding-top:4px;width:30%'>
-                                  <b>Sipariş Döviz Cinsi</b>
-                                  <span style='float:right'>:</span>
-                                </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> USD </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
-                              </tr>
-                              <tr style='background-color:#f3f3f3;width:400px'>
-                                <td style='float:left;padding-top:4px;width:30%'>
-                                  <b>Döviz Kuru</b>
-                                  <span style='float:right'>:</span>
-                                </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> 1 USD : 28,67 TL </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
-                              </tr>
-                              <tr style='background-color:#f3f3f3;width:400px'>
-                                <td style='float:left;padding-top:4px;width:30%'>
-                                  <b>Ödeme Tipi</b>
-                                  <span style='float:right'>:</span>
-                                </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> Havale </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
-                              </tr>
-                              <tr style='background-color:#f3f3f3;width:400px'>
-                                <td style='float:left;padding-top:4px;width:30%'>
-                                  <b>Teslimat Tipi</b>
-                                  <span style='float:right'>:</span>
-                                </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> Karşı Ödemeli Aras Kargo </td>
-                                <td style='float:left;padding-top:4px;text-align:left;width:30%'> &nbsp; </td>
-                              </tr>
-                            </tbody>
-                            <tbody style='margin-bottom:20px;min-width:100%'></tbody>
-                          </table>
+                          
                           <table style='display: none;border:0;border-collapse:collapse;margin-bottom:10px;margin-top:10px;width:100%'>
                             <thead style='background-color:#009ca6;border:1px solid #009ca6;width:100%'>
                               <tr>
