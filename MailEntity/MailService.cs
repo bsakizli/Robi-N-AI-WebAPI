@@ -344,7 +344,7 @@ namespace MailEntity
                               <br>
                                 <br>
 
-                <b>{Tarih}</b> tarihinde yapılan kontrollerde <b>SGK Vizite uygulamasında</b> toplam <b style=""color:red"">{RaporSayisi} adet</b> rapor onayı verilmiştir. </br></br> Raporu onaylanan çalışanların rapoy bilgisini alt taraftaki tabloda bulabilir veya ekte yer alan rapor onay bildirim formu ile personel özlük dosyasına ekleyebilirsiniz. </br></br> İyi Çalışmalar.
+                <b>{Tarih}</b> tarihinde yapılan kontrollerde <b>SGK Vizite uygulamasında</b> toplam <b style=""color:red"">{RaporSayisi} adet</b> rapor onayı verilmiştir. </br></br> Raporu onaylanan çalışanların rapor bilgisini alt taraftaki tabloda bulabilir veya ekte yer alan rapor onay bildirim formu ile personel özlük dosyasına ekleyebilirsiniz. </br></br> İyi Çalışmalar.
                 </td>
                               </tr>
                             </tbody>

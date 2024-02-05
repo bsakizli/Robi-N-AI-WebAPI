@@ -20,6 +20,10 @@ using System.Xml.Serialization;
 using static Robi_N_WebAPI.Model.Response.responseSMSGateway;
 using RobinCore._3rdService.dub.Models.request;
 using ExtendedXmlSerializer;
+using WhatsAppBusinessAPI;
+using Microsoft.EntityFrameworkCore;
+using NetGsmAPI.Models.Response;
+using WhatsAppBusinessAPI.Model;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -29,6 +33,7 @@ namespace Robi_N_WebAPI.Controllers
     public class SMSGatewayController : ControllerBase
     {
 
+        WhatsAppBusinessClient wpClient = new WhatsAppBusinessClient();
 
         NetGsmService _smsService = new NetGsmService();
         MobilDevService _mobilDevService = new MobilDevService();
@@ -66,7 +71,7 @@ namespace Robi_N_WebAPI.Controllers
 
                     if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                     {
-                        Regex rgx = new Regex("#([A-Za-z0-9]+)#");
+                        Regex rgx = new Regex("{([A-Za-z0-9]+)}");
                         if (rgx.Matches(_getMessage.Message).Count == 0)
                         {
                             var _sendSMSResponse = await _mobilDevService.sendSms(_request.gsmNumber, _getMessage.Message);
@@ -85,8 +90,24 @@ namespace Robi_N_WebAPI.Controllers
                                 textResult = new JavaScriptSerializer().Serialize(response);
                                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
+                                if (_getMessage.whatsappSend)
+                                {
+                                    var whatsappTemplate = await _db.RBN_WhatsAppMessageTemplate.Where(x => x.active == true && x.SmsId == _getMessage.Id).FirstOrDefaultAsync();
+                                    if (whatsappTemplate != null) {
+
+                                        SendTextMessageRequest _rq = new SendTextMessageRequest
+                                        {
+                                            body = whatsappTemplate.MessageBody,
+                                            typing_time = 0,
+                                            to = _request.gsmNumber
+                                        };
+                                        var test = await wpClient.SendTextMessage(_rq);
+                                    }
+                                    
+                                }
                                 return Ok(response);
                             }
+
                             else
                             {
                                 response = new responsesendSMSById

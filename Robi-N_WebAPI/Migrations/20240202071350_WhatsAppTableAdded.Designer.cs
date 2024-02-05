@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240202071350_WhatsAppTableAdded")]
+    partial class WhatsAppTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -503,9 +506,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<DateTime>("updateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("whatsappSend")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.ToTable("RBN_SMS_TEMPLATES");
@@ -574,34 +574,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RBN_WAITING_TIMES");
-                });
-
-            modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_WhatsAppMessageTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("MessageBody")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SmsId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("add_date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("update_date")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RBN_WhatsAppMessageTemplate");
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RNB_IVR_WORKING_HOURS", b =>

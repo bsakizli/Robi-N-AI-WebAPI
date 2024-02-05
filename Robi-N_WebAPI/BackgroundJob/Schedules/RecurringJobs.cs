@@ -38,12 +38,13 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 			/*  RemoveIfExists yöntemini çağırarak var olan yinelenen bir işi kaldırabilirsiniz. 
 				Böyle tekrar eden bir iş olmadığında bir istisna oluşturmaz */
 
+
 			RecurringJob.AddOrUpdate<AutomaticTicketClosed>(nameof(AutomaticTicketClosed),
 					job => job.Process(), "*/30 * * * *", TimeZoneInfo.Local);
 
 
-			RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
-					job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
+			//RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
+			//		job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
 
 			//var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
 			//optionsBuilder.UseSqlServer(_database);
