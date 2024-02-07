@@ -43,8 +43,8 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 					job => job.Process(), "*/30 * * * *", TimeZoneInfo.Local);
 
 
-			//RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
-			//		job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
+			RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
+					job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
 
 			//var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
 			//optionsBuilder.UseSqlServer(_database);

@@ -102,9 +102,6 @@ namespace Robi_N_WebAPI.Services
             if (firms.Count > 0)
             {
 
-
-
-
                 #region Rapor Kontrol ve Onay 
                 foreach (var item in firms)
                 {
