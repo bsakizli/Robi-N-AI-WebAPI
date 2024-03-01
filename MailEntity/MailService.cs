@@ -28,6 +28,13 @@ namespace MailEntity
                 message.To.Add(MailboxAddress.Parse(_request.SubResponsibleEmail));
                 message.Cc.Add(MailboxAddress.Parse(_request.MainResponsibleEmail));
                 message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
+
+                if(CompanyName.Contains("ZENIA")) {
+                    message.Cc.Add(MailboxAddress.Parse("ayse.kan@bdh.com.tr"));
+                    message.Cc.Add(MailboxAddress.Parse("emre.topcu@bdh.com.tr"));
+                    message.Cc.Add(MailboxAddress.Parse("cem.yilmaz@bdh.com.tr"));
+                }
+
                 //message.Cc.Add(MailboxAddress.Parse("kemal.yurdakul@bdh.com.tr"));
                 //message.From.AddRange(emailMessage.FromAddresses.Select(x => new MailboxAddress(x.Name, x.Address)));
 
