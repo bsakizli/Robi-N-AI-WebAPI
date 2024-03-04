@@ -48,8 +48,8 @@ namespace Robi_N_WebAPI.Controllers
 
                 DateTimeOffset _reqestSolutionDateTime = DateTimeOffset.FromUnixTimeSeconds(solutionDate);
 
-                MailService test = new MailService();
-                test.SendMail();
+                //MailService test = new MailService();
+                //test.SendMail();
 
                 IList<string> fileExtensionsToAllowed = new List<string> { ".jpg", ".png", ".jpeg" };
                 var uploadedFileExtension = Path.GetExtension(ServiceFormPicture.FileName).ToLower();
@@ -68,37 +68,72 @@ namespace Robi_N_WebAPI.Controllers
                     //var PhotoResult = BarcodeReader.ReadASingleBarcode(@"C:\Users\baris.sakizli\Desktop\New folder (5)\IMG_5490.jpeg", BarcodeEncoding.QRCode, BarcodeReader.BarcodeRotationCorrection.Medium, BarcodeReader.BarcodeImageCorrection.LightlyCleanPixels);
                     //var resultFromFile = BarcodeReader.Read(@"C:\Users\baris.sakizli\Desktop\New folder (5)\IMG_5490.jpeg"); // From a file
 
-                    BarcodeReaderOptions myOptions = new BarcodeReaderOptions()
-                    {
-                        
-                        // Choose a speed from: Faster, Balanced, Detailed, ExtremeDetail
-                        // There is a tradeoff in performance as more Detail is set
-                        Speed = ReadingSpeed.ExtremeDetail,
+                    var filtersToApply = new ImageFilterCollection() {
 
-                        // Reader will stop scanning once a barcode is found, unless set to true
-                        ExpectMultipleBarcodes = true,
+                      // new ContrastFilter(70),
 
-                        // By default, all barcode formats are scanned for.
-                        // Specifying one or more, performance will increase.
-                        ExpectBarcodeTypes = BarcodeEncoding.QRCode,
-                        
-                        // Utilizes multiple threads to reads barcodes from multiple images in parallel.
-                        Multithreaded = true,
+                     // new BrightnessFilter()
 
-                        // Maximum threads for parallel. Default is 4
-                        MaxParallelThreads = 4,
+                    new ContrastFilter(2),
 
-                        // The area of each image frame in which to scan for barcodes.
-                        // Will improve perfornace significantly and avoid unwanted results and avoid noisy parts of the image.
-                        CropArea = new System.Drawing.Rectangle(),
-
-                        // Special Setting for Code39 Barcodes.
-                        // If a Code39 barcode is detected. Try to use extended mode for the full ASCII Character Set
-                        UseCode39ExtendedMode = true
                     };
 
 
-                    var resultFromStream = BarcodeReader.Read(bytes, myOptions);
+                    BarcodeReaderOptions readerOptions = new BarcodeReaderOptions()
+
+                    {
+
+                        Speed = ReadingSpeed.Balanced,
+
+                        ImageFilters = filtersToApply,
+
+                        ExpectMultipleBarcodes = true,
+
+                        ExpectBarcodeTypes = BarcodeEncoding.QRCode,
+
+                        // ScanMode = BarcodeScanMode.OnlyBasicScan
+
+                        // ImageFilters = filtersToApply,
+
+                    };
+
+
+                    //BarcodeReaderOptions myOptions = new BarcodeReaderOptions()
+                    //{
+
+                    //    // Choose a speed from: Faster, Balanced, Detailed, ExtremeDetail
+                    //    // There is a tradeoff in performance as more Detail is set
+                    //    Speed = ReadingSpeed.ExtremeDetail,
+
+                    //    // Reader will stop scanning once a barcode is found, unless set to true
+                    //    ExpectMultipleBarcodes = true,
+
+                    //    // By default, all barcode formats are scanned for.
+                    //    // Specifying one or more, performance will increase.
+                    //    //ExpectBarcodeTypes = BarcodeEncoding.QRCode,
+
+                    //    ScanMode = BarcodeScanMode.Auto,
+                    //    //ExpectBarcodeTypes = BarcodeEncoding.QRCode,
+
+
+                    //    // Utilizes multiple threads to reads barcodes from multiple images in parallel.
+                    //    Multithreaded = true,
+
+
+                    //    // Maximum threads for parallel. Default is 4
+                    //    MaxParallelThreads = 4,
+
+                    //    // The area of each image frame in which to scan for barcodes.
+                    //    // Will improve perfornace significantly and avoid unwanted results and avoid noisy parts of the image.
+                    //    CropArea = new System.Drawing.Rectangle(),
+
+                    //    // Special Setting for Code39 Barcodes.
+                    //    // If a Code39 barcode is detected. Try to use extended mode for the full ASCII Character Set
+                    //    UseCode39ExtendedMode = true
+                    //};
+
+
+                    var resultFromStream = BarcodeReader.Read(bytes, readerOptions);
 
                     var results  = resultFromStream.ToList();
 
@@ -122,7 +157,6 @@ namespace Robi_N_WebAPI.Controllers
                             {
                                 if (_timeout.Minutes < 20)
                                 {
-
                                     response = new ResponseFormQRCodeReading
                                     {
                                         status = true,
