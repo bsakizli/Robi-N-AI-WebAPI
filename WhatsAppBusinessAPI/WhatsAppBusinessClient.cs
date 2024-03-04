@@ -11,7 +11,7 @@ namespace WhatsAppBusinessAPI
     public class WhatsAppBusinessClient
     {
         private static string _url = "https://gate.whapi.cloud";
-        private static string _token = "bPICErEvO7fxdd0TOw2irwySw08bY7mG";
+        private static string _token = "DDcE9NCM24lBG4KwrJ6mbxYEy6WNfqO8";
 
 
         #region CheckPhones
