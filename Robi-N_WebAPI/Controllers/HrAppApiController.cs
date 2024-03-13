@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using RobinCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Robi_N_WebAPI.Services;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -79,6 +80,16 @@ namespace Robi_N_WebAPI.Controllers
 
                 return BadRequest(_response);
             }
+        }
+
+        [HttpGet("personelTest")]
+        public async Task<IActionResult> personelTest(long tc)
+        {
+            PersonelService personelService = new PersonelService();
+
+            bool test = personelService.CalisanSorgulama(tc);
+
+            return Ok(test);
         }
 
     }
