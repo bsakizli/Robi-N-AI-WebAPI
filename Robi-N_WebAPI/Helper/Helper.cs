@@ -140,10 +140,5 @@ namespace Robi_N_WebAPI.Helper
             return sifre;
         }
 
-
-
-
-
-
     }
 }

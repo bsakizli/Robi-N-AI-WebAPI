@@ -36,7 +36,7 @@ using RobinCore;
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddSingleton<IAppSettings, AppSettingsRepo>();
+builder.Services.AddSingleton<HR_IAppSettings, AppSettingsRepo>();
 
 // Add services to the container.
 

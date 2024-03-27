@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RobinCore
 {
-    public class AppSettingsRepo : IAppSettings
+    public class AppSettingsRepo : HR_IAppSettings
     {
 
         private IConfiguration _configuration;
@@ -20,7 +20,7 @@ namespace RobinCore
         public string client_id => _configuration["AzureKeyVaultHR:client_id"];
         public string client_secret => _configuration["AzureKeyVaultHR:client_secret"];
         public string tenant_id => _configuration["AzureKeyVaultHR:tenant_id"];
-        public string url => _configuration["AzureKeyVaultHR:url"];
 
+    
     }
 }

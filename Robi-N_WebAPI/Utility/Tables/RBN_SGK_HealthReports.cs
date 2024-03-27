@@ -37,6 +37,8 @@ namespace Robi_N_WebAPI.Utility.Tables
         public DateTime? addDate { get; set; }
         public Boolean? active { get; set; }
         public Boolean? mailSend { get; set; }
+        public Boolean? Personel { get; set; }
+        public int FirmCode { get; set; }
 
 
 

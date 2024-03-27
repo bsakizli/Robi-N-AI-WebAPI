@@ -14,6 +14,7 @@ namespace Robi_N_WebAPI.Utility.Tables
         public DateTime? addDate { get; set; }
         public DateTime? updateDate { get; set; }
         public Boolean? active { get; set; }
+        public int FirmCode { get; set; }
         public string? region { get; set; }
     }
 }

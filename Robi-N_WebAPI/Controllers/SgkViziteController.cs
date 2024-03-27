@@ -29,10 +29,10 @@ namespace Robi_N_WebAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly ILogger<SgkViziteController> _logger;
-        private IAppSettings _appConfig;
+        private HR_IAppSettings _appConfig;
 
 
-        public SgkViziteController(AIServiceDbContext db, IWebHostEnvironment appEnvironment, IConfiguration configuration, ILogger<SgkViziteController> logger, IAppSettings appConfig)
+        public SgkViziteController(AIServiceDbContext db, IWebHostEnvironment appEnvironment, IConfiguration configuration, ILogger<SgkViziteController> logger, HR_IAppSettings appConfig)
         {
             _appEnvironment = appEnvironment;
             _logger = logger;

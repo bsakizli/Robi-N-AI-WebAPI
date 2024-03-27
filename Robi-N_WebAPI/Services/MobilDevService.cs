@@ -41,6 +41,7 @@ namespace Robi_N_WebAPI.Services
                 var response = await client.PostAsync("https://xmlapi.mobildev.com/", data);
                 var result = await response.Content.ReadAsStringAsync();
 
+
                 Regex rgx = new Regex("ID: \\d+");
                 _response = new responseSendSms
                 {
