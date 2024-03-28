@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NetGsmAPI;
+using Newtonsoft.Json;
 using Robi_N_WebAPI.Model;
 using Robi_N_WebAPI.Model.Response.WhatsApp;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Utility;
+using System.Text.Json.Nodes;
 using WhatsAppBusinessAPI;
 using WhatsAppBusinessAPI.Model;
 using WhatsAppBusinessAPI.WhatsAppBusinessModel;
@@ -106,21 +108,38 @@ namespace Robi_N_WebAPI.Controllers
                     };
 
                     var checkPhone = await wpClient.CheckPhones(checkPhonesRequest);
-                    if (checkPhone != null && checkPhone.contacts.Count() > 0)
+
+                    IEnumerable<dynamic> items = @checkPhone.contacts;
+
+                    if (checkPhone != null && items.Count() > 0)
                     {
-                        if (checkPhone.contacts[0].status == "valid")
+                        if (checkPhone.contacts[0].status.ToString() == "valid")
                         {
                             sendTextMessageRequest.to = checkPhone.contacts[0].wa_id;
+                            var tt = await wpClient.SendTextMessage(sendTextMessageRequest);
 
-                            response = new sendTextMessageResponse
+                            if (Convert.ToBoolean(tt.sent.ToString())) {
+                                response = new sendTextMessageResponse
+                                {
+                                    status = true,
+                                    displayMessage = "Mesaj gönderildi!",
+                                    statusCode = 200,
+                                    message = "Successful",
+                                    result = null
+                                };
+                                return Ok(response);
+                            } else
                             {
-                                status = true,
-                                displayMessage = "Mesaj gönderim kuyruğuna alınmıştır.",
-                                statusCode = 200,
-                                message = "Successful",
-                                result = await wpClient.SendTextMessage(sendTextMessageRequest)
-                            };
-                            return Ok(response);
+                                response = new sendTextMessageResponse
+                                {
+                                    status = false,
+                                    displayMessage = "Mesaj gönderilmedi!",
+                                    statusCode = 400,
+                                    message = "Unsuccessful",
+                                    result = null
+                                };
+                                return BadRequest(response);
+                            }
                         }
                         else
                         {
@@ -162,6 +181,55 @@ namespace Robi_N_WebAPI.Controllers
                     return BadRequest(response);
                 }
 
+            }
+            catch (Exception ex)
+            {
+                response = new sendTextMessageResponse
+                {
+                    status = false,
+                    displayMessage = ex.Message,
+                    message = "Unsuccessful",
+                    statusCode = 500,
+                    result = null
+                };
+                return BadRequest(response);
+            }
+
+        }
+
+
+        [HttpPost("sendTextGroupMessage")]
+        public async Task<IActionResult> sendTextGroupMessage([FromBody] SendTextMessageRequest sendTextMessageRequest)
+        {
+            sendTextMessageResponse response;
+            try
+            {
+                var tt = await wpClient.SendTextMessage(sendTextMessageRequest);
+
+                if (Convert.ToBoolean(tt.sent.ToString()))
+                {
+                    response = new sendTextMessageResponse
+                    {
+                        status = true,
+                        displayMessage = "Mesaj gönderildi!",
+                        statusCode = 200,
+                        message = "Successful",
+                        result = null
+                    };
+                    return Ok(response);
+                }
+                else
+                {
+                    response = new sendTextMessageResponse
+                    {
+                        status = false,
+                        displayMessage = "Mesaj gönderilmedi!",
+                        statusCode = 400,
+                        message = "Unsuccessful",
+                        result = null
+                    };
+                    return BadRequest(response);
+                }
             }
             catch (Exception ex)
             {

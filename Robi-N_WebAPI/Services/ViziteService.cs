@@ -90,12 +90,10 @@ namespace Robi_N_WebAPI.Services
             return await _sgkClient.raporOkunduKapatAsync(username, workplaceCode, token, medulaRaporId.ToString());
         }
 
-
         public async Task<personelimDegildirResponse> setPersonelimDegildirResponseAsync(string username, string workplaceCode, string token, long kimlikNumarasi, string vaka, long medulaRaporId)
         {
             return await _sgkClient.personelimDegildirAsync(username,workplaceCode,token,kimlikNumarasi.ToString(),vaka, medulaRaporId.ToString());
         }
-
 
         public async Task<Boolean> SuccessFactorsPersonnelControl(long tcKimlikNo)
         {

@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+using System.Text;
 using System.Text.Json;
 using WhatsAppBusinessAPI.Model;
 using WhatsAppBusinessAPI.WhatsAppBusinessModel;
@@ -15,22 +16,19 @@ namespace WhatsAppBusinessAPI
 
 
         #region CheckPhones
-        public async Task<CheckPhones> CheckPhones(CheckPhonesRequest checkPhonesRequest)
+        public async Task<dynamic> CheckPhones(CheckPhonesRequest checkPhonesRequest)
         {
-            CheckPhones _CheckPhones;
             try
             {
-                var options = new RestClientOptions($"{_url}/contacts");
-                var client = new RestClient(options, configureSerialization: s => s.UseNewtonsoftJson());
-                var request = new RestRequest();
-
-                request.AddHeader("accept", "application/json");
-                request.AddHeader("authorization", $"Bearer {_token}");
-                //request.AddJsonBody("{\"blocking\":\"wait\",\"force_check\":false,\"contacts\":[\"905074441444\"]}", false);
-                request.AddBody(checkPhonesRequest);
-                var response = await client.PostAsync(request);
-                _CheckPhones = JsonConvert.DeserializeObject<CheckPhones>(response.Content);
-                return _CheckPhones;
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+                client.DefaultRequestHeaders.Add("accept", "application/json");
+                var json = JsonConvert.SerializeObject(checkPhonesRequest);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"{_url}/contacts", data);
+                var result = await response.Content.ReadAsStringAsync();
+                dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(result);
+                return jsonResponse;
                 #region Exp
                 //if (response.StatusCode  == System.Net.HttpStatusCode.OK)
                 //{
@@ -52,23 +50,20 @@ namespace WhatsAppBusinessAPI
         }
         #endregion
 
-
         #region SendTextMessage
-        public async Task<SendTextMessage.Root> SendTextMessage(SendTextMessageRequest sendTextMessageRequest)
+        public async Task<dynamic> SendTextMessage(SendTextMessageRequest sendTextMessageRequest)
         {
-            SendTextMessage.Root _SendTextMessage;
             try
             {
-                var options = new RestClientOptions($"{_url}/messages/text");
-                var client = new RestClient(options);
-                var request = new RestRequest();
-                request.AddHeader("accept", "application/json");
-                request.AddHeader("authorization", $"Bearer {_token}");
-                //request.AddJsonBody("{\"typing_time\":0,\"to\":\"1234567891@s.whatsapp.net\",\"quoted\":\"yqKWpvMRwhI-wGXSunQ0ww\",\"ephemeral\":5,\"edit\":\"yqKWpvMRwhI-wGXSunQ0ww\",\"body\":\"string\",\"no_link_preview\":true,\"mentions\":[\"905071310019\"],\"view_once\":true}", false);
-                request.AddBody(sendTextMessageRequest);
-                var response = await client.PostAsync(request);
-                _SendTextMessage = JsonConvert.DeserializeObject<SendTextMessage.Root>(response.Content);
-                return _SendTextMessage;
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+                client.DefaultRequestHeaders.Add("accept", "application/json");
+                var json = JsonConvert.SerializeObject(sendTextMessageRequest);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"{_url}/messages/text", data);
+                var result = await response.Content.ReadAsStringAsync();
+                dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(result);
+                return jsonResponse;
             }
             catch (Exception ex)
             {
@@ -79,20 +74,19 @@ namespace WhatsAppBusinessAPI
 
 
         #region SendLocationMessage
-        public async Task<SendLocationMessage.Root> SendLocationMessage(SendLocationMessageRequest sendLocationMessageRequest)
+        public async Task<dynamic> SendLocationMessage(SendLocationMessageRequest sendLocationMessageRequest)
         {
-            SendLocationMessage.Root _SendTextMessage;
             try
             {
-                var options = new RestClientOptions($"{_url}/messages/location");
-                var client = new RestClient(options);
-                var request = new RestRequest();
-                request.AddHeader("accept", "application/json");
-                request.AddHeader("authorization", $"Bearer {_token}");
-                request.AddBody(sendLocationMessageRequest);
-                var response = await client.PostAsync(request);
-                _SendTextMessage = JsonConvert.DeserializeObject<SendLocationMessage.Root>(response.Content);
-                return _SendTextMessage;
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+                client.DefaultRequestHeaders.Add("accept", "application/json");
+                var json = JsonConvert.SerializeObject(sendLocationMessageRequest);
+                var data = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync($"{_url}/messages/location", data);
+                var result = await response.Content.ReadAsStringAsync();
+                dynamic jsonResponse = JsonConvert.DeserializeObject<dynamic>(result);
+                return jsonResponse;
             }
             catch (Exception ex)
             {
@@ -101,6 +95,33 @@ namespace WhatsAppBusinessAPI
         }
         #endregion
 
+        #region GetGroupById
+        public async Task<bool> checkGroupsById(string groupId)
+        {
+            try
+            {
+                var options = new RestClientOptions($"{_url}/api/groups/{groupId}");
+                var client = new RestClient(options);
+                var request = new RestRequest();
+                request.AddHeader("accept", "application/json");
+                request.AddHeader("authorization", $"Bearer {_token}");
+                var response = await client.GetAsync(request);
+                var _response = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                if (String.IsNullOrEmpty(_response.id))
+                {
+                    return true;
+                } else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        #endregion
 
     }
 

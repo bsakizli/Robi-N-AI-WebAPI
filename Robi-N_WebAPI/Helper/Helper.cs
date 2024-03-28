@@ -6,6 +6,7 @@ using Robi_N_WebAPI.Model;
 using DocumentFormat.OpenXml.Bibliography;
 using System.Data;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace Robi_N_WebAPI.Helper
 {
@@ -43,6 +44,41 @@ namespace Robi_N_WebAPI.Helper
             }
 
             return ds;
+        }
+
+
+
+        public static bool checkPhonesStatic(string phone)
+        {
+            try
+            {
+                if (Convert.ToString(phone).Length == 12)
+                {
+                    return true;                }
+                else if (IsValidEmail(Convert.ToString(phone)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+        }
+
+
+        public static bool IsValidEmail(string email)
+        {
+            // E-posta adresi için geçerli olan Regex deseni
+            string pattern = @"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$";
+
+            // Regex desenini kullanarak e-posta adresini kontrol et
+            return Regex.IsMatch(email, pattern);
         }
 
         public static async Task<responseVoiceIVRApplication.GoogleCalender.Root>? getGoogleTurkeyHolidays()
