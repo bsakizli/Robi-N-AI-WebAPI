@@ -13,6 +13,7 @@ namespace MailEntity.Models
         public long? MedulaRaporId { get; set; }
         public string? RaporTakipNumarasi { get; set; }
         public long? OnayReferansId { get; set; }
+        public int? FirmCode { get; set; }
         public DateTime? RaporBaslamaTarihi { get; set; }
         public DateTime? RaporBirisTarihi { get; set; }
     }

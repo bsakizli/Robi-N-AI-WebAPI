@@ -29,5 +29,6 @@ namespace RobinCore
             ViziteLoginRequest response = JsonConvert.DeserializeObject<ViziteLoginRequest>(tt.Value.Value);
             return response;
         }
+
     }
 }

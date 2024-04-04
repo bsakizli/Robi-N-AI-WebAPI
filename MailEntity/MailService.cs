@@ -254,7 +254,7 @@ namespace MailEntity
         }
 
 
-        public bool SGKOnayMailGonder(Stream ms, List<EmailReports> _reports)
+        public bool SGKOnayMailGonder(Stream ms, List<EmailReports> _reports, int FirmCode)
         {
             try
             {
@@ -262,11 +262,20 @@ namespace MailEntity
                 string _htmlRawTable = String.Empty;
                 string _htmlRawTableRecord = String.Empty;
                 var message = new MimeMessage();
-                message.To.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
-                message.Cc.Add(MailboxAddress.Parse("hakan.dansik@bdh.com.tr"));
-                message.Cc.Add(MailboxAddress.Parse("kaya.aslan@bdh.com.tr"));
-                
-                
+
+                if(FirmCode == 1)
+                {
+                    message.To.Add(MailboxAddress.Parse("ik@bdh.com.tr"));
+                } else if(FirmCode == 2)
+                {
+                    message.To.Add(MailboxAddress.Parse("yaseming@netas.com.tr"));
+                    message.To.Add(MailboxAddress.Parse("csensoy@netas.com.tr"));
+                }
+
+                message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
+                message.Bcc.Add(MailboxAddress.Parse("hakan.dansik@bdh.com.tr"));
+                message.Bcc.Add(MailboxAddress.Parse("kaya.aslan@bdh.com.tr"));
+
                 //message.Cc.Add(MailboxAddress.Parse("gamze.ozen@bdh.com.tr"));
                 //message.Cc.Add(MailboxAddress.Parse("mehmet.adiyaman@bdh.com.tr"));
                 //message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
