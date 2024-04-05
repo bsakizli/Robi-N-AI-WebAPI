@@ -23,7 +23,7 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_EMPTOR_AUTOCLOSEDTICKET> RBN_EMPTOR_AUTOCLOSEDTICKET { get; set; }  
         public DbSet<RNB_IVR_WORKING_HOURS> RNB_IVR_WORKING_HOURS { get; set; }  
         public DbSet<RBN_SGK_VisitingIntroductionInformation> RBN_SGK_VisitingIntroductionInformation { get; set; }  
-        public DbSet<RBN_SGK_Settings> RBN_SGK_Settings { get; set; }  
+        //public DbSet<RBN_SGK_Settings> RBN_SGK_Settings { get; set; }  
         public DbSet<RBN_SGK_HealthReports> RBN_SGK_HealthReports { get; set; }  
         public DbSet<RBN_WhatsAppMessageTemplate> RBN_WhatsAppMessageTemplate { get; set; }  
     }

@@ -47,8 +47,8 @@ namespace Robi_N_WebAPI.Controllers
         {
 
             ViziteService viziteService = new ViziteService(_appEnvironment, _db, _appConfig);
-            await viziteService.RaporSorgulaOnay();
-            return Ok(true);
+            var _response = await viziteService.RaporSorgulaOnay();
+            return Ok(_response);
 
         }
 

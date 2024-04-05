@@ -20,6 +20,9 @@ using Newtonsoft.Json;
 using Robi_N_WebAPI.Model.Request;
 using System.Text;
 using NetGsmServiceReference;
+using Newtonsoft.Json.Linq;
+using FastReport;
+using Robi_N_WebAPI.Model;
 
 namespace Robi_N_WebAPI.Services
 {
@@ -129,11 +132,9 @@ namespace Robi_N_WebAPI.Services
 
 
         [AutomaticRetry(OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        public async Task RaporSorgulaOnay()
+        public async Task<GlobalResponse> RaporSorgulaOnay()
         {
-
             AzureKeyVaultRobin AzureKeyVault = new AzureKeyVaultRobin(_appConfig);
-
             ViziteGonderClient _sgkClient = new ViziteGonderClient();
 
             //SGK Sicil Lokasyonları Listesi
@@ -179,6 +180,8 @@ namespace Robi_N_WebAPI.Services
                                     {
                                         foreach (var report in reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0"))
                                         {
+                                          #region GenelRaporKontrol
+                                            
                                             var reportCheck = await _db.RBN_SGK_HealthReports.Where(x => x.MEDULARAPORID == Convert.ToInt64(report.MEDULARAPORID)).FirstOrDefaultAsync();
                                             if (reportCheck == null)
                                             {
@@ -317,10 +320,12 @@ namespace Robi_N_WebAPI.Services
                                                     //Rapor Veritabanıa kayıt edilemedi
                                                 }
                                             }
+                                            
                                             else
                                             {
                                                 //Zaten Böyle vir rapor var.
                                             }
+                                        #endregion
                                         }
                                     }
                                     #endregion
@@ -340,7 +345,6 @@ namespace Robi_N_WebAPI.Services
 
                                     }
                                     #endregion
-
                                 }
                             }
                         }
@@ -350,81 +354,116 @@ namespace Robi_N_WebAPI.Services
                     {
                         //AzureKey Boş Geldi
                     }
-                }
-                #endregion
 
 
-                #region Tarih Bazlı Rapor Onay
-                foreach (var item in firms)
-                {
-                    #region KeyVaultGetPassword Start
-                    var azureKey = await AzureKeyVault.RobinAzureKeyVault(item.value, _azureServiceLink);
-                    #endregion
 
-                    if (azureKey != null && !String.IsNullOrEmpty(azureKey.username) && !String.IsNullOrEmpty(azureKey.password) && !String.IsNullOrEmpty(azureKey.workcode))
+                    //#region DogumRaporKontrol
+                    var _dogumRaporKontrolBdh = await _db.RBN_SGK_HealthReports.Where(x => x.FirmCode == item.FirmCode && x.process == 1 & x.active == true && x.RAPORBITTAR.Date == Convert.ToDateTime("0001-01-01") && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
+
+                    if (_dogumRaporKontrolBdh.Count() > 0)
                     {
-                        #region Rapor Tarih Kontrol Onay & Otomatik Onay
-                        var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId == null && x.RAPORBITTAR.Date  == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
-                        if (getDateReports.Count() > 0)
+                        foreach (var dogumReport in _dogumRaporKontrolBdh)
                         {
-                            foreach (var report in getDateReports)
+                            var _sgkToken = await getSGKToken(azureKey.username, azureKey.workcode, azureKey.password);
+                            string _sgkTokenResult = _sgkToken.wsLoginReturn.wsToken;
+                            if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
                             {
-                                var _sgkToken = await getSGKToken(azureKey.username, azureKey.workcode, azureKey.password);
-                                if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
+                                var reportDetails = await getSGKraporAramaKimlikNoAsync(azureKey.username, azureKey.workcode, _sgkTokenResult, dogumReport.TCKIMLIKNO);
+                                var _report = reportDetails.raporAramaKimlikNoReturn.raporBeanArray.Where(x => x.MEDULARAPORID == dogumReport.MEDULARAPORID.ToString() && x.VAKA == "4").FirstOrDefault();
+
+                                if (_report != null && _report.ABITTAR != dogumReport.ABITTAR.Date.ToString("yyyy-MM-dd"))
                                 {
-                                    string _token = _sgkToken.wsLoginReturn.wsToken;
+                                    dogumReport.RAPORBITTAR = Convert.ToDateTime(_report.ABITTAR);
+                                    dogumReport.ABITTAR = Convert.ToDateTime(_report.ABITTAR);
+                                    await _db.SaveChangesAsync();
+                                }
+                            }
+                        }
+                    }
 
-                                  
+                    //var _dogumRaporKontrolNetas = await _db.RBN_SGK_HealthReports.Where(x => x.FirmCode == 2 && x.process == 1 & x.active == true && x.RAPORBITTAR.Date == Convert.ToDateTime("0001-01-01") && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
 
-                                    if (await SuccessFactorsPersonnelControl(report.TCKIMLIKNO))
+                    //if (_dogumRaporKontrolNetas.Count() > 0)
+                    //{
+                    //    foreach (var dogumReport in _dogumRaporKontrolNetas)
+                    //    {
+                    //        var _sgkToken = await getSGKToken(azureKey.username, azureKey.workcode, azureKey.password);
+                    //        if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
+                    //        {
+                    //            var reportDetails = await getSGKraporAramaKimlikNoAsync(azureKey.username, azureKey.workcode, _sgkToken.wsLoginReturn.wsToken, dogumReport.TCKIMLIKNO);
+
+                    //            var _report = reportDetails.raporAramaKimlikNoReturn.raporBeanArray.Where(x => x.MEDULARAPORID == dogumReport.MEDULARAPORID.ToString()).FirstOrDefault();
+
+                    //            if (_report != null && _report.ABITTAR != dogumReport.ABITTAR.Date.ToString("yyyy-MM-dd"))
+                    //            {
+                    //                dogumReport.RAPORBITTAR = Convert.ToDateTime(_report.ABITTAR);
+                    //                dogumReport.ABITTAR = Convert.ToDateTime(_report.ABITTAR);
+                    //                await _db.SaveChangesAsync();
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    //#endregion
+
+
+
+                    #region Rapor Tarih Kontrol Onay & Otomatik Onay
+                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId == null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
+                    if (getDateReports.Count() > 0)
+                    {
+                        foreach (var report in getDateReports)
+                        {
+                            var _sgkToken = await getSGKToken(azureKey.username, azureKey.workcode, azureKey.password);
+                            if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
+                            {
+                                string _token = _sgkToken.wsLoginReturn.wsToken;
+
+                                if (await SuccessFactorsPersonnelControl(report.TCKIMLIKNO))
+                                {
+                                    //Rapor Onay
+                                    var sgkConfirmReport = await getSGKraporOnay(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID, report.RAPORBITTAR, "0");
+                                    if (sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
                                     {
-                                        //Rapor Onay
-                                        var sgkConfirmReport = await getSGKraporOnay(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID, report.RAPORBITTAR, "0");
-                                        if (sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
+                                        if (sgkConfirmReport.raporOnayResponse.raporOnayReturn.sonucKod == 0)
                                         {
-                                            if (sgkConfirmReport.raporOnayResponse.raporOnayReturn.sonucKod == 0)
+                                            report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
+                                            report.process = 0;
+                                            report.OnaylamaTarihi = DateTime.Now;
+                                            report.Personel = true;
+                                            report.mailSend = true;
+                                            if (await _db.SaveChangesAsync() == 1)
                                             {
-                                                report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
-                                                report.process = 0;
-                                                report.OnaylamaTarihi = DateTime.Now;
-                                                report.Personel = true;
-                                                report.mailSend = true;
-                                                if (await _db.SaveChangesAsync() == 1)
+                                                var confirmOkunduKapat = await getSGKraporOkunduKapatAsync(azureKey.username, azureKey.workcode, _token, report.MEDULARAPORID);
+                                                if (confirmOkunduKapat != null && confirmOkunduKapat.raporOkunduKapatReturn.sonucKod == 0)
                                                 {
-                                                    var confirmOkunduKapat = await getSGKraporOkunduKapatAsync(azureKey.username, azureKey.workcode, _token, report.MEDULARAPORID);
-                                                    if (confirmOkunduKapat != null && confirmOkunduKapat.raporOkunduKapatReturn.sonucKod == 0)
-                                                    {
-                                                        //Rapor Okundu ve Onaylandı.
-                                                    }
+                                                    //Rapor Okundu ve Onaylandı.
                                                 }
                                             }
                                         }
+                                    }
 
-                                    } else
+                                }
+                                else
+                                {
+                                    var personelimDegildir = await setPersonelimDegildirResponseAsync(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID);
+                                    if (personelimDegildir.personelimDegildirReturn.sonucKod == 0)
                                     {
-                                        var personelimDegildir = await setPersonelimDegildirResponseAsync(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID);
-                                        if (personelimDegildir.personelimDegildirReturn.sonucKod == 0)
-                                        {
-                                            report.Personel = false;
-                                            await _db.SaveChangesAsync();
-                                            //Mail ve Gönderebilirsin.
-                                        }
-                                        else
-                                        {
-                                            //Personelim Değildir Çalışmadı
-                                        }
+                                        report.Personel = false;
+                                        await _db.SaveChangesAsync();
+                                        //Mail ve Gönderebilirsin.
+                                    }
+                                    else
+                                    {
+                                        //Personelim Değildir Çalışmadı
                                     }
                                 }
                             }
                         }
-                        #endregion
-
                     }
-                    else {
-                    //Azure Key Boş Geldi
-                    }
+                    #endregion
                 }
                 #endregion
+
 
             }
 
@@ -433,8 +472,6 @@ namespace Robi_N_WebAPI.Services
             var _reports = await _db.RBN_SGK_HealthReports.Where(x => x.active == true && x.process == 0 && x.BildirimId != null && x.mailSend == true && x.active == true).ToListAsync();
             if (_reports.Count > 0)
             {
-
-
 
                 if(_reports.Where(x=>x.FirmCode == 1).Count() > 0)
                 {
@@ -585,8 +622,13 @@ namespace Robi_N_WebAPI.Services
             }
             #endregion
 
-           
-
+            GlobalResponse _response = new GlobalResponse
+            {
+                status = true,
+                statusCode = 200,
+                displayMessage = "Vizite konrolleri yapıldı, rapor onayları verilmiştir."
+            };
+            return _response;
 
 
         }
