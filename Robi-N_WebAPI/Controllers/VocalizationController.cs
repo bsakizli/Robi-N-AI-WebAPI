@@ -27,7 +27,7 @@ namespace Robi_N_WebAPI.Controllers
 
     public class VocalizationController : ControllerBase
     {
-
+      
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IdentityCheckController> _logger;
         private readonly IConfiguration _configuration;
@@ -43,7 +43,7 @@ namespace Robi_N_WebAPI.Controllers
         }
 
         [HttpPost("customVocalization")]
-        [SwaggerOperation("SSML supported voice-over.", "Link: https://cloud.google.com/text-to-speech/docs/ssml", OperationId = "customVocalization")]
+        [SwaggerOperation("SSML supported voice-over.", "Link: https://cloud.google.com/text-to-speech/docs/ssml, https://cloud.google.com/text-to-speech?hl=tr", OperationId = "customVocalization")]
 
         public IActionResult customVocalization(string ssml)
         {
@@ -135,6 +135,8 @@ namespace Robi_N_WebAPI.Controllers
         //[Consumes("application/xml")]
         public async Task<IActionResult> WarrantyTransactionFeeVocalization(string price = null)
         {
+
+
             var xmlDoc = new XmlDocument();
             var response = new responseWarrantyTransactionFeeVocalization();
             try

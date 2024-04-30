@@ -189,7 +189,10 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddSwaggerGen(c =>
 {
 
-
+    //c.AddServer(new OpenApiServer()
+    //{
+    //    Url = "https://ai.bdh.com.tr"
+    //});
 
     c.SwaggerDoc("v2", new OpenApiInfo()
     {

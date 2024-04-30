@@ -5,9 +5,10 @@ namespace NetGsmAPI
 {
     public class NetGsmService
     {
-        private string _username = "5071310019";
-        private string _password = "76D1_55";
-        private string _header = "TOSPI BILG.";
+        private string _dealerCode = "F1DDA5CA";
+        private string _username = "8503080234";
+        private string _password = "B8EE32F";
+        private string _header = "BDH BILISIM";
 
         smsnnClient smsnnClient = new smsnnClient();
 
@@ -25,7 +26,7 @@ namespace NetGsmAPI
                     filter = 0,
                     gsm = numbers,
                     appkey = null,
-                    bayikodu = null,
+                    bayikodu = _dealerCode,
                     encoding = "TR",
                     header = _header,
                     msg = message,

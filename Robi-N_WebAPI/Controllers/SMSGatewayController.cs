@@ -67,82 +67,104 @@ namespace Robi_N_WebAPI.Controllers
 
                 if (!String.IsNullOrEmpty(_request.gsmNumber) && _request != null && _request.messageId > 0)
                 {
-                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId);
 
-                    if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
+                    string phoneNumber = _request.gsmNumber;
+
+                    if (Helper.Helper.IsValidPhoneNumber(phoneNumber))
                     {
-                        Regex rgx = new Regex("{([A-Za-z0-9]+)}");
-                        if (rgx.Matches(_getMessage.Message).Count == 0)
+                        string formattedNumber = Helper.Helper.FormatPhoneNumber(phoneNumber);
+                       
+                        var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId);
+
+                        if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                         {
-                            var _sendSMSResponse = await _mobilDevService.sendSms(_request.gsmNumber, _getMessage.Message);
-
-                            if (_sendSMSResponse.status)
+                            Regex rgx = new Regex("{([A-Za-z0-9]+)}");
+                            if (rgx.Matches(_getMessage.Message).Count == 0)
                             {
-                                response = new responsesendSMSById
-                                {
-                                    status = true,
-                                    statusCode = 200,
-                                    message = "Message sent successfully.",
-                                    data = _getMessage,
-                                    displayMessage = "Mesaj başarıyla gönderilmiştir.",
-                                    bulkid = _sendSMSResponse.bulkid
-                                };
-                                textResult = new JavaScriptSerializer().Serialize(response);
-                                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                                var _sendSMSResponse = await _smsService.sendSms(formattedNumber, _getMessage.Message);
 
-                                if (_getMessage.whatsappSend)
+                                if (_sendSMSResponse.status)
                                 {
-                                    var whatsappTemplate = await _db.RBN_WhatsAppMessageTemplate.Where(x => x.active == true && x.SmsId == _getMessage.Id).FirstOrDefaultAsync();
-                                    if (whatsappTemplate != null) {
+                                    response = new responsesendSMSById
+                                    {
+                                        status = true,
+                                        statusCode = 200,
+                                        message = "Message sent successfully.",
+                                        data = _getMessage,
+                                        displayMessage = "Mesaj başarıyla gönderilmiştir.",
+                                        bulkid = _sendSMSResponse.bulkid
+                                    };
+                                    textResult = new JavaScriptSerializer().Serialize(response);
+                                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
 
-                                        SendTextMessageRequest _rq = new SendTextMessageRequest
+                                    if (_getMessage.whatsappSend)
+                                    {
+                                        var whatsappTemplate = await _db.RBN_WhatsAppMessageTemplate.Where(x => x.active == true && x.SmsId == _getMessage.Id).FirstOrDefaultAsync();
+                                        if (whatsappTemplate != null)
                                         {
-                                            body = whatsappTemplate.MessageBody,
-                                            typing_time = 0,
-                                            to = _request.gsmNumber
-                                        };
-                                        var test = await wpClient.SendTextMessage(_rq);
-                                    }
-                                    
-                                }
-                                return Ok(response);
-                            }
 
+                                            SendTextMessageRequest _rq = new SendTextMessageRequest
+                                            {
+                                                body = whatsappTemplate.MessageBody,
+                                                typing_time = 0,
+                                                to = formattedNumber
+                                            };
+                                            var test = await wpClient.SendTextMessage(_rq);
+                                        }
+
+                                    }
+                                    return Ok(response);
+                                }
+
+                                else
+                                {
+                                    response = new responsesendSMSById
+                                    {
+                                        status = true,
+                                        statusCode = 202,
+                                        displayMessage = "Mesaj gönderilemedi",
+                                        message = "The message could not be sent due to an ISP problem. Please provide information.",
+                                        data = _getMessage
+                                    };
+
+                                }
+                            }
                             else
                             {
                                 response = new responsesendSMSById
                                 {
-                                    status = true,
-                                    statusCode = 202,
-                                    displayMessage = "Mesaj gönderilemedi",
-                                    message = "The message could not be sent due to an ISP problem. Please provide information.",
-                                    data = _getMessage
-                                };
+                                    status = false,
+                                    statusCode = 203,
+                                    message = "Unsuccessfully",
+                                    displayMessage = "SMS içeriğinde değişken tanımı var, bu method üzerinden sms gönderilemez."
 
+                                };
                             }
+
                         }
                         else
                         {
                             response = new responsesendSMSById
                             {
                                 status = false,
-                                statusCode = 203,
-                                message = "Unsuccessfully",
-                                displayMessage = "SMS içeriğinde değişken tanımı var, bu method üzerinden sms gönderilemez."
-
+                                statusCode = 201,
+                                message = "The message could not be sent because there is no template defined for the Id number entered."
                             };
                         }
 
+
+
                     }
                     else
-                    {
+                   {
                         response = new responsesendSMSById
                         {
                             status = false,
-                            statusCode = 201,
-                            message = "The message could not be sent because there is no template defined for the Id number entered."
+                            statusCode = 206,
+                            message = "The entered phone number is invalid."
                         };
                     }
+                    
                 }
                 else
                 {
@@ -194,197 +216,242 @@ namespace Robi_N_WebAPI.Controllers
                 var textResult = new JavaScriptSerializer().Serialize(_log);
                 _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                 string _MessageBody = String.Empty;
-
+                string _wpMessageBody = String.Empty;
 
                 if (_request != null && _request.parameters != null && _request.gsmNumber != null)
                 {
 
-                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId && x.active == true);
-
-                    Regex rgx_CargoTrackingNumber = new Regex("{CargoTrackingNumber}");
-
-                    
-                    if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
+                    if (Helper.Helper.IsValidPhoneNumber(_request.gsmNumber))
                     {
-                        _MessageBody = _getMessage.Message;
+                        string formattedNumber = Helper.Helper.FormatPhoneNumber(_request.gsmNumber);
 
-                        List<string> _parameters = new List<string>();
-                        List<string> _requestParameters = new List<string>();
+                        #region Mesaj Gönderme İşlemleri
+                        var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.Id == _request.messageId && x.active == true);
+                        var whatsappTemplate = await _db.RBN_WhatsAppMessageTemplate.Where(x => x.active == true && x.SmsId == _getMessage.Id).FirstOrDefaultAsync();
+                        
+                        Regex rgx_CargoTrackingNumber = new Regex("{CargoTrackingNumber}");
 
-                        Regex rgx = new Regex("{([A-Za-z0-9]+)}");
+                        
 
-                        if (rgx.Matches(_getMessage.Message).Count > 0)
+                        if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                         {
-                            foreach (Match match in rgx.Matches(_getMessage.Message))
-                            {
-                                _parameters.RemoveAll(x => x == match.Value);
-                                _parameters.Add(match.Value);
-                            }
+                            _MessageBody = _getMessage.Message;
+                            _wpMessageBody = whatsappTemplate.MessageBody;
 
-                            foreach (var item in _request.parameters)
+                            List<string> _parameters = new List<string>();
+                            List<string> _requestParameters = new List<string>();
+
+                            Regex rgx = new Regex("{([A-Za-z0-9]+)}");
+
+                            if (rgx.Matches(_getMessage.Message).Count > 0)
                             {
-                                if (!String.IsNullOrEmpty(item.key))
+                             
+                                
+                                foreach (Match match in rgx.Matches(_getMessage.Message))
                                 {
-                                    _requestParameters.RemoveAll(x => x == item.key);
-                                    _requestParameters.Add(item.key);
+                                    _parameters.RemoveAll(x => x == match.Value);
+                                    _parameters.Add(match.Value);
                                 }
-                            }
 
-
-                            //Bak buraya
-                            var _cargoFirms = new RBN_CARGO_COMPANY_LIST();
-                            string _trackingUrl = String.Empty;
-                            bool _setLinkStatus = false;
-                            foreach (var parameter in _request.parameters)
-                            {
-
-                                if(rgx_CargoTrackingNumber.Match(_getMessage.Message).Success)
+                                foreach (var item in _request.parameters)
                                 {
-                                 
-                                    if (!_setLinkStatus)
+                                    if (!String.IsNullOrEmpty(item.key))
                                     {
-                                        if (_requestParameters.Contains("{CargoCompany}"))
-                                        {
-                                            var _temp = _request.parameters.Where(x => x.key == "{CargoCompany}").FirstOrDefault();
-                                            _cargoFirms = _db.RBN_CARGO_COMPANY_LIST.Where(x => x.active == true && x.cargoName == _temp.value).FirstOrDefault();
-                                            if (_cargoFirms == null)
-                                            {
-                                                _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", "");
-                                            }
-                                        }
-
-                                        if (_requestParameters.Contains("{CargoTrackingNumber}"))
-                                        {
-                                            var _temp = _request.parameters.Where(x => x.key == "{CargoTrackingNumber}").FirstOrDefault();
-
-                                            if (_cargoFirms != null && _cargoFirms.trackingUrl != null)
-                                            {
-                                                string _defaultTrackingUrl = _cargoFirms.trackingUrl.Replace("{tracking_no}", _temp.value);
-
-                                                dubService dubService = new dubService();
-                                                requestSetLink.Root requestSetLink = new requestSetLink.Root
-                                                {
-                                                    url = _defaultTrackingUrl,
-                                                    archived = false,
-                                                    title = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
-                                                    description = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
-                                                    comments = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
-                                                    expiresAt = DateTime.Now.AddDays(_cargoFirms.validityPeriod).ToString("yyyy-MM-dd")
-                                                };
-                                                var _dobResponse = await dubService.setLink(requestSetLink);
-                                                if (_dobResponse.status && !String.IsNullOrEmpty(_dobResponse.url))
-                                                {
-                                                    _setLinkStatus = _dobResponse.status;
-                                                    _trackingUrl = _dobResponse.url;
-                                                    _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", _trackingUrl);
-                                                }
-                                            }
-                                        } 
+                                        _requestParameters.RemoveAll(x => x == item.key);
+                                        _requestParameters.Add(item.key);
                                     }
                                 }
 
-                                if (!String.IsNullOrEmpty(parameter.key) && !String.IsNullOrEmpty(parameter.value))
+
+                                //Bak buraya
+                                var _cargoFirms = new RBN_CARGO_COMPANY_LIST();
+                                string _trackingUrl = String.Empty;
+                                bool _setLinkStatus = false;
+                                foreach (var parameter in _request.parameters)
                                 {
-                                    _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
-                                }
-                            }
 
-                            if (!rgx.IsMatch(_MessageBody))
-                            {
-                                var _sendSMSResponse = await _mobilDevService.sendSms(_request.gsmNumber, _MessageBody);
-
-                                if (_sendSMSResponse.status)
-                                {
-                                    _getMessage.Message = _MessageBody;
-
-                                    response = new responsesendSMSById
+                                    if (rgx_CargoTrackingNumber.Match(_getMessage.Message).Success)
                                     {
-                                        status = true,
-                                        statusCode = 200,
-                                        message = "Message sent successfully.",
-                                        displayMessage = "SMS Başarıyla Gönderilmiştir",
-                                        data = _getMessage,
-                                        bulkid = _sendSMSResponse.bulkid
-                                    };
-                                    textResult = new JavaScriptSerializer().Serialize(response);
-                                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                                        if (!_setLinkStatus)
+                                        {
+                                            if (_requestParameters.Contains("{CargoCompany}"))
+                                            {
+                                                var _temp = _request.parameters.Where(x => x.key == "{CargoCompany}").FirstOrDefault();
+                                                _cargoFirms = _db.RBN_CARGO_COMPANY_LIST.Where(x => x.active == true && x.cargoName == _temp.value).FirstOrDefault();
+                                                if (_cargoFirms == null)
+                                                {
+                                                    _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", "");
+                                                    _wpMessageBody = _wpMessageBody.Replace("{CargoTrackingUrl}", "");
+                                                }
+                                            }
+
+                                            if (_requestParameters.Contains("{CargoTrackingNumber}"))
+                                            {
+                                                var _temp = _request.parameters.Where(x => x.key == "{CargoTrackingNumber}").FirstOrDefault();
+
+                                                if (_cargoFirms != null && _cargoFirms.trackingUrl != null)
+                                                {
+                                                    string _defaultTrackingUrl = _cargoFirms.trackingUrl.Replace("{tracking_no}", _temp.value);
+
+                                                    //dubService dubService = new dubService();
+                                                    //requestSetLink.Root requestSetLink = new requestSetLink.Root
+                                                    //{
+                                                    //    url = _defaultTrackingUrl,
+                                                    //    archived = false,
+                                                    //    title = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    //    description = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    //    comments = String.Format($"{_cargoFirms.cargoName} Takip Link - {_temp.value}"),
+                                                    //    expiresAt = DateTime.Now.AddDays(_cargoFirms.validityPeriod).ToString("yyyy-MM-dd")
+                                                    //};
+                                                    //var _dobResponse = await dubService.setLink(requestSetLink);
+
+
+                                                    _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", _defaultTrackingUrl);
+                                                    _wpMessageBody = _wpMessageBody.Replace("{CargoTrackingUrl}", _defaultTrackingUrl);
+
+                                                    //if (_dobResponse.status && !String.IsNullOrEmpty(_dobResponse.url))
+                                                    //{
+                                                    //    _setLinkStatus = _dobResponse.status;
+                                                    //    _trackingUrl = _dobResponse.url;
+                                                    //    _MessageBody = _MessageBody.Replace("{CargoTrackingUrl}", _trackingUrl);
+                                                    //}
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!String.IsNullOrEmpty(parameter.key) && !String.IsNullOrEmpty(parameter.value))
+                                    {
+                                        _MessageBody = _MessageBody.Replace(parameter.key, parameter.value);
+                                        _wpMessageBody = _wpMessageBody.Replace(parameter.key, parameter.value);
+                                    }
+                                }
+
+                                if (!rgx.IsMatch(_MessageBody) && !rgx.IsMatch(_wpMessageBody))
+                                {
+                                    if (whatsappTemplate != null)
+                                    {
+                                        SendTextMessageRequest _rq = new SendTextMessageRequest
+                                        {
+                                            body = _wpMessageBody,
+                                            typing_time = 0,
+                                            to = formattedNumber
+                                        };
+                                        var test = await wpClient.SendTextMessage(_rq);
+                                    }
+
+
+                                    var _sendSMSResponse = await _smsService.sendSms(formattedNumber, _MessageBody);
+
+                                    if (_sendSMSResponse.status)
+                                    {
+                                        _getMessage.Message = _MessageBody;
+
+                                        response = new responsesendSMSById
+                                        {
+                                            status = true,
+                                            statusCode = 200,
+                                            message = "Message sent successfully.",
+                                            displayMessage = "SMS Başarıyla Gönderilmiştir",
+                                            data = _getMessage,
+                                            bulkid = _sendSMSResponse.bulkid
+                                        };
+                                        textResult = new JavaScriptSerializer().Serialize(response);
+                                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+
+                                    }
+                                    else
+                                    {
+                                        response = new responsesendSMSById
+                                        {
+                                            status = true,
+                                            statusCode = 202,
+                                            message = "The message could not be sent due to an ISP problem. Please provide information.",
+                                            data = _getMessage
+                                        };
+                                        textResult = new JavaScriptSerializer().Serialize(response);
+                                        _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                                        return BadRequest(response);
+                                    }
 
                                 }
                                 else
                                 {
                                     response = new responsesendSMSById
                                     {
-                                        status = true,
-                                        statusCode = 202,
-                                        message = "The message could not be sent due to an ISP problem. Please provide information.",
-                                        data = _getMessage
+                                        status = false,
+                                        statusCode = 205,
+                                        message = "Unsuccessful",
+                                        displayMessage = "Gönderilen mesajın parametre bilgisi eşleşmedi ve parametre bilgisi değiştirilemedi. Mesaj gönderilemedi"
                                     };
                                     textResult = new JavaScriptSerializer().Serialize(response);
                                     _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                                     return BadRequest(response);
+
                                 }
 
-                            } else
+
+
+                                //if (_parameters.All(_requestParameters.Contains))
+                                //{
+
+                                //}
+                                //else
+                                //{
+                                //    response = new responsesendSMSById
+                                //    {
+                                //        status = false,
+                                //        statusCode = 205,
+                                //        message = "Unsuccessful",
+                                //        displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
+                                //    };
+                                //    textResult = new JavaScriptSerializer().Serialize(response);
+                                //    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
+                                //    return BadRequest(response);
+                                //}
+
+                            }
+                            else
                             {
                                 response = new responsesendSMSById
                                 {
                                     status = false,
-                                    statusCode = 205,
-                                    message = "Unsuccessful",
-                                    displayMessage = "Gönderilen mesajın parametre bilgisi eşleşmedi ve parametre bilgisi değiştirilemedi. Mesaj gönderilemedi"
+                                    statusCode = 210,
+                                    displayMessage = "Gönderilmek istenen mesajda parametre bilgisi yok tekli sms ile gönderim deneyiniz.",
+                                    message = "The message could not be sent because there is no template defined for the Id number entered."
                                 };
-                                textResult = new JavaScriptSerializer().Serialize(response);
-                                _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
                                 return BadRequest(response);
-
                             }
-
-
-
-                            //if (_parameters.All(_requestParameters.Contains))
-                            //{
-
-
-
-                            //}
-                            //else
-                            //{
-                            //    response = new responsesendSMSById
-                            //    {
-                            //        status = false,
-                            //        statusCode = 205,
-                            //        message = "Unsuccessful",
-                            //        displayMessage = "Şablon içinde bulunan parametre ile gönderilen parametre farklı olduğundan dolayı mesaj gönderilemez."
-                            //    };
-                            //    textResult = new JavaScriptSerializer().Serialize(response);
-                            //    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), textResult));
-                            //    return BadRequest(response);
-                            //}
-
                         }
                         else
                         {
                             response = new responsesendSMSById
                             {
                                 status = false,
-                                statusCode = 210,
-                                displayMessage = "Gönderilmek istenen mesajda parametre bilgisi yok tekli sms ile gönderim deneyiniz.",
+                                statusCode = 201,
                                 message = "The message could not be sent because there is no template defined for the Id number entered."
                             };
                             return BadRequest(response);
+                            //Mesaj tanımı yok
                         }
+                        #endregion
+
+
                     }
                     else
                     {
                         response = new responsesendSMSById
                         {
                             status = false,
-                            statusCode = 201,
-                            message = "The message could not be sent because there is no template defined for the Id number entered."
+                            statusCode = 206,
+                            message = "The entered phone number is invalid."
                         };
-                        return BadRequest(response);
-                        //Mesaj tanımı yok
                     }
+
+                        
+
+
                 }
                 else
                 {

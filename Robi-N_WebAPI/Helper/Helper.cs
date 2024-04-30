@@ -176,5 +176,39 @@ namespace Robi_N_WebAPI.Helper
             return sifre;
         }
 
+
+
+
+        public static bool IsValidPhoneNumber(string phoneNumber)
+        {
+            // Geçerli bir Türkiye telefon numarası regex deseni
+            string pattern = @"^(5\d{9}|05\d{9}|905\d{10}||90\d{10})$";
+
+            Regex regex = new Regex(pattern);
+            return regex.IsMatch(phoneNumber);
+        }
+
+        public static string FormatPhoneNumber(string phoneNumber)
+        {
+            // Başına +90 veya 9 ekleyerek formatlama
+            if (phoneNumber.StartsWith("5"))
+            {
+                return "90" + phoneNumber;
+            }
+            else if (phoneNumber.StartsWith("05"))
+            {
+                return "90" + phoneNumber.Substring(1);
+            }
+            else if (phoneNumber.StartsWith("905") || phoneNumber.StartsWith("90"))
+            {
+                return phoneNumber;
+            }
+            else
+            {
+                return "90" + phoneNumber;
+            }
+        }
     }
+
 }
+

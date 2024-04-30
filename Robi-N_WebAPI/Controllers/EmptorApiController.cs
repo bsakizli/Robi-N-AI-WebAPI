@@ -99,9 +99,9 @@ namespace Robi_N_WebAPI.Controllers
             {
                 EmptorDbAction db = new EmptorDbAction(_configuration);
 
-               var _check = await db.TicketWaitingPreCheck(TicketId);
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == DateTime.Now.Date);
 
-                if (_check.StatusCode == 200)
+                if (_holidays != null)
                 {
                     var _listReasons = await db.GetWaitReasonsListFromTicketId(TicketId);
 
@@ -114,7 +114,7 @@ namespace Robi_N_WebAPI.Controllers
                             status = true,
                             displayMessage = "Lütfen bir bekleme nedeni seçiniz.",
                             message = "Successfully",
-                            statusCode = _check.StatusCode,
+                            statusCode = 200,
                             data = _listReasons,
                             company = _company
                         };
@@ -133,21 +133,55 @@ namespace Robi_N_WebAPI.Controllers
                         return BadRequest(_response);
                     }
 
-                }
-                else
+                } else
                 {
-                    _response = new responseGetWaitReasonsListFromTicketId
+                    var _check = await db.TicketWaitingPreCheck(TicketId);
+
+                    if (_check.StatusCode == 200)
                     {
-                        status = false,
-                        displayMessage = _check.StatusMessage,
-                        message = "Successfully",
-                        statusCode = _check.StatusCode
-                    };
-                    return BadRequest(_response);
+                        var _listReasons = await db.GetWaitReasonsListFromTicketId(TicketId);
+
+                        if (_listReasons.Count > 0)
+                        {
+                            var _company = await db.getCompanyFullName(TicketId);
+
+                            _response = new responseGetWaitReasonsListFromTicketId
+                            {
+                                status = true,
+                                displayMessage = "Lütfen bir bekleme nedeni seçiniz.",
+                                message = "Successfully",
+                                statusCode = _check.StatusCode,
+                                data = _listReasons,
+                                company = _company
+                            };
+                            return Ok(_response);
+                        }
+                        else
+                        {
+                            _response = new responseGetWaitReasonsListFromTicketId
+                            {
+                                status = false,
+                                displayMessage = "Böyle bir kayıt numarası mevcut değil, lütfen kayıt numarasını kontrol ediniz.",
+                                message = "Successfully",
+                                statusCode = 199,
+                                data = await db.GetWaitReasonsListFromTicketId(TicketId)
+                            };
+                            return BadRequest(_response);
+                        }
+
+                    }
+                    else
+                    {
+                        _response = new responseGetWaitReasonsListFromTicketId
+                        {
+                            status = false,
+                            displayMessage = _check.StatusMessage,
+                            message = "Successfully",
+                            statusCode = _check.StatusCode
+                        };
+                        return BadRequest(_response);
+                    }
                 }
-
-
-
             }
             catch
             {
@@ -181,11 +215,10 @@ namespace Robi_N_WebAPI.Controllers
                 DateTime? _reasonDate;
                 if (_request.TicketId != null && _request.ReasonId > 0 && Convert.ToInt32(UserId) > 0)
                 {
-                    var _check = await db.TicketWaitingPreCheck(_request.TicketId);
                     var _company = await db.getCompanyFullName(_request.TicketId);
-                   
 
-                    if (_check.StatusCode == 200 && _company.Name != null)
+                    var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == DateTime.Now.Date);
+                    if (_holidays != null)
                     {
                         var item = await _db.RBN_WAITING_TIMES.Where(x => x.EmptorTicketWaitingReasonId == _request.ReasonId).FirstOrDefaultAsync();
                         if (item != null)
@@ -260,7 +293,9 @@ namespace Robi_N_WebAPI.Controllers
                                             displayMessage = "Kayıt beklemeye alınmıştır."
                                         };
                                         return Ok(_response);
-                                    } else {
+                                    }
+                                    else
+                                    {
 
 
                                         _response = new GlobalResponse
@@ -297,20 +332,144 @@ namespace Robi_N_WebAPI.Controllers
                             return BadRequest(_response);
 
                         }
-                    }
-                    else
-                    {
-                        //Beklemeye Alınamadı Sebebleri
-                        _response = new GlobalResponse
-                        {
-                            status = false,
-                            statusCode = _check.StatusCode,
-                            message = "Failed",
-                            displayMessage = _check.StatusMessage
-                        };
-                        return BadRequest(_response);
 
+                    } else
+                    {
+                        var _check = await db.TicketWaitingPreCheck(_request.TicketId);
+                        if (_check.StatusCode == 200 && _company.Name != null)
+                        {
+                            var item = await _db.RBN_WAITING_TIMES.Where(x => x.EmptorTicketWaitingReasonId == _request.ReasonId).FirstOrDefaultAsync();
+                            if (item != null)
+                            {
+                                TimeSpan hours = new TimeSpan(10, 00, 0);
+
+                                //if (item.Overtime)
+                                //{
+                                //    int _now = (int)DateTime.Now.DayOfWeek;
+
+                                //    if (_now == 5)
+                                //    {
+                                //        _reasonDate = DateTime.Now.AddDays(3).Date + hours;
+                                //    }
+                                //    else if (_now == 6)
+                                //    {
+                                //        _reasonDate = DateTime.Now.AddDays(2).Date + hours;
+                                //    }
+                                //    else
+                                //    {
+                                //        _reasonDate = DateTime.Now.AddDays(1).Date + hours;
+                                //    }
+
+                                //}
+                                //else
+                                //{
+                                //    _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
+                                //}
+
+                                _reasonDate = DateTime.UtcNow.AddDays(item.WaitingTimeDay).Date + hours;
+
+                                var _wait = await db.TicketWaiting(_request.TicketId, (int)_request.ReasonId, (DateTime)_reasonDate, Convert.ToInt32(UserId));
+
+                                if (_wait)
+                                {
+                                    var _contactInformation = await db.getMainResponsibleInfo(Convert.ToInt32(UserId), _request.TicketId);
+
+                                    if (_contactInformation != null)
+                                    {
+                                        if (Convert.ToBoolean(_contactInformation.status))
+                                        {
+                                            MailService mailService = new MailService();
+                                            var _send = mailService.WaitingEmptorSendMail(_request.TicketId, _contactInformation, _company.Name, (DateTime)_reasonDate, "");
+                                        }
+
+                                        //Ticket Waiting Logs
+                                        RBN_EMPTOR_WaitingTicketHistory _RBN_EMPTOR_WaitingTicketHistory = new RBN_EMPTOR_WaitingTicketHistory
+                                        {
+                                            TicketIdDesc = _request.TicketId,
+                                            Active = true,
+                                            MainUserId = _contactInformation.MainResponsibleId,
+                                            UserId = Convert.ToInt32(UserId),
+                                            CallBackDate = _reasonDate,
+                                            WaitingReasonId = Convert.ToInt32(_request.ReasonId),
+                                            //CompanyId = _company.Id,
+                                            //CompanyName = _company.Name,
+                                            //MainUserFullName = _contactInformation.MainResponsibleFullName,
+                                            //SubUserFullName = _contactInformation.SubResponsibleFullName,
+                                            //WaitingDate = _reasonDate,
+                                            //WaitingReason = _request.ReasonId,
+                                            TransactionDate = DateTime.Now
+                                        };
+                                        var lastRecord = _db.RBN_EMPTOR_WaitingTicketHistory.Add(_RBN_EMPTOR_WaitingTicketHistory);
+                                        await _db.SaveChangesAsync();
+                                        if (lastRecord != null)
+                                        {
+                                            _response = new GlobalResponse
+                                            {
+                                                status = true,
+                                                statusCode = 200,
+                                                message = "Successfuly",
+                                                displayMessage = "Kayıt beklemeye alınmıştır."
+                                            };
+                                            return Ok(_response);
+                                        }
+                                        else
+                                        {
+
+
+                                            _response = new GlobalResponse
+                                            {
+                                                status = false,
+                                                statusCode = 199,
+                                                message = "Successfuly",
+                                                displayMessage = "Kayıt beklemeye alınamadı!"
+                                            };
+                                            return BadRequest(_response);
+                                        }
+
+                                    }
+                                }
+                                _response = new GlobalResponse
+                                {
+                                    status = false,
+                                    statusCode = 199,
+                                    message = "Successfuly",
+                                    displayMessage = "Kayıt beklemeye alınamadı!"
+                                };
+                                return BadRequest(_response);
+                            }
+                            else
+                            {
+                                //Bekleme Nedeni ile Süresi Tanımsız
+                                _response = new GlobalResponse
+                                {
+                                    status = false,
+                                    statusCode = 404,
+                                    message = "Failed",
+                                    displayMessage = "Bekleme nedeni tanımsız olması sebebi ile kayıt beklemye alınamadı."
+                                };
+                                return BadRequest(_response);
+
+                            }
+                        }
+                        else
+                        {
+                            //Beklemeye Alınamadı Sebebleri
+                            _response = new GlobalResponse
+                            {
+                                status = false,
+                                statusCode = _check.StatusCode,
+                                message = "Failed",
+                                displayMessage = _check.StatusMessage
+                            };
+                            return BadRequest(_response);
+
+                        }
                     }
+
+                    
+
+
+
                 }
                 else
                 {

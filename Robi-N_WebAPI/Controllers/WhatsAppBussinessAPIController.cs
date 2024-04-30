@@ -66,7 +66,7 @@ namespace Robi_N_WebAPI.Controllers
                     checkPhonesResponse = new checkPhones
                     {
                         status = false,
-                        displayMessage = "Telefon numarası 10 haneli olmak zorunda",
+                        displayMessage = "Telefon numarası 12 haneli olmak zorunda",
                         message = "Unsuccessful",
                         statusCode = 404
                     };

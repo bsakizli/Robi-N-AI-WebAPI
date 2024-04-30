@@ -270,7 +270,7 @@ namespace Robi_N_WebAPI.Controllers
 			}
 		}
 
-		[HttpPut("AutomaticTicketClosing/{Id}")]
+		[HttpPut("AutomaticTicketClosing/{id}")]
         public async Task<IActionResult> UpdateAutomaticTicketClosing(int id, [FromBody] RBN_EMPTOR_AUTOTICKETCLOSEDScheduler data)
         {
             responseSingleAutomaticTicketClosingList _response;

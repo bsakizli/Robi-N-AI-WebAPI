@@ -96,12 +96,12 @@ namespace Robi_N_WebAPI.Services
 
         public async Task<personelimDegildirResponse> setPersonelimDegildirResponseAsync(string username, string workplaceCode, string token, long kimlikNumarasi, string vaka, long medulaRaporId)
         {
-            return await _sgkClient.personelimDegildirAsync(username,workplaceCode,token,kimlikNumarasi.ToString(),vaka, medulaRaporId.ToString());
+            return await _sgkClient.personelimDegildirAsync(username, workplaceCode, token, kimlikNumarasi.ToString(), vaka, medulaRaporId.ToString());
         }
 
         public async Task<Boolean> SuccessFactorsPersonnelControl(long tcKimlikNo)
         {
-           try
+            try
             {
                 requestSuccessFactorsPersonnelControl _req = new requestSuccessFactorsPersonnelControl
                 {
@@ -123,11 +123,12 @@ namespace Robi_N_WebAPI.Services
                 {
                     return false;
                 }
-            } catch
+            }
+            catch
             {
                 return false;
             }
-           
+
         }
 
 
@@ -147,10 +148,11 @@ namespace Robi_N_WebAPI.Services
                 foreach (var item in firms)
                 {
                     //Set Link
-                    if(item.FirmCode == 1)
+                    if (item.FirmCode == 1)
                     {
                         _azureServiceLink = "https://bdhhr.vault.azure.net/";
-                    } else if (item.FirmCode == 2)
+                    }
+                    else if (item.FirmCode == 2)
                     {
                         _azureServiceLink = "https://netashr.vault.azure.net";
                     }
@@ -180,8 +182,8 @@ namespace Robi_N_WebAPI.Services
                                     {
                                         foreach (var report in reports.raporAramaTarihileReturn.raporAramaTarihleBeanArray.Where(x => x.ARSIV == "0"))
                                         {
-                                          #region GenelRaporKontrol
-                                            
+                                            #region GenelRaporKontrol
+
                                             var reportCheck = await _db.RBN_SGK_HealthReports.Where(x => x.MEDULARAPORID == Convert.ToInt64(report.MEDULARAPORID)).FirstOrDefaultAsync();
                                             if (reportCheck == null)
                                             {
@@ -245,7 +247,7 @@ namespace Robi_N_WebAPI.Services
 
                                                 if (await _db.SaveChangesAsync() == 1)
                                                 {
-                                                    if(_record.RAPORBITTAR.ToString("yyyy-MM-dd") != "0001-01-01")
+                                                    if (_record.RAPORBITTAR.ToString("yyyy-MM-dd") != "0001-01-01")
                                                     {
                                                         if (_record.RAPORBITTAR <= DateTime.Now)
                                                         {
@@ -320,12 +322,12 @@ namespace Robi_N_WebAPI.Services
                                                     //Rapor Veritabanıa kayıt edilemedi
                                                 }
                                             }
-                                            
+
                                             else
                                             {
                                                 //Zaten Böyle vir rapor var.
                                             }
-                                        #endregion
+                                            #endregion
                                         }
                                     }
                                     #endregion
@@ -369,13 +371,17 @@ namespace Robi_N_WebAPI.Services
                             if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
                             {
                                 var reportDetails = await getSGKraporAramaKimlikNoAsync(azureKey.username, azureKey.workcode, _sgkTokenResult, dogumReport.TCKIMLIKNO);
-                                var _report = reportDetails.raporAramaKimlikNoReturn.raporBeanArray.Where(x => x.MEDULARAPORID == dogumReport.MEDULARAPORID.ToString() && x.VAKA == "4").FirstOrDefault();
 
-                                if (_report != null && _report.ABITTAR != dogumReport.ABITTAR.Date.ToString("yyyy-MM-dd"))
+                                if (reportDetails.raporAramaKimlikNoReturn.sonucKod == 0)
                                 {
-                                    dogumReport.RAPORBITTAR = Convert.ToDateTime(_report.ABITTAR);
-                                    dogumReport.ABITTAR = Convert.ToDateTime(_report.ABITTAR);
-                                    await _db.SaveChangesAsync();
+                                    var _report = reportDetails.raporAramaKimlikNoReturn.raporBeanArray.Where(x => x.MEDULARAPORID == dogumReport.MEDULARAPORID.ToString() && x.VAKA == "4").FirstOrDefault();
+
+                                    if (_report != null && _report.ABITTAR != dogumReport.ABITTAR.Date.ToString("yyyy-MM-dd"))
+                                    {
+                                        dogumReport.RAPORBITTAR = Convert.ToDateTime(_report.ABITTAR);
+                                        dogumReport.ABITTAR = Convert.ToDateTime(_report.ABITTAR);
+                                        await _db.SaveChangesAsync();
+                                    }
                                 }
                             }
                         }
@@ -408,7 +414,7 @@ namespace Robi_N_WebAPI.Services
 
 
                     #region Rapor Tarih Kontrol Onay & Otomatik Onay
-                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId == null && x.RAPORBITTAR.Date == DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
+                    var getDateReports = await _db.RBN_SGK_HealthReports.Where(x => x.process == 1 && x.BildirimId == null && x.RAPORBITTAR.Date <= DateTime.Now.Date && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
                     if (getDateReports.Count() > 0)
                     {
                         foreach (var report in getDateReports)
@@ -420,23 +426,26 @@ namespace Robi_N_WebAPI.Services
 
                                 if (await SuccessFactorsPersonnelControl(report.TCKIMLIKNO))
                                 {
-                                    //Rapor Onay
-                                    var sgkConfirmReport = await getSGKraporOnay(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID, report.RAPORBITTAR, "0");
-                                    if (sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
+                                    if (report.RAPORBITTAR.ToString("yyyy-MM-dd") != "0001-01-01")
                                     {
-                                        if (sgkConfirmReport.raporOnayResponse.raporOnayReturn.sonucKod == 0)
+                                        //Rapor Onay
+                                        var sgkConfirmReport = await getSGKraporOnay(azureKey.username, azureKey.workcode, _token, report.TCKIMLIKNO, report.VAKA.ToString(), report.MEDULARAPORID, report.RAPORBITTAR, "0");
+                                        if (sgkConfirmReport != null && sgkConfirmReport.raporOnayResponse != null)
                                         {
-                                            report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
-                                            report.process = 0;
-                                            report.OnaylamaTarihi = DateTime.Now;
-                                            report.Personel = true;
-                                            report.mailSend = true;
-                                            if (await _db.SaveChangesAsync() == 1)
+                                            if (sgkConfirmReport.raporOnayResponse.raporOnayReturn.sonucKod == 0)
                                             {
-                                                var confirmOkunduKapat = await getSGKraporOkunduKapatAsync(azureKey.username, azureKey.workcode, _token, report.MEDULARAPORID);
-                                                if (confirmOkunduKapat != null && confirmOkunduKapat.raporOkunduKapatReturn.sonucKod == 0)
+                                                report.BildirimId = Convert.ToInt64(sgkConfirmReport.bildirimId);
+                                                report.process = 0;
+                                                report.OnaylamaTarihi = DateTime.Now;
+                                                report.Personel = true;
+                                                report.mailSend = true;
+                                                if (await _db.SaveChangesAsync() == 1)
                                                 {
-                                                    //Rapor Okundu ve Onaylandı.
+                                                    var confirmOkunduKapat = await getSGKraporOkunduKapatAsync(azureKey.username, azureKey.workcode, _token, report.MEDULARAPORID);
+                                                    if (confirmOkunduKapat != null && confirmOkunduKapat.raporOkunduKapatReturn.sonucKod == 0)
+                                                    {
+                                                        //Rapor Okundu ve Onaylandı.
+                                                    }
                                                 }
                                             }
                                         }
@@ -473,7 +482,7 @@ namespace Robi_N_WebAPI.Services
             if (_reports.Count > 0)
             {
 
-                if(_reports.Where(x=>x.FirmCode == 1).Count() > 0)
+                if (_reports.Where(x => x.FirmCode == 1).Count() > 0)
                 {
 
                     //MemoryStream stream;
@@ -548,7 +557,7 @@ namespace Robi_N_WebAPI.Services
                 }
 
 
-                if(_reports.Where(x=>x.FirmCode == 2).Count() > 0)
+                if (_reports.Where(x => x.FirmCode == 2).Count() > 0)
                 {
                     //MemoryStream stream;
                     string webRootPath = _appEnvironment.WebRootPath; // Get the path to the wwwroot folder
