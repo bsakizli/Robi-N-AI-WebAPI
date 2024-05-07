@@ -6,6 +6,7 @@ namespace Robi_N_WebAPI.Utility.Tables
     {
         [Key]
         public int Id { get; set; }
+        public int? MessageCode { get; set; }
         public string? Message { get; set; }
         public DateTime addDate { get; set; }
         public DateTime updateDate { get; set; }

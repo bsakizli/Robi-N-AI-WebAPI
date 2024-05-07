@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507104738_DatabaseUpdated07062024-01")]
+    partial class DatabaseUpdated0706202401
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -503,9 +506,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MessageCode")
-                        .HasColumnType("int");
-
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
@@ -534,11 +534,11 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
-                    b.Property<long>("agentid")
-                        .HasColumnType("bigint");
+                    b.Property<int>("agentid")
+                        .HasColumnType("int");
 
-                    b.Property<long>("calltype")
-                        .HasColumnType("bigint");
+                    b.Property<int>("calltype")
+                        .HasColumnType("int");
 
                     b.Property<long>("contactid")
                         .HasColumnType("bigint");

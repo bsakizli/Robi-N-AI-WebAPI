@@ -3,6 +3,7 @@ using Google;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Robi_N_WebAPI.Controllers;
+using Robi_N_WebAPI.Schedule;
 using Robi_N_WebAPI.Services;
 using Robi_N_WebAPI.Shecles;
 using Robi_N_WebAPI.Utility;
@@ -46,19 +47,22 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 			RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
 					job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
 
-			//var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
-			//optionsBuilder.UseSqlServer(_database);
-			//var _db = new AIServiceDbContext(optionsBuilder.Options);
+            RecurringJob.AddOrUpdate<MissedCallsMessages>(nameof(MissedCallsMessages),
+                    job => job.MissedCallMessageService(), "*/1 * * * *", TimeZoneInfo.Local);
 
-			//var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
-			//if (Jobs.Count > 0)
-			//{
-			//	foreach (var item in Jobs)
-			//	{
+            //var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
+            //optionsBuilder.UseSqlServer(_database);
+            //var _db = new AIServiceDbContext(optionsBuilder.Options);
 
-			//	}
-			//}
+            //var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
+            //if (Jobs.Count > 0)
+            //{
+            //	foreach (var item in Jobs)
+            //	{
 
-		}
+            //	}
+            //}
+
+        }
 	}
 }

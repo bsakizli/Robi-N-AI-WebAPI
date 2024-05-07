@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240507080004_DatabaseUpdated07062024")]
+    partial class DatabaseUpdated07062024
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -503,9 +506,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MessageCode")
-                        .HasColumnType("int");
-
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
@@ -521,55 +521,6 @@ namespace Robi_N_WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RBN_SMS_TEMPLATES");
-                });
-
-            modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_UnansweredCalls", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
-                    b.Property<bool>("active")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("agentid")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("calltype")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("contactid")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("csqname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("disposition")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("enddatetime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("phonenumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("record_date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("smsSendDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("smsSendStatus")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("startdatetime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("id");
-
-                    b.ToTable("RBN_UnansweredCalls");
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_VOICE_SOUNDS", b =>
