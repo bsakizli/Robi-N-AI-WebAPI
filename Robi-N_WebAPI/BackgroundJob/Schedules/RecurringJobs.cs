@@ -47,7 +47,7 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 			RecurringJob.AddOrUpdate<ViziteService>(nameof(ViziteService),
 					job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
 
-            RecurringJob.AddOrUpdate<MissedCallsMessages>(nameof(MissedCallsMessages),
+			RecurringJob.AddOrUpdate<MissedCallsMessages>(nameof(MissedCallsMessages),
                     job => job.MissedCallMessageService(), "*/1 * * * *", TimeZoneInfo.Local);
 
             //var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
