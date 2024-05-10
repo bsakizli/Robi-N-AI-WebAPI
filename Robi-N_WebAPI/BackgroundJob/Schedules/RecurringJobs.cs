@@ -48,21 +48,21 @@ namespace Robi_N_WebAPI.BackgroundJob.Schedules
 					job => job.RaporSorgulaOnay(), "0 10,17 * * *", TimeZoneInfo.Local);
 
 			RecurringJob.AddOrUpdate<MissedCallsMessages>(nameof(MissedCallsMessages),
-                    job => job.MissedCallMessageService(), "*/1 * * * *", TimeZoneInfo.Local);
+					job => job.MissedCallMessageService(), "*/1 * * * *", TimeZoneInfo.Local);
 
-            //var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
-            //optionsBuilder.UseSqlServer(_database);
-            //var _db = new AIServiceDbContext(optionsBuilder.Options);
+			//var optionsBuilder = new DbContextOptionsBuilder<AIServiceDbContext>();
+			//optionsBuilder.UseSqlServer(_database);
+			//var _db = new AIServiceDbContext(optionsBuilder.Options);
 
-            //var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
-            //if (Jobs.Count > 0)
-            //{
-            //	foreach (var item in Jobs)
-            //	{
+			//var Jobs = await _db.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler.Where(x => x.active == true).ToListAsync();
+			//if (Jobs.Count > 0)
+			//{
+			//	foreach (var item in Jobs)
+			//	{
 
-            //	}
-            //}
+			//	}
+			//}
 
-        }
+		}
 	}
 }

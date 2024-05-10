@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240509044027_WhatsAppMessageAdded")]
+    partial class WhatsAppMessageAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -552,20 +555,14 @@ namespace Robi_N_WebAPI.Migrations
                     b.Property<DateTime?>("enddatetime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("phonenumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("process")
-                        .HasColumnType("int");
+                    b.Property<long>("phonenumber")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("record_date")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("smsSendDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<long>("smsSendId")
-                        .HasColumnType("bigint");
 
                     b.Property<bool>("smsSendStatus")
                         .HasColumnType("bit");
