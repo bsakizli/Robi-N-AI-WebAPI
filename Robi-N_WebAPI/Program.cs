@@ -57,8 +57,6 @@ builder.Services.AddAuthentication(opt =>
     rsa.ImportSubjectPublicKeyInfo(publicKey, out readByte);
 
    
-
-
 	options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,

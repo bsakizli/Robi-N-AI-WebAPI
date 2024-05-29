@@ -31,7 +31,6 @@ namespace Robi_N_WebAPI.Authentication.basic
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             string username = null;
-            
             try
             {
                 var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);

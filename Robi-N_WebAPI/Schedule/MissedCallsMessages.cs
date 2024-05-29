@@ -53,11 +53,15 @@ namespace Robi_N_WebAPI.Schedule
                                 RBN_UnansweredCalls _numberCheck;
                                 if(MultipleCallSendMessage)
                                 {
-                                     _numberCheck = await _db.RBN_UnansweredCalls.Where(x => x.contactid == item.contactid && x.phonenumber == item.phonenumber && x.startdatetime.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
+                                     _numberCheck = await _db.RBN_UnansweredCalls.Where(x => x.contactid == item.contactid && x.phonenumber == item.phonenumber && x.record_date.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
                                 } else
                                 {
-                                     _numberCheck = await _db.RBN_UnansweredCalls.Where(x => x.phonenumber == item.phonenumber && x.startdatetime.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
+                                     _numberCheck = await _db.RBN_UnansweredCalls.Where(x => x.phonenumber == item.phonenumber && x.record_date.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
                                 }
+
+
+                                //var tt = DateTime.Now.Date;
+
                                 
                                 if (_numberCheck == null)
                                 {
@@ -111,6 +115,10 @@ namespace Robi_N_WebAPI.Schedule
                                 item.smsSendId = _sendSmsStatus.bulkid;
                                 item.smsSendStatus = true;
                                 item.smsSendDate = DateTime.Now;
+                                await _db.SaveChangesAsync();
+                            } else
+                            {
+                                item.process = 0;
                                 await _db.SaveChangesAsync();
                             }
                         }

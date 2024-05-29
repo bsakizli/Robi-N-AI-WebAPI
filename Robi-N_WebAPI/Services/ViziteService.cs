@@ -112,7 +112,7 @@ namespace Robi_N_WebAPI.Services
                 var json = JsonConvert.SerializeObject(_req);
                 var data = new StringContent(json, Encoding.UTF8, "application/json");
                 using var client = new HttpClient();
-                var response = await client.PostAsync("http://10.254.46.69/BackOfficeApi/Personal/SearchPersonalInfosByTCKN", data);
+                var response = await client.PostAsync("http://10.254.46.69/BackOfficeApi/Personal/KamuRaporlama", data);
                 var result = await response.Content.ReadAsStringAsync();
                 dynamic jsonResult = JsonConvert.DeserializeObject(result);
                 if (jsonResult != null)
