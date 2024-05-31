@@ -46,7 +46,7 @@ namespace Robi_N_WebAPI.Controllers
             MissedCallsMessages missedCallsMessages = new MissedCallsMessages(_db);
             missedCallsMessages.MissedCallMessageService();
 
-           
+
             return Ok(true);
 
         }

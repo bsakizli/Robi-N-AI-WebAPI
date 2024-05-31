@@ -30,7 +30,7 @@ namespace Robi_N_WebAPI.Schedule
 
         [AutomaticRetry(OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         public async Task MissedCallMessageService()
-         {
+        {
             uccxSoapClient uCCXWebService = new uccxSoapClient();
             try
             {

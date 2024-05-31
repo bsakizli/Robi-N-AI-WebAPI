@@ -190,6 +190,7 @@ namespace Robi_N_WebAPI.Helper
 
         public static string FormatPhoneNumber(string phoneNumber)
         {
+            phoneNumber = phoneNumber.Replace(" ","");
             // Başına +90 veya 9 ekleyerek formatlama
             if (phoneNumber.StartsWith("5"))
             {
