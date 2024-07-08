@@ -59,7 +59,6 @@ namespace Robi_N_WebAPI.Schedule
                                      _numberCheck = await _db.RBN_UnansweredCalls.Where(x => x.phonenumber == item.phonenumber && x.record_date.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
                                 }
 
-
                                 //var tt = DateTime.Now.Date;
 
                                 

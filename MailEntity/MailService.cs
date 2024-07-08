@@ -31,8 +31,8 @@ namespace MailEntity
 
                 if(CompanyName.Contains("ZENIA")) {
                     message.Cc.Add(MailboxAddress.Parse("ayse.kan@bdh.com.tr"));
-                    message.Cc.Add(MailboxAddress.Parse("emre.topcu@bdh.com.tr"));
-                    message.Cc.Add(MailboxAddress.Parse("cem.yilmaz@bdh.com.tr"));
+                    message.Cc.Add(MailboxAddress.Parse("gurkan.aydar@bdh.com.tr"));
+                    message.Cc.Add(MailboxAddress.Parse("anil.ersoy@bdh.com.tr"));
                 }
 
                 //message.Cc.Add(MailboxAddress.Parse("kemal.yurdakul@bdh.com.tr"));
