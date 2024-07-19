@@ -212,7 +212,6 @@ namespace Robi_N_WebAPI.Services
                                                     FirmCode = item.FirmCode,
                                                     mailSend = false,
                                                     addDate = DateTime.Now
-
                                                 };
                                                 var lastRecord = _db.RBN_SGK_HealthReports.Add(_record);
                                                 if (await _db.SaveChangesAsync() == 1)

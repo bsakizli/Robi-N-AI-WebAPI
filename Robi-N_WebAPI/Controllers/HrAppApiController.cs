@@ -11,6 +11,7 @@ using RobinCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Robi_N_WebAPI.Services;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -32,7 +33,6 @@ namespace Robi_N_WebAPI.Controllers
             _configuration = configuration;
             _logger = logger;
             _db = db;
-         
         }
 
         RobinHelper _robin = new RobinHelper();
@@ -90,6 +90,19 @@ namespace Robi_N_WebAPI.Controllers
             bool test = personelService.CalisanSorgulama(tc);
 
             return Ok(test);
+        }
+
+        [HttpGet("EgmPersonelNotification")]
+        public async Task<IActionResult> EgmPersonelNotification(DateTime girisTarihi, DateTime cikisTarihi)
+        {
+            return Ok("");
+        }
+
+
+        [HttpGet("EGMPersonnelNotificationApproval")]
+        public async Task<IActionResult> EGMPersonnelNotificationApproval(DateTime girisTarihi, DateTime cikisTarihi)
+        {
+            return Ok("");
         }
 
     }
