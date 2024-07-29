@@ -231,8 +231,6 @@ namespace Robi_N_WebAPI.Controllers
                         
                         Regex rgx_CargoTrackingNumber = new Regex("{CargoTrackingNumber}");
 
-                        
-
                         if (_getMessage != null && !String.IsNullOrEmpty(_getMessage.Message))
                         {
                             _MessageBody = _getMessage.Message;

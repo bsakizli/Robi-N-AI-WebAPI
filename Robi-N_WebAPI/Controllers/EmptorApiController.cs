@@ -18,6 +18,7 @@ using DecaTec.WebDav;
 using Google.Apis.Auth.OAuth2;
 using System.Net.Http.Headers;
 using System.IdentityModel.Tokens.Jwt;
+using EmptorUtility.Models;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -504,6 +505,52 @@ namespace Robi_N_WebAPI.Controllers
         public async Task<IActionResult> closeTicket()
         {
             return Ok("");
+        }
+
+
+
+        [HttpPost("ticketdosyaekle")]
+        public async Task<IActionResult> dosyaekle(IFormFile ServiceFormPicture)
+        {
+
+            var bytes = Convert.FromBase64String("");
+
+            EmptorDbAction db = new EmptorDbAction(_configuration);
+
+            // Dosyayı byte dizisine çevirme
+            byte[] fileBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                await ServiceFormPicture.CopyToAsync(memoryStream);
+                fileBytes = memoryStream.ToArray();
+            }
+
+            // Modeli oluşturma ve değerleri atama
+            var model = new EmptorFileUploadModel
+            {
+                FileName = ServiceFormPicture.FileName,
+                MimeType = ServiceFormPicture.ContentType,
+                DataSize = (int)ServiceFormPicture.Length,
+                Summary = "Kanıt Dosyası",  // Özeti buraya ekleyin
+                CreateUserTime = DateTime.Now,
+                CreateUserPositionId = 1,  // Kullanıcının pozisyon ID'si
+                CreateUserId = 1,  // Kullanıcı ID'si
+                UpdateUserTime = DateTime.Now,
+                UpdateUserPositionId = 1,  // Güncelleyen kullanıcının pozisyon ID'si
+                UpdateUserId = 1,  // Güncelleyen kullanıcı ID'si
+                Active = true,
+                FilePath = "",  // Dosya yolu
+                BlobData = fileBytes,
+                CBlobTypeId = 1  // BLOB türü ID'si
+            };
+
+            // Byte dizisini veritabanına kaydetme
+  
+
+            await db.EmptorSaveFileToDatabase(model);
+
+            return Ok(true);
+
         }
 
         //[HttpGet("getCloseTicketList")]

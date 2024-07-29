@@ -161,6 +161,8 @@ namespace Robi_N_WebAPI.Services
                     var azureKey = await AzureKeyVault.RobinAzureKeyVault(item.value, _azureServiceLink);
                     #endregion
 
+
+                    #region Rapor Kontrol Tarafı
                     if (azureKey != null && !String.IsNullOrEmpty(azureKey.username) && !String.IsNullOrEmpty(azureKey.password) && !String.IsNullOrEmpty(azureKey.workcode))
                     {
                         #region Rapor KOntrol ve Otomatik Onay
@@ -355,10 +357,9 @@ namespace Robi_N_WebAPI.Services
                     {
                         //AzureKey Boş Geldi
                     }
+                    #endregion 
 
-
-
-                    //#region DogumRaporKontrol
+                    #region DogumRaporKontrol
                     var _dogumRaporKontrolBdh = await _db.RBN_SGK_HealthReports.Where(x => x.FirmCode == item.FirmCode && x.process == 1 & x.active == true && x.RAPORBITTAR.Date == Convert.ToDateTime("0001-01-01") && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
 
                     if (_dogumRaporKontrolBdh.Count() > 0)
@@ -385,6 +386,7 @@ namespace Robi_N_WebAPI.Services
                             }
                         }
                     }
+                    #endregion
 
                     //var _dogumRaporKontrolNetas = await _db.RBN_SGK_HealthReports.Where(x => x.FirmCode == 2 && x.process == 1 & x.active == true && x.RAPORBITTAR.Date == Convert.ToDateTime("0001-01-01") && x.ISYERIKODU == Convert.ToInt32(azureKey.workcode)).ToListAsync();
 
@@ -422,8 +424,8 @@ namespace Robi_N_WebAPI.Services
                             if (_sgkToken != null && !String.IsNullOrEmpty(_sgkToken.wsLoginReturn.wsToken))
                             {
                                 string _token = _sgkToken.wsLoginReturn.wsToken;
-
-                                if (await SuccessFactorsPersonnelControl(report.TCKIMLIKNO))
+                                Boolean _IsPersonel = await SuccessFactorsPersonnelControl(report.TCKIMLIKNO);
+                                if (_IsPersonel)
                                 {
                                     if (report.RAPORBITTAR.ToString("yyyy-MM-dd") != "0001-01-01")
                                     {

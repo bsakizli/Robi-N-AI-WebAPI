@@ -95,7 +95,7 @@ namespace Robi_N_WebAPI.Controllers
         [HttpGet("EgmPersonelNotification")]
         public async Task<IActionResult> EgmPersonelNotification(DateTime girisTarihi, DateTime cikisTarihi)
         {
-            return Ok("");
+            return Ok("");;
         }
 
 

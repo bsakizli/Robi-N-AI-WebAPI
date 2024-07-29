@@ -12,6 +12,5 @@ namespace Robi_N_WebAPI.Utility.Tables
         public DateTime updateDate { get; set; }
         public bool whatsappSend { get; set; }
         public bool active { get; set; }
-
     }
 }

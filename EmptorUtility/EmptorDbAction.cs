@@ -1,4 +1,5 @@
-﻿using EmptorUtility.Models.Response;
+﻿using EmptorUtility.Models;
+using EmptorUtility.Models.Response;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -45,8 +46,9 @@ namespace EmptorUtility
 
                 if (rdr.HasRows)
                 {
-                    while (rdr.Read()) {
-                       
+                    while (rdr.Read())
+                    {
+
                         int Id = Convert.ToInt32(rdr["ID"]);
                         string name = rdr["NAME"].ToString();
                     }
@@ -100,7 +102,7 @@ namespace EmptorUtility
                             Id = Id,
                             Name = name
                         };
-                       
+
                     }
                 }
             }
@@ -418,7 +420,7 @@ ELSE
 
             await con.OpenAsync();
 
-            using (SqlDataReader rdr =  await cmd.ExecuteReaderAsync())
+            using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
             {
                 if (rdr.HasRows)
                 {
@@ -432,13 +434,13 @@ ELSE
                             StatusCode = StatusCode,
                             StatusMessage = StatusMessage
                         };
-                       
+
                     }
                 }
             }
             await con.CloseAsync();
             return _response;
-           
+
         }
 
         public async Task<Boolean> TicketWaitingHistoryAdded(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
@@ -460,7 +462,8 @@ ELSE
                     await cn.CloseAsync();
                     return true;
                 }
-            } catch
+            }
+            catch
             {
                 return false;
             }
@@ -468,7 +471,7 @@ ELSE
 
         public async Task<Boolean> TicketWaiting(string TicketIdDesc, int ReasonId, DateTime ReasonDate, int RequestingPerson)
         {
-           try
+            try
             {
                 var tt = _appConfig.GetConnectionString("EmptorConnection");
                 Boolean StatusCode = false;
@@ -559,7 +562,7 @@ ELSE
                 //{
                 //    if (rdr.HasRows)
                 //    {
-                        
+
                 //    }
                 //}
                 await con.CloseAsync();
@@ -571,7 +574,8 @@ ELSE
                 //await con.CloseAsync();
 
                 //return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
             }
@@ -583,7 +587,7 @@ ELSE
             try
             {
                 var tt = _appConfig.GetConnectionString("EmptorConnection");
-                
+
                 DataTable dt = new DataTable();
                 SqlConnection con = new SqlConnection(tt);
                 SqlCommand cmd = new SqlCommand(String.Format(@"DECLARE @TICKET_ID VARCHAR(12), @ANASORUMLU_ID INT, @ALTSORUMLU_ID INT;
@@ -627,7 +631,8 @@ SELECT
                                 MainResponsibleId = Convert.ToInt32(MainResponsibleFullNameId)
                             };
                         }
-                    } else
+                    }
+                    else
                     {
                         _response = new r_getMainResponsibleInfo
                         {
@@ -639,7 +644,8 @@ SELECT
 
                 return _response;
 
-            } catch
+            }
+            catch
             {
                 _response = new r_getMainResponsibleInfo
                 {
@@ -649,100 +655,208 @@ SELECT
             }
         }
 
-		public async Task<Boolean> InventoryStillSaveClose(long TicketId)
-		{
-			Boolean _response = false;
-			try
-			{
-				var tt = _appConfig.GetConnectionString("EmptorConnection");
+        public async Task<Boolean> InventoryStillSaveClose(long TicketId)
+        {
+            Boolean _response = false;
+            try
+            {
+                var tt = _appConfig.GetConnectionString("EmptorConnection");
 
-				DataTable dt = new DataTable();
-				SqlConnection con = new SqlConnection(tt);
-				SqlCommand cmd = new SqlCommand(String.Format(@"EXEC	[dbo].[ENVANTER_HAREKETSIZ_KAYITLARI_OTOMATIK_STATU_COZULDU_YAPMA]
+                DataTable dt = new DataTable();
+                SqlConnection con = new SqlConnection(tt);
+                SqlCommand cmd = new SqlCommand(String.Format(@"EXEC	[dbo].[ENVANTER_HAREKETSIZ_KAYITLARI_OTOMATIK_STATU_COZULDU_YAPMA]
 		@TicketId = @_TicketId
 "), con);
-				cmd.Parameters.Add("@_TicketId", SqlDbType.BigInt).Value = TicketId;
-				SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-				adapter.Fill(dt);
+                cmd.Parameters.Add("@_TicketId", SqlDbType.BigInt).Value = TicketId;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(dt);
 
-				await con.OpenAsync();
+                await con.OpenAsync();
 
-				using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
-				{
-					if (rdr.HasRows)
-					{
-						while (rdr.Read())
-						{
-							string Result = rdr["Result"].ToString();
-							
-                            if(Convert.ToBoolean(Result))
+                using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+                {
+                    if (rdr.HasRows)
+                    {
+                        while (rdr.Read())
+                        {
+                            string Result = rdr["Result"].ToString();
+
+                            if (Convert.ToBoolean(Result))
                             {
                                 _response = true;
-                            } else
+                            }
+                            else
                             {
                                 _response = false;
                             }
-						}
-					}
-					else
-					{
+                        }
+                    }
+                    else
+                    {
                         _response = false;
-					}
-				}
-				con.Close();
+                    }
+                }
+                con.Close();
 
-				return _response;
+                return _response;
 
-			}
-			catch
-			{
+            }
+            catch
+            {
                 _response = false;
-				return _response;
-			}
-		}
+                return _response;
+            }
+        }
 
-		public async Task<List<long>> getTicketClosedList(string SqlQuery)
+        public async Task<List<long>> getTicketClosedList(string SqlQuery)
         {
-			List<long> ticketIds = new List<long>();
-			try
-			{
-				
-				var tt = _appConfig.GetConnectionString("EmptorConnection");
+            List<long> ticketIds = new List<long>();
+            try
+            {
 
-				DataTable dt = new DataTable();
-				SqlConnection con = new SqlConnection(tt);
-				SqlCommand cmd = new SqlCommand(String.Format(SqlQuery), con);
-				
-				SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-				adapter.Fill(dt);
+                var tt = _appConfig.GetConnectionString("EmptorConnection");
 
-				await con.OpenAsync();
+                DataTable dt = new DataTable();
+                SqlConnection con = new SqlConnection(tt);
+                SqlCommand cmd = new SqlCommand(String.Format(SqlQuery), con);
 
-				using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
-				{
-					if (rdr.HasRows)
-					{
-						while (rdr.Read())
-						{
-							string _TicketId = rdr["TicketId"].ToString();
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(dt);
+
+                await con.OpenAsync();
+
+                using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+                {
+                    if (rdr.HasRows)
+                    {
+                        while (rdr.Read())
+                        {
+                            string _TicketId = rdr["TicketId"].ToString();
                             ticketIds.Add((long)Convert.ToDouble(_TicketId));
-						}
-					}
-					else
-					{
+                        }
+                    }
+                    else
+                    {
                         return ticketIds;
-					}
-				}
-				con.Close();
+                    }
+                }
+                con.Close();
 
-				return ticketIds;
+                return ticketIds;
 
-			}
-			catch
-			{
-				return ticketIds;
-			}
-		}
+            }
+            catch
+            {
+                return ticketIds;
+            }
+        }
 
+
+        //public async Task<bool> addAttahmentTicket()
+        //{
+        //    try
+        //    {
+        //        var tt = _appConfig.GetConnectionString("EmptorBlobConnection");
+
+        //        DataTable dt = new DataTable();
+        //        SqlConnection con = new SqlConnection(tt);
+        //        SqlCommand cmd = new SqlCommand(String.Format("SELECT TOP 5 * FROM BIZTBL_BLOB"), con);
+
+        //        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+        //        adapter.Fill(dt);
+
+        //        await con.OpenAsync();
+
+        //        using (SqlDataReader rdr = await cmd.ExecuteReaderAsync())
+        //        {
+        //            if (rdr.HasRows)
+        //            {
+        //                while (rdr.Read())
+        //                {
+        //                    string _TicketId = rdr["FILENAME"].ToString();
+        //                }
+        //            }
+        //            else
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //        con.Close();
+
+        //        return true;
+
+        //    }
+        //    catch
+        //    {
+        //        return true;
+        //    }
+        //}
+
+
+        public async Task<bool> EmptorSaveFileToDatabase(EmptorFileUploadModel model)
+        {
+            var tt = _appConfig.GetConnectionString("EmptorBlobConnection");
+
+            using (SqlConnection connection = new SqlConnection(tt))
+            {
+                connection.Open();
+
+                string query = @"
+            INSERT INTO [dbo].[BIZTBL_BLOB]
+            (
+                [FILENAME],
+                [MIMETYPE],
+                [DATASIZE],
+                [SUMMARY],
+                [CREATE_USER_TIME],
+                [CREATE_USER_POSITION_ID],
+                [CREATE_USER_ID],
+                [UPDATE_USER_TIME],
+                [UPDATE_USER_POSITION_ID],
+                [UPDATE_USER_ID],
+                [ACTIVE],
+                [BLOBDATA],
+                [C_BLOBTYPEID]
+            )
+            VALUES
+            (
+                @FILENAME,
+                @MIMETYPE,
+                @DATASIZE,
+                @SUMMARY,
+                @CREATE_USER_TIME,
+                @CREATE_USER_POSITION_ID,
+                @CREATE_USER_ID,
+                @UPDATE_USER_TIME,
+                @UPDATE_USER_POSITION_ID,
+                @UPDATE_USER_ID,
+                @ACTIVE,
+                @BLOBDATA,
+                @C_BLOBTYPEID
+            )";
+
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@FILENAME", model.FileName);
+                    command.Parameters.AddWithValue("@MIMETYPE", model.MimeType);
+                    command.Parameters.AddWithValue("@DATASIZE", model.DataSize);
+                    command.Parameters.AddWithValue("@SUMMARY", model.Summary);
+                    command.Parameters.AddWithValue("@CREATE_USER_TIME", model.CreateUserTime);
+                    command.Parameters.AddWithValue("@CREATE_USER_POSITION_ID", model.CreateUserPositionId);
+                    command.Parameters.AddWithValue("@CREATE_USER_ID", model.CreateUserId);
+                    command.Parameters.AddWithValue("@UPDATE_USER_TIME", model.UpdateUserTime);
+                    command.Parameters.AddWithValue("@UPDATE_USER_POSITION_ID", model.UpdateUserPositionId);
+                    command.Parameters.AddWithValue("@UPDATE_USER_ID", model.UpdateUserId);
+                    command.Parameters.AddWithValue("@ACTIVE", model.Active);
+                    //command.Parameters.AddWithValue("@FILEPATH", model.FilePath);
+                    command.Parameters.AddWithValue("@BLOBDATA", model.BlobData);
+                    command.Parameters.AddWithValue("@C_BLOBTYPEID", model.CBlobTypeId);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+
+            return true;
+
+        }
     }
 }

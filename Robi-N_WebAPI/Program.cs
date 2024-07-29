@@ -672,7 +672,9 @@ GlobalConfiguration.Configuration
 
 
 
-RecurringJobs.AutomaticTicketClosedOperation();
+//RecurringJobs.AutomaticTicketClosedOperation();
+
+
 
 
 app.MapControllerRoute(
