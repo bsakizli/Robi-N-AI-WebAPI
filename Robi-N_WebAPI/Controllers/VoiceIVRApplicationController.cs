@@ -185,119 +185,126 @@ namespace Robi_N_WebAPI.Controllers
         {
             GlobalResponse globalResponse;
 
-			try
-			{
-				var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == dateTime.Date.Date && x.csq == csq);
-				var _workHours = await _db.RNB_IVR_WORKING_HOURS.Where(x => x.csqname == csq).FirstOrDefaultAsync();
-				//Holiday Start Time Control
-				var _date = DateTime.Now.Date;
-				var _time = DateTime.Now.TimeOfDay.Ticks;
+            try
+            {
+                var _holidays = await _db.RBN_IVR_HOLIDAY_DAYS.FirstOrDefaultAsync(x => x.startDate.Date == dateTime.Date.Date && x.csq == csq);
+                var _workHours = await _db.RNB_IVR_WORKING_HOURS.Where(x => x.csqname == csq).FirstOrDefaultAsync();
 
-				if (_holidays != null)
-				{
-					if (_workHours == null)
-					{
-						globalResponse = new GlobalResponse
-						{
-							statusCode = 200,
-							status = false,
-							message = "You are in working hours."
-						};
+                //Holiday Start Time Control
+                var _date = DateTime.Now.Date;
+                var _time = DateTime.Now.TimeOfDay.Ticks;
 
-					}
-					else
-					{
-						globalResponse = new GlobalResponse
-						{
-							statusCode = 201,
-							status = true,
-							message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
-						};
-					}
-					var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
-					_logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), globalResponseResult));
-					return Ok(globalResponse);
-				}
-				else
-				{
-					int _now = (int)dateTime.DayOfWeek;
-					
-                    
-                    if(_workHours == null)
+                if (_holidays != null)
+                {
+                    if (_workHours == null)
                     {
-						globalResponse = new GlobalResponse
-						{
-							statusCode = 200,
-							status = false,
-							message = "You are in working hours."
-						};
-					} else
-					if (_now == 6 || _now == 7)
-					{
-						globalResponse = new GlobalResponse
-						{
-							statusCode = 200,
-							status = true,
-							message = "We're out of office hours."
-						};
+                        globalResponse = new GlobalResponse
+                        {
+                            statusCode = 200,
+                            status = false,
+                            message = "You are in working hours."
+                        };
+                    }
+                    else
+                    {
+                        globalResponse = new GlobalResponse
+                        {
+                            statusCode = 201,
+                            status = true,
+                            message = String.Format("Today is a holiday. - {0} - {1}", _holidays.displayName, _holidays.description)
+                        };
+                    }
+                    var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
+                    _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), globalResponseResult));
+                    return Ok(globalResponse);
+                }
+                else
+                {
+                    int _now = (int)dateTime.DayOfWeek;
 
-					}
-					else
-					{
-						
-						if (_workHours != null)
-						{
+                    if (_workHours == null)
+                    {
+                        globalResponse = new GlobalResponse
+                        {
+                            statusCode = 200,
+                            status = false,
+                            message = "You are in working hours."
+                        };
+                    }
+                    else if (_now == 6 || _now == 7) // Saturday (6) or Sunday (7)
+                    {
+                        if (_workHours.weekend == false)
+                        {
+                            globalResponse = new GlobalResponse
+                            {
+                                statusCode = 200,
+                                status = true,
+                                message = "We're out of office hours."
+                            };
+                        }
+                        else
+                        {
+                            // Handle case when weekend is true
+                            if (_workHours.starthours <= dateTime.TimeOfDay && _workHours.endhours >= dateTime.TimeOfDay)
+                            {
+                                globalResponse = new GlobalResponse
+                                {
+                                    statusCode = 200,
+                                    status = false,
+                                    message = "You are in working hours."
+                                };
+                            }
+                            else
+                            {
+                                globalResponse = new GlobalResponse
+                                {
+                                    statusCode = 200,
+                                    status = true,
+                                    message = "We're out of office hours."
+                                };
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (_workHours.starthours <= dateTime.TimeOfDay && _workHours.endhours >= dateTime.TimeOfDay)
+                        {
+                            globalResponse = new GlobalResponse
+                            {
+                                statusCode = 200,
+                                status = false,
+                                message = "You are in working hours."
+                            };
+                        }
+                        else
+                        {
+                            globalResponse = new GlobalResponse
+                            {
+                                statusCode = 200,
+                                status = true,
+                                message = "We're out of office hours."
+                            };
+                        }
+                    }
 
-							if (_workHours.starthours <= dateTime.TimeOfDay && _workHours.endhours >= dateTime.TimeOfDay)
-							{
-								globalResponse = new GlobalResponse
-								{
-									statusCode = 200,
-									status = false,
-									message = "You are in working hours."
-								};
-							}
-							else
-							{
-								globalResponse = new GlobalResponse
-								{
-									statusCode = 200,
-									status = true,
-									message = "We're out of office hours."
-								};
-							}
-						}
-						else
-						{
-							globalResponse = new GlobalResponse
-							{
-								statusCode = 200,
-								status = false,
-								message = "You are in working hours."
-							};
-						}
-
-					}
-
-					var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
-					_logger.LogInformation(String.Format(@"{0} - Response: {1}", this.ControllerContext.RouteData.Values["controller"].ToString(), globalResponseResult));
-					return Ok(globalResponse);
-				}
-
-			}
-			catch
-			{
-				globalResponse = new GlobalResponse
-				{
-					statusCode = 500,
-					status = false,
-					message = "System error please inform your administrator."
-				};
-				var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
-				_logger.LogInformation(String.Format(@"{0} - Response: {1}", this.ControllerContext.RouteData.Values["controller"].ToString(), globalResponseResult));
-				return BadRequest(globalResponse);
-			}
-		}
+                    var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
+                    _logger.LogInformation(String.Format(@"{0} - Response: {1}", this.ControllerContext.RouteData.Values["controller"].ToString(), globalResponseResult));
+                    return Ok(globalResponse);
+                }
+            }
+            catch
+            {
+                globalResponse = new GlobalResponse
+                {
+                    statusCode = 500,
+                    status = false,
+                    message = "System error please inform your administrator."
+                };
+                var globalResponseResult = new JavaScriptSerializer().Serialize(globalResponse);
+                _logger.LogInformation(String.Format(@"{0} - Response: {1}", this.ControllerContext.RouteData.Values["controller"].ToString(), globalResponseResult));
+                return BadRequest(globalResponse);
+            }
+        }
         
         [HttpGet("getCSQList")]
         public async Task<IActionResult> listCSQ()

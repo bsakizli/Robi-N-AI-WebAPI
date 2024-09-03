@@ -243,8 +243,6 @@ namespace Robi_N_WebAPI.Controllers
 
                             if (rgx.Matches(_getMessage.Message).Count > 0)
                             {
-                             
-                                
                                 foreach (Match match in rgx.Matches(_getMessage.Message))
                                 {
                                     _parameters.RemoveAll(x => x == match.Value);

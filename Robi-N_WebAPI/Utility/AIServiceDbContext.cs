@@ -28,5 +28,7 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_SGK_HealthReports> RBN_SGK_HealthReports { get; set; }  
         public DbSet<RBN_WhatsAppMessageTemplate> RBN_WhatsAppMessageTemplate { get; set; }  
         public DbSet<RBN_UnansweredCalls> RBN_UnansweredCalls { get; set; }  
+        public DbSet<RBN_ANKET_CEVAP> RBN_ANKET_CEVAP { get; set; }  
+        public DbSet<RBN_RequestACallBack> RBN_RequestACallBack { get; set; }  
     }
 }

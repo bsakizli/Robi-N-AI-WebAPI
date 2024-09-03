@@ -142,7 +142,6 @@ namespace Robi_N_WebAPI.Controllers
                                 displayMessage = _response.ResultMessage
                             };
 
-
                             var globalResponseResult = new JavaScriptSerializer().Serialize(response);
                             _logger.LogInformation(String.Format(@"Controller: {0} - Method: {1} - Response: {2}", this.ControllerContext?.RouteData?.Values["controller"]?.ToString(), this.ControllerContext?.RouteData?.Values["action"]?.ToString(), response));
                             

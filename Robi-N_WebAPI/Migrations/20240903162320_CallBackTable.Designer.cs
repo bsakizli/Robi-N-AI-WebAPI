@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240903162320_CallBackTable")]
+    partial class CallBackTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -385,20 +388,11 @@ namespace Robi_N_WebAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("CallCode")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("CallId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CallingNumber")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("add_date")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

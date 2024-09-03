@@ -38,6 +38,8 @@ using Microsoft.IdentityModel.Tokens;
 using ExtendedXmlSerializer.ExtensionModel.Types.Sources;
 using Robi_N_WebAPI.Helper.Models;
 using Org.BouncyCastle.Utilities;
+using NetGsmAPI;
+using MailEntity;
 
 namespace Robi_N_WebAPI.Controllers
 {
@@ -50,8 +52,9 @@ namespace Robi_N_WebAPI.Controllers
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IvrApiController> _logger;
         private readonly IConfiguration _configuration;
-
+        NetGsmService _smsService = new NetGsmService();
         PBKDF2 crypto = new PBKDF2();
+        MailService MailService = new MailService();
 
         public IvrApiController(IConfiguration configuration, ILogger<IvrApiController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
@@ -168,6 +171,104 @@ namespace Robi_N_WebAPI.Controllers
                     status = true,
                     statusCode = 500,
                     displayMessage = "Server Hatası: " +ex.Message,
+                    message = "Unsuccessful"
+                };
+                return BadRequest(response);
+            }
+        }
+
+
+
+        [HttpPost("cevap")]
+        public async Task<IActionResult> Cevap([FromBody] requestAddLog _request)
+        {
+            return Ok();
+        }
+
+        [HttpPost("RequestACallBack")]
+        public async Task<IActionResult> RequestACallBack(int CallCode, int MessageId, string CallingNumber, string CallId)
+        {
+            try
+            {
+                GlobalResponse response;
+                var CallRecord = await _db.RBN_RequestACallBack.Where(x => x.CallingNumber == CallingNumber).FirstOrDefaultAsync();
+
+                RBN_RequestACallBack item = new RBN_RequestACallBack
+                {
+                    CallId = CallId,
+                    CallingNumber = CallingNumber,
+                    CallCode = CallCode,
+                    active = true,
+                    add_date = DateTime.Now.ToLocalTime()
+                };
+                var lastRecord = _db.RBN_RequestACallBack.Add(item);
+                await _db.SaveChangesAsync();
+                if (lastRecord != null)
+                {
+                    string formattedNumber = Helper.Helper.FormatPhoneNumber(CallingNumber);
+
+                    var _getMessage = _db.RBN_SMS_TEMPLATES.FirstOrDefault(x => x.MessageCode == MessageId && x.active == true);
+
+                    if (_getMessage != null)
+                    {
+                        var _sendSMSResponse = await _smsService.sendSms(formattedNumber, _getMessage.Message);
+                        if (_sendSMSResponse.status)
+                        {
+                            bool MailStatus = MailService.GeriAramaTalepMailGonder("baris.sakizli@bdh.com.tr", "hakan.dansik@bdh.comt.r", CallingNumber, CallId);
+                            response = new GlobalResponse
+                            {
+                                status = true,
+                                statusCode = 200,
+                                displayMessage = "Arama talebi alınmıştır.",
+                                message = "Successful"
+                            };
+                            return Ok(response);
+                        } else
+                        {
+                            response = new GlobalResponse
+                            {
+                                status = true,
+                                statusCode = 200,
+                                displayMessage = "Arama talebi alımıştır.",
+                                message = "Successful"
+                            };
+                            return Ok(response);
+                        }
+
+                       
+                    } else
+                    {
+                        response = new GlobalResponse
+                        {
+                            status = false,
+                            statusCode = 201,
+                            displayMessage = "SMS Şablonu getirilemedi",
+                            message = "Unsuccessful"
+                        };
+                        return BadRequest(response);
+                    }
+
+                    
+                } else
+                {
+                    response = new GlobalResponse
+                    {
+                        status = false,
+                        statusCode = 201,
+                        displayMessage = "Sistemsel bir hata meydana geldi.",
+                        message = "Unsuccessful"
+                    };
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalResponse response;
+                response = new GlobalResponse
+                {
+                    status = false,
+                    statusCode = 500,
+                    displayMessage = ex.Message,
                     message = "Unsuccessful"
                 };
                 return BadRequest(response);
