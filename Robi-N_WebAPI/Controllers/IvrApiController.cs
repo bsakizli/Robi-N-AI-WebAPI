@@ -214,7 +214,7 @@ namespace Robi_N_WebAPI.Controllers
                         var _sendSMSResponse = await _smsService.sendSms(formattedNumber, _getMessage.Message);
                         if (_sendSMSResponse.status)
                         {
-                            bool MailStatus = MailService.GeriAramaTalepMailGonder("baris.sakizli@bdh.com.tr", "hakan.dansik@bdh.comt.r", CallingNumber, CallId);
+                            bool MailStatus = MailService.GeriAramaTalepMailGonder("candan.budak@bdh.com.tr", "ebru.muratli@bdh.com.tr", CallingNumber, CallId);
                             response = new GlobalResponse
                             {
                                 status = true,
