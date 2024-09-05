@@ -30,5 +30,7 @@ namespace Robi_N_WebAPI.Utility
         public DbSet<RBN_UnansweredCalls> RBN_UnansweredCalls { get; set; }  
         public DbSet<RBN_ANKET_CEVAP> RBN_ANKET_CEVAP { get; set; }  
         public DbSet<RBN_RequestACallBack> RBN_RequestACallBack { get; set; }  
+        public DbSet<RBN_IVR_AutomaticSurveyCallNumbers> RBN_IVR_AutomaticSurveyCallNumbers { get; set; }  
+        public DbSet<RBN_IVR_AutomaticSurveyAnswers> RBN_IVR_AutomaticSurveyAnswers { get; set; }  
     }
 }

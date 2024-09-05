@@ -274,5 +274,14 @@ namespace Robi_N_WebAPI.Controllers
                 return BadRequest(response);
             }
         }
+
+
+        [HttpPost("surveyanswercall")]
+        public async Task<IActionResult> surveyanswercall([FromForm] string model, [FromForm] IFormFile file)
+        {
+            var test = model;
+
+            return Ok();
+        }
     }
 }
