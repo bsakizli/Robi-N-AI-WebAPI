@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Robi_N_WebAPI.Utility;
 
@@ -11,9 +12,11 @@ using Robi_N_WebAPI.Utility;
 namespace Robi_N_WebAPI.Migrations
 {
     [DbContext(typeof(AIServiceDbContext))]
-    partial class AIServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240906080041_IVRSurveyAdded")]
+    partial class IVRSurveyAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -297,11 +300,11 @@ namespace Robi_N_WebAPI.Migrations
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_AutomaticSurveyAnswers", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<int>("AnswerKeying")
                         .HasColumnType("int");
@@ -337,11 +340,11 @@ namespace Robi_N_WebAPI.Migrations
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_AutomaticSurveyCallNumbers", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("CallDate")
                         .HasColumnType("datetime2");
@@ -453,11 +456,11 @@ namespace Robi_N_WebAPI.Migrations
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_SurveyQuestions", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("Question")
                         .HasColumnType("nvarchar(max)");
@@ -481,11 +484,11 @@ namespace Robi_N_WebAPI.Migrations
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_RequestACallBack", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<long?>("CallCode")
                         .HasColumnType("bigint");

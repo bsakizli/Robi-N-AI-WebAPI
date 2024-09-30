@@ -459,11 +459,17 @@ namespace Robi_N_WebAPI.Services
                                     if (personelimDegildir.personelimDegildirReturn.sonucKod == 0)
                                     {
                                         report.Personel = false;
+                                        report.active = false;
+                                        report.process = 0;
                                         await _db.SaveChangesAsync();
                                         //Mail ve Gönderebilirsin.
                                     }
                                     else
                                     {
+                                       
+                                        report.active = false;
+                                        report.process = 0;
+                                        await _db.SaveChangesAsync();
                                         //Personelim Değildir Çalışmadı
                                     }
                                 }
@@ -638,7 +644,8 @@ namespace Robi_N_WebAPI.Services
                 statusCode = 200,
                 displayMessage = "Vizite konrolleri yapıldı, rapor onayları verilmiştir."
             };
-            return _response;
+            C40.3
+                return _response;
 
 
         }

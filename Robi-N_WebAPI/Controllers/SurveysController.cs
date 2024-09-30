@@ -1,25 +1,22 @@
-﻿using Robi_N_WebAPI.Utility;
-using Microsoft.Extensions.Options;
-using Robi_N_WebAPI.Model;
-using DocumentFormat.OpenXml.Packaging;
-using System.Data;
-using DocumentFormat.OpenXml.Spreadsheet;
-using RobinCore;
-using Microsoft.AspNetCore.Mvc;
+﻿using MailEntity;
 using Microsoft.AspNetCore.Authorization;
-using Robi_N_WebAPI.Services;
-using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NetGsmAPI;
+using Robi_N_WebAPI.Model;
+using Robi_N_WebAPI.Services;
+using Robi_N_WebAPI.Utility;
 using SimpleCrypto;
-using MailEntity;
 
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [Authorize(Roles = "Admin,IVR Read Only Web Service,IVR Full Authorization")]
     [ApiController]
-    public class QuestionnaireController : ControllerBase
+    public class SurveysController : ControllerBase
     {
+
         MobilDevService _mobilDevService = new MobilDevService();
         private readonly AIServiceDbContext _db;
         private readonly ILogger<IvrApiController> _logger;
@@ -28,17 +25,19 @@ namespace Robi_N_WebAPI.Controllers
         PBKDF2 crypto = new PBKDF2();
         MailService MailService = new MailService();
 
-        public QuestionnaireController(IConfiguration configuration, ILogger<IvrApiController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
+        public SurveysController(IConfiguration configuration, ILogger<IvrApiController> logger, AIServiceDbContext db, IOptions<JwtSettings> JwtSettings)
         {
             _configuration = configuration;
             _logger = logger;
             _db = db;
         }
 
-        [HttpPost("cevap")]
-        public async Task<IActionResult> Index()
+        [HttpPost("SurveyCollectionOfAnswers")]
+        public async Task<IActionResult> SurveyCollectionOfAnswers([FromForm] string test)
         {
             return Ok();
         }
+
+       
     }
 }

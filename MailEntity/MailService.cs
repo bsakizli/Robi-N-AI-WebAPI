@@ -91,7 +91,8 @@ namespace MailEntity
               <tbody style='color:#505050;width:100%'>
                 <tr style='color:#505050'>
                   <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center;color:red;'> <b>{CallId}</b> </td>
-                  <td style='border:1px solid #505050;margin-left:5px;padding:0.4rem 0.7rem 0.4rem 0.7rem;text-align:center'> <b>{CallNumber}</b> </td>
+                  <a href=""
+http://10.254.51.143:8080/webdialer/Webdialer?destination=90{{CallNumber}}"">90{{CallNumber}}</a>
                   <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center'>  {DateTime.Now.ToString("dd.MM.yyyy HH:mm")} </td>
                 </tr>
               </tbody>

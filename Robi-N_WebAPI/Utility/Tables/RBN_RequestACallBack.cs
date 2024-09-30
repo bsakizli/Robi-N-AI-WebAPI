@@ -5,7 +5,7 @@ namespace Robi_N_WebAPI.Utility.Tables
     public class RBN_RequestACallBack
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string? CallingNumber { get; set; }
         public string? CallId { get; set; }
         public long? CallCode { get; set; }

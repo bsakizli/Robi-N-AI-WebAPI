@@ -5,10 +5,10 @@ namespace Robi_N_WebAPI.Utility.Tables
     public class RBN_IVR_AutomaticSurveyAnswers
     {
         [Key]
-        public int id { get; set; }
+        public long id { get; set; }
         public int CallId { get; set; }
-        public int SurveyId { get; set; }
-        public int QuestionID { get; set; }
+        public long SurveyId { get; set; }
+        public long QuestionID { get; set; }
         public int AnswerKeying { get; set; }
         public long arayan_no { get; set; }
         public long aranan_no { get; set; }
