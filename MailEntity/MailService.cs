@@ -29,8 +29,8 @@ namespace MailEntity
                 message.Cc.Add(MailboxAddress.Parse(ccAdress));
                 message.Bcc.Add(MailboxAddress.Parse("baris.sakizli@bdh.com.tr"));
                 message.Bcc.Add(MailboxAddress.Parse("hakan.dansik@bdh.com.tr"));
+               
 
-              
 
                 message.From.Add(MailboxAddress.Parse("robin@bdh.com.tr"));
 
