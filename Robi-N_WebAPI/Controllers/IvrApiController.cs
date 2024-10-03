@@ -44,7 +44,7 @@ using MailEntity;
 namespace Robi_N_WebAPI.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,IVR Read Only Web Service,IVR Full Authorization")]
+    [Authorize(Roles = "Admin,IVR Read Only Wesb Service,IVR Full Authorization")]
     [ApiController]
     public class IvrApiController : ControllerBase
     {
