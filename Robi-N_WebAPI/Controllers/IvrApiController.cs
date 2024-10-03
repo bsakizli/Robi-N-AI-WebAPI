@@ -177,7 +177,7 @@ namespace Robi_N_WebAPI.Controllers
             }
         }
 
-<<<<<<< HEAD
+
 
 
         [HttpPost("cevap")]
@@ -294,7 +294,5 @@ namespace Robi_N_WebAPI.Controllers
 
             return Ok();
         }
-=======
->>>>>>> 1f0e82efe52b8c93a5f0e5347c948217c1186c20
     }
 }
