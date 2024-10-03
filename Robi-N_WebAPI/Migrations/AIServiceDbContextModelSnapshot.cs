@@ -56,7 +56,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_AI_SERVICE_USERS");
+                    b.ToTable("RBN_AI_SERVICE_USERS", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_AI_SERVICE_ROLE", b =>
@@ -81,7 +81,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_AI_SERVICE_ROLE");
+                    b.ToTable("RBN_AI_SERVICE_ROLE", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_AI_SERVICE_ROLES_MAP", b =>
@@ -109,7 +109,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_AI_SERVICE_ROLES_MAP");
+                    b.ToTable("RBN_AI_SERVICE_ROLES_MAP", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_ANKET_CEVAP", b =>
@@ -137,7 +137,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_ANKET_CEVAP");
+                    b.ToTable("RBN_ANKET_CEVAP", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_CARGO_COMPANY_LIST", b =>
@@ -168,7 +168,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_CARGO_COMPANY_LIST");
+                    b.ToTable("RBN_CARGO_COMPANY_LIST", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_AUTOCLOSEDTICKET", b =>
@@ -190,7 +190,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_EMPTOR_AUTOCLOSEDTICKET");
+                    b.ToTable("RBN_EMPTOR_AUTOCLOSEDTICKET", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_AUTOTICKETCLOSEDScheduler", b =>
@@ -224,7 +224,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_EMPTOR_AUTOTICKETCLOSEDScheduler");
+                    b.ToTable("RBN_EMPTOR_AUTOTICKETCLOSEDScheduler", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_ClosedTicketHistory", b =>
@@ -255,7 +255,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_EMPTOR_ClosedTicketHistory");
+                    b.ToTable("RBN_EMPTOR_ClosedTicketHistory", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_EMPTOR_WaitingTicketHistory", b =>
@@ -292,16 +292,16 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_EMPTOR_WaitingTicketHistory");
+                    b.ToTable("RBN_EMPTOR_WaitingTicketHistory", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_AutomaticSurveyAnswers", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<int>("AnswerKeying")
                         .HasColumnType("int");
@@ -332,16 +332,16 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RBN_IVR_AutomaticSurveyAnswers");
+                    b.ToTable("RBN_IVR_AutomaticSurveyAnswers", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_AutomaticSurveyCallNumbers", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<DateTime>("CallDate")
                         .HasColumnType("datetime2");
@@ -366,7 +366,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RBN_IVR_AutomaticSurveyCallNumbers");
+                    b.ToTable("RBN_IVR_AutomaticSurveyCallNumbers", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_HOLIDAY_DAYS", b =>
@@ -416,7 +416,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_IVR_HOLIDAY_DAYS");
+                    b.ToTable("RBN_IVR_HOLIDAY_DAYS", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_LOGS", b =>
@@ -448,16 +448,16 @@ namespace Robi_N_WebAPI.Migrations
                         .IsUnique()
                         .HasFilter("[uniqId] IS NOT NULL");
 
-                    b.ToTable("RBN_IVR_LOGS");
+                    b.ToTable("RBN_IVR_LOGS", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_IVR_SurveyQuestions", b =>
                 {
-                    b.Property<long>("id")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
                     b.Property<string>("Question")
                         .HasColumnType("nvarchar(max)");
@@ -476,16 +476,16 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RBN_IVR_SurveyQuestions");
+                    b.ToTable("RBN_IVR_SurveyQuestions", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_RequestACallBack", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<long?>("CallCode")
                         .HasColumnType("bigint");
@@ -504,7 +504,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_RequestACallBack");
+                    b.ToTable("RBN_RequestACallBack", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_SGK_HealthReports", b =>
@@ -616,7 +616,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_SGK_HealthReports");
+                    b.ToTable("RBN_SGK_HealthReports", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_SGK_VisitingIntroductionInformation", b =>
@@ -647,7 +647,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RBN_SGK_VisitingIntroductionInformation");
+                    b.ToTable("RBN_SGK_VisitingIntroductionInformation", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_SMS_TEMPLATES", b =>
@@ -678,7 +678,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_SMS_TEMPLATES");
+                    b.ToTable("RBN_SMS_TEMPLATES", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_UnansweredCalls", b =>
@@ -733,7 +733,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RBN_UnansweredCalls");
+                    b.ToTable("RBN_UnansweredCalls", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_VOICE_SOUNDS", b =>
@@ -767,7 +767,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_VOICE_SOUNDS");
+                    b.ToTable("RBN_VOICE_SOUNDS", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_WAITING_TIMES", b =>
@@ -798,7 +798,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_WAITING_TIMES");
+                    b.ToTable("RBN_WAITING_TIMES", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RBN_WhatsAppMessageTemplate", b =>
@@ -829,7 +829,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RBN_WhatsAppMessageTemplate");
+                    b.ToTable("RBN_WhatsAppMessageTemplate", (string)null);
                 });
 
             modelBuilder.Entity("Robi_N_WebAPI.Utility.Tables.RNB_IVR_WORKING_HOURS", b =>
@@ -857,7 +857,7 @@ namespace Robi_N_WebAPI.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("RNB_IVR_WORKING_HOURS");
+                    b.ToTable("RNB_IVR_WORKING_HOURS", (string)null);
                 });
 #pragma warning restore 612, 618
         }
