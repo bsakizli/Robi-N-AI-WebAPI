@@ -672,7 +672,7 @@ GlobalConfiguration.Configuration
 
 
 
-//RecurringJobs.AutomaticTicketClosedOperation();
+RecurringJobs.AutomaticTicketClosedOperation();
 
 
 

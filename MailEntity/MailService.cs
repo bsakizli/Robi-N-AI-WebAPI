@@ -91,10 +91,19 @@ namespace MailEntity
               <tbody style='color:#505050;width:100%'>
                 <tr style='color:#505050'>
                   <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center;color:red;'> <b>{CallId}</b> </td>
+<<<<<<< HEAD
+                  
+                   <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center;color:red;'> <b><a href='http://10.254.51.143:8080/webdialer/Webdialer?destination=90{CallNumber}'>0{CallNumber}</a></b> </td>
+                   
+                    <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center;color:red;'> <b>{DateTime.Now.ToString("dd.MM.yyyy HH:mm")}</b> </td>
+                 
+=======
                   <a href=""
 http://10.254.51.143:8080/webdialer/Webdialer?destination=90{{CallNumber}}"">90{{CallNumber}}</a>
                   <td style='border:1px solid #505050;padding:0.4rem 0.6rem 0.4rem 0.6rem;text-align:center'>  {DateTime.Now.ToString("dd.MM.yyyy HH:mm")} </td>
+>>>>>>> 1f0e82efe52b8c93a5f0e5347c948217c1186c20
                 </tr>
+               
               </tbody>
             </table>
             <table style='display: none;'>
