@@ -199,8 +199,6 @@ namespace Robi_N_WebAPI.Controllers
                 return BadRequest(response);
 
             }
-
-
         }
 
 
